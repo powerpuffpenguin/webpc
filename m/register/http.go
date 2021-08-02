@@ -2,6 +2,7 @@ package register
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -37,16 +38,17 @@ func HTTP(cc *grpc.ClientConn, engine *gin.Engine, gateway *runtime.ServeMux, sw
 				}
 			}
 		}
-		gateway.ServeHTTP(c.Writer, c.Request)
-	})
-	engine.Group(`/api/slave/:id/*filepath`, func(c *gin.Context) {
-		var req struct {
-			ID       int64
-			Filepath string
-		}
-		e := w.BindURI(c, &req)
-		if e != nil {
-			return
+		if strings.HasPrefix(c.Request.URL.Path, `/api/forward/`) {
+			var query struct {
+				ID int64 `form:"slave_id"`
+			}
+			e := c.BindQuery(&query)
+			if e != nil {
+				return
+			}
+			DefaultForward().Forward(query.ID, c)
+		} else {
+			gateway.ServeHTTP(c.Writer, c.Request)
 		}
 	})
 	if swagger {

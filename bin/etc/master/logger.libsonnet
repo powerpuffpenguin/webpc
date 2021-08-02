@@ -2,7 +2,7 @@ local def = import "def.libsonnet";
 local level = def.Level;
 {
     // log file name
-    Filename: 'var/logs/webpc.log',
+    Filename: 'var/logs/master/webpc.log',
     // Maximum size of a single log file
     // MB
     MaxSize: 100,

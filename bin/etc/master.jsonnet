@@ -1,6 +1,7 @@
 {
-    HTTP: import 'cnf/http.libsonnet',
-    DB: import 'cnf/db.libsonnet',
-    Session: import 'cnf/session.libsonnet',
-    Logger: import 'cnf/logger.libsonnet',
+    HTTP: import 'master/http.libsonnet',
+    System: import 'master/system.libsonnet',
+    DB: import 'master/db.libsonnet',
+    Session: import 'master/session.libsonnet',
+    Logger: import 'master/logger.libsonnet',
 }

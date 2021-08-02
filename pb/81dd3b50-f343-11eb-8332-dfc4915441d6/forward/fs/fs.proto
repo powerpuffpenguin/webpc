@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package jsgenerate_webpc.session.forward.fs;
+option go_package = "github.com/powerpuffpenguin/webpc/protocol/session/forward/fs";
+
+import "google/api/annotations.proto";
+
+service FS {
+    // Get Mount list
+    rpc Mount (MountRequest) returns (MountResponse){
+        option (google.api.http) = {
+            get: "/api/forward/v1/fs/mount"
+        };
+    }
+}
+message MountRequest{
+}
+message MountResponse{
+    repeated string name = 1;
+}

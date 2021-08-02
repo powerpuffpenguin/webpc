@@ -1,5 +1,7 @@
 module github.com/powerpuffpenguin/webpc
 
+go 1.16
+
 require (
 	github.com/andybalholm/brotli v1.0.2
 	github.com/denisenkom/go-mssqldb v0.10.0

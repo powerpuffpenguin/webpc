@@ -15,4 +15,6 @@ Protos=(
     session/session.proto
     user/user.proto
     logger/logger.proto
+
+    forward/fs/fs.proto
 )

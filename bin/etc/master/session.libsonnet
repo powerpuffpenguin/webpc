@@ -1,7 +1,7 @@
 local def = import "def.libsonnet";
 {
     Backend: def.Session.Memory,
-    Coder: def.Coder.JSON,
+    Coder: def.Coder.GOB,
     Client: {
         Protocol: def.Protocol.H2C,
         Addr: 'sessionid_server:80',

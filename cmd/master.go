@@ -51,7 +51,7 @@ func init() {
 			manipulator.Init(&cnf.DB)
 			sessions.Init(&cnf.Session)
 
-			master.Run(&cnf.HTTP, debug)
+			master.Run(&cnf.HTTP, &cnf.System, debug)
 		},
 	}
 	flags := cmd.Flags()

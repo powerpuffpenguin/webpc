@@ -10,7 +10,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func Run(cnf *configure.HTTP, debug bool) {
+func Run(cnf *configure.HTTP, system *configure.System, debug bool) {
 	if debug {
 		gin.SetMode(gin.DebugMode)
 	} else {
@@ -30,7 +30,7 @@ func Run(cnf *configure.HTTP, debug bool) {
 		zap.Bool(`h2`, h2),
 	)
 	// serve
-	s := newServer(l, cnf.Swagger, debug, &cnf.Option)
+	s := newServer(system, l, cnf.Swagger, debug, &cnf.Option)
 	if h2 {
 		e = s.ServeTLS(cnf.CertFile, cnf.KeyFile)
 	} else {
