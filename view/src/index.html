@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>View</title>
+  <base href="/view/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+
+  <link rel="stylesheet" href="/static/theme/icon.css">
+  <link rel="stylesheet" href="/static/css/fontawesome.min.css">
+
+  <script src="/static/js/require.min.js"></script>
+  <script>
+    var __requireNet = require
+    requirejs.config({
+      baseUrl: '/static/js',
+      paths: {
+        'clipboard': 'clipboard.min',
+        'moment': 'moment.min',
+        'jquery': 'jquery.min',
+      },
+    })
+  </script>
+</head>
+
+<body>
+  <app-root></app-root>
+</body>
+
+</html>

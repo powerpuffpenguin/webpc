@@ -1,0 +1,38 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, build with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+/vendor/
+*.gz
+*.bz
+*.bz2
+*.xz
+*.7z
+*.zip
+*.db
+*.log
+*sha256
+
+/assets/
+/static/3rdpartylicenses.txt
+
+/.tmp/
+/webpc
+/webpcd
+/bin/webpc
+/bin/webpcd
+/bin/var/logs/
+
+# grpc code
+/protocol/
+/bin/protocol/
+/static/document/api/

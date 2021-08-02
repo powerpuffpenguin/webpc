@@ -1,0 +1,42 @@
+<ng-container *ngIf="session;then accessVIew;else signView"></ng-container>
+
+<ng-template #accessVIew>
+    <h1 mat-dialog-title i18n>Sign in</h1>
+    <div mat-dialog-content class="dialog-content">
+        <ng-container i18n>Welcome {{session?.who}}, you have signed in.</ng-container>
+    </div>
+</ng-template>
+<ng-template #signView>
+    <form (submit)="onSubmit()" #form="ngForm">
+        <h1 mat-dialog-title i18n>Sign in</h1>
+
+        <div mat-dialog-content class="dialog-content">
+            <mat-form-field appearance="outline" class="fullwidth">
+                <mat-label i18n>Name</mat-label>
+                <input matInput [disabled]="disabled" cdkFocusInitial required [(ngModel)]="name" name="name">
+                <mat-error i18n>Name Invalid</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="fullwidth">
+                <mat-label i18n>Password</mat-label>
+                <input matInput [type]="visibility ? 'text' : 'password'" [disabled]="disabled" required minlength="6"
+                    [(ngModel)]="password" name="password">
+                <button type="button" mat-icon-button matSuffix (click)="visibility = !visibility">
+                    <mat-icon>{{visibility ? 'visibility' : 'visibility_off'}}</mat-icon>
+                </button>
+                <mat-error i18n>Password Invalid</mat-error>
+            </mat-form-field>
+
+            <div class="fill">
+                <mat-checkbox [(ngModel)]="remember" name="remember" [disabled]="disabled">
+                    <ng-container i18n>Remember me</ng-container>
+                </mat-checkbox>
+            </div>
+        </div>
+        <div mat-dialog-actions>
+            <button type="submit" mat-stroked-button i18n [disabled]="disabled || form.invalid">Submit</button>
+            <button type="button" mat-stroked-button (click)="onClose()" i18n>Close</button>
+            <mat-spinner diameter='36' *ngIf="disabled"></mat-spinner>
+        </div>
+    </form>
+</ng-template>

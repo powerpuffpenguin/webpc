@@ -1,0 +1,10 @@
+.view{
+    margin-top: 8px;
+    // background-color: red;
+    height: calc(100vh - 370px);
+    height: calc(var(--vh, 1vh) * 100 - 370px);
+    min-height: 100px;
+}
+.left{
+    margin-left: 12px;
+}

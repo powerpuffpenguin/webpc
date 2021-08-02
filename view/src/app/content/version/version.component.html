@@ -1,0 +1,12 @@
+<div class="viewcard">
+    <mat-card>
+        <mat-card-content>
+            <p>angular {{VERSION.full}}</p>
+            <div *ngIf="response">
+                <p>{{response.platform}}</p>
+                <p>{{response.version}}</p>
+                <p *ngIf="startAt">start at {{startAt.format('YYYY-MM-DD HH:mm:ss')}}, started {{started}}.</p>
+            </div>
+        </mat-card-content>
+    </mat-card>
+</div>

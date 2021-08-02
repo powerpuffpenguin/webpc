@@ -1,0 +1,34 @@
+<div class="viewcard">
+    <mat-card>
+        <mat-card-title>
+            <ng-container i18n>Welcome to use this system</ng-container>
+        </mat-card-title>
+        <mat-card-content>
+            <p i18n>
+                This is a system built by the jsgenerate_grpc-gateway framework.
+                jsgenerate_grpc-gateway is a open source gprc framework developed by 飛天小企鵝 . For more information about
+                jsgenerate_grpc-gateway, please see source
+                description.
+            </p>
+            <a mat-button href="https://github.com/powerpuffpenguin/jsgenerate_grpc-gateway" target="_blank">
+                <ng-container i18n>Source Code</ng-container>
+            </a>
+        </mat-card-content>
+    </mat-card>
+    <mat-card *ngIf="license">
+        <mat-card-title>
+            LICENSE
+        </mat-card-title>
+        <mat-card-content>
+            <pre>{{license}}</pre>
+        </mat-card-content>
+    </mat-card>
+    <mat-card *ngIf="licenses">
+        <mat-card-title>
+            3rdpartylicenses.txt
+        </mat-card-title>
+        <mat-card-content>
+            <pre>{{licenses}}</pre>
+        </mat-card-content>
+    </mat-card>
+</div>

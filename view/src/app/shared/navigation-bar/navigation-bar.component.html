@@ -1,0 +1,69 @@
+<mat-toolbar class="header" color="primary">
+    <a mat-icon-button i18n-matTooltip matTooltip="Home Tooltip" routerLink="/">
+        <mat-icon>home</mat-icon>
+    </a>
+
+    <a *ngIf="!production" mat-icon-button i18n-matTooltip matTooltip="Dev Tooltip" routerLink="/dev">
+        <mat-icon>code</mat-icon>
+    </a>
+    <a mat-icon-button i18n-matTooltip matTooltip="About Tooltip" routerLink="/content/about">
+        <mat-icon>info</mat-icon>
+    </a>
+
+    <span class="fill-flex"></span>
+    <a mat-icon-button matTooltip="Github" href="https://github.com/powerpuffpenguin/jsgenerate_grpc-gateway"
+        target="_blank">
+        <mat-icon class="iconfont" fontSet="fontawesome-fab" fontIcon="fa-github"></mat-icon>
+    </a>
+    <button mat-icon-button i18n-matTooltip matTooltip="Select a theme for page" [matMenuTriggerFor]="menuTheme">
+        <mat-icon>format_color_fill</mat-icon>
+    </button>
+    <ng-container *ngIf="session;then sessionView;else signinView"></ng-container>
+</mat-toolbar>
+
+<mat-menu #menuTheme="matMenu">
+    <button mat-menu-item *ngFor="let item of themes; trackBy: trackByThemeId" (click)="onClickTheme(item.id)">
+        <mat-icon [color]="themeColor(item.id)">{{themeIcon(item.id)}}</mat-icon>
+        <span>{{item.name}}</span>
+    </button>
+</mat-menu>
+
+<ng-template #sessionView>
+    <button mat-icon-button matTooltip="{{session?.who}}" [matMenuTriggerFor]="menuPerson">
+        <mat-icon>person_pin</mat-icon>
+    </button>
+    <mat-menu #menuPerson="matMenu">
+        <button mat-menu-item (click)="onClickPassword()">
+            <mat-icon>lock</mat-icon>
+            <ng-container i18n>Password</ng-container>
+        </button>
+        <mat-divider></mat-divider>
+        <ng-container *ngIf="session?.root;then rootView;"></ng-container>
+        <ng-template #rootView>
+            <a mat-menu-item routerLink="/user">
+                <mat-icon>supervised_user_circle</mat-icon>
+                <ng-container i18n>User Management</ng-container>
+            </a>
+            <mat-divider></mat-divider>
+            <a mat-menu-item routerLink="/logger">
+                <mat-icon>textsms</mat-icon>
+                <ng-container i18n>Logger Management</ng-container>
+            </a>
+            <mat-divider></mat-divider>
+            <a mat-menu-item routerLink="/content/version">
+                <mat-icon>bug_report</mat-icon>
+                <ng-container i18n>Version</ng-container>
+            </a>
+            <mat-divider></mat-divider>
+        </ng-template>
+        <button mat-menu-item (click)="onClickSignout()">
+            <mat-icon>exit_to_app</mat-icon>
+            <ng-container i18n>Sign out</ng-container>
+        </button>
+    </mat-menu>
+</ng-template>
+<ng-template #signinView>
+    <button mat-icon-button i18n-matTooltip matTooltip="Sign in" (click)="onClickSignin()">
+        <mat-icon class="iconfont" fontSet="fontawesome-fas" fontIcon="fa-sign-in-alt"></mat-icon>
+    </button>
+</ng-template>

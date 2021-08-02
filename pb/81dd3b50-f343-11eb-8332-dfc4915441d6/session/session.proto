@@ -1,0 +1,100 @@
+syntax = "proto3";
+
+package jsgenerate_webpc.session;
+option go_package = "github.com/powerpuffpenguin/webpc/protocol/session";
+
+import "google/api/annotations.proto";
+
+service Session {
+    // sign in and return token 
+    rpc Signin (SigninRequest) returns (SigninResponse){
+        option (google.api.http) = {
+            post: "/api/v1/sessions"
+            body: "*"
+        };
+    }
+    // sign out and destroy token
+    rpc Signout (SignoutRequest) returns (SignoutResponse){
+        option (google.api.http) = {
+            delete: "/api/v1/sessions/access"
+        };
+    }
+    // refresh token
+    rpc Refresh (RefreshRequest) returns (RefreshResponse){
+        option (google.api.http) = {
+            post: "/api/v1/sessions/refresh"
+            body: "*"
+        };
+    }
+    // change session's password
+    rpc Password (PasswordRequest) returns (PasswordResponse){
+        option (google.api.http) = {
+            post: "/api/v1/sessions/password"
+            body: "*"
+        };
+    }
+    // get user info
+    rpc User (UserRequest) returns (UserResponse){
+        option (google.api.http) = {
+            get: "/api/v1/sessions/access"
+        };
+    }
+}
+message SigninRequest{
+    string platform = 1;
+    string name = 2;
+    // md5string(platform + '.' + md5string(input_password) + '.' + unix)
+    string password = 3;
+    // the current time unix value error cannot exceed 5 minutes
+    int64 unix = 4;
+    // cookie mode only for debug
+    bool cookie = 5;
+}
+message SigninResponse{
+    // access token
+    string access = 1;
+    // refresh token
+    string refresh = 2;
+
+    int64 id = 3;
+    // [a-zA-Z][a-zA-Z0-9]{4,}
+    string name = 4;   
+    string nickname = 5;
+    repeated int32 authorization = 6;
+}
+message SignoutRequest{
+    // cookie mode only for debug
+    bool cookie = 1;
+}
+message SignoutResponse{
+}
+message RefreshRequest{
+    // old access token
+    string access = 1;
+    // old refresh token
+    string refresh = 2;
+}
+message RefreshResponse{
+    // new access token
+    string access = 1;
+    // new refresh token
+    string refresh = 2;
+}
+message PasswordRequest{
+    // old password
+    string old = 1;
+    // new password
+    string password = 2;
+}
+message PasswordResponse{
+    bool changed = 1;
+}
+message UserRequest{
+}
+message UserResponse{
+    int64 id = 1;
+    // [a-zA-Z][a-zA-Z0-9]{4,}
+    string name = 2;   
+    string nickname = 3;
+    repeated int32 authorization = 4;
+}

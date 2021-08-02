@@ -1,0 +1,32 @@
+<h1 mat-dialog-title i18n>Add User</h1>
+
+<form #form="ngForm">
+    <div mat-dialog-content class="dialog-content">
+        <mat-form-field appearance="outline" class="fullwidth">
+            <mat-label i18n>Name</mat-label>
+            <input matInput [disabled]="disabled" cdkFocusInitial required [(ngModel)]="name" name="name">
+            <mat-error i18n>Name Invalid</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="fullwidth">
+            <mat-label i18n>Nickname</mat-label>
+            <input matInput type="text" [disabled]="disabled"  [(ngModel)]="nickname" name="nickname">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="fullwidth">
+            <mat-label i18n>Password</mat-label>
+            <input matInput type="text" [disabled]="disabled" required minlength="6" [(ngModel)]="password" name="password">
+            <mat-error i18n>Password Invalid</mat-error>
+        </mat-form-field>
+
+        <div class="fill">
+            <mat-checkbox *ngFor="let authorization of authorizations;" [checked]="set.has(authorization)" (change)="onCheckedChange(authorization,$event)">{{authorizationName(this.authorization)}}</mat-checkbox>
+        </div>
+    </div>
+    <div mat-dialog-actions>
+        <button type="button" mat-stroked-button i18n [disabled]="disabled || form.invalid"
+            (click)="onSubmit()">Submit</button>
+        <button type="button" mat-stroked-button i18n [disabled]="disabled" (click)="onClose()">Close</button>
+        <mat-spinner diameter='36' *ngIf="disabled"></mat-spinner>
+    </div>
+</form>

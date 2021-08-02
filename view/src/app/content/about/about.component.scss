@@ -1,0 +1,7 @@
+pre{
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+.mat-card:not(:first-child){
+    margin-top: 8px;
+}

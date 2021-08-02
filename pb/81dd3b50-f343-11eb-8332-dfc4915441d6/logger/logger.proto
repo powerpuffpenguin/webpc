@@ -1,0 +1,66 @@
+syntax = "proto3";
+
+package jsgenerate_webpc.session;
+option go_package = "github.com/powerpuffpenguin/webpc/protocol/session";
+
+import "google/api/annotations.proto";
+import "google/api/httpbody.proto";
+
+service Logger {
+    // Level return loggers level
+    rpc Level (LevelRequest) returns (LevelResponse){
+        option (google.api.http) = {
+            get: "/api/v1/logger/level"
+        };
+    }
+    // SetLevel set logger level
+    rpc SetLevel (SetLevelRequest) returns (SetLevelResponse){
+        option (google.api.http) = {
+            post: "/api/v1/logger/level"
+            body: "*"
+        };
+    }
+    // Attach console logger stdout
+    // websocket /api/v1/logger/atach
+    rpc Atach (AttachRequest) returns (stream AttachResponse);
+    // List return log files name
+    rpc List (ListRequest) returns (ListResponse){
+        option (google.api.http) = {
+            get: "/api/v1/logger"
+        };
+    }
+    // Download log file
+    rpc Download (DownloadRequest) returns (stream google.api.HttpBody){
+        option (google.api.http) = {
+            get: "/api/v1/logger/download/{name}"
+        };
+    }
+}
+
+message LevelRequest{
+}
+message LevelResponse{
+    string file = 1;
+    string console = 2;
+}
+message SetLevelRequest{
+    // 'file' or 'console'
+    string tag = 1;
+    // debug info warn error dpanic panic fatal
+    string level = 2;
+}
+message SetLevelResponse{
+}
+message AttachRequest{
+}
+message AttachResponse{
+    bytes data = 1;
+}
+message ListRequest{
+}
+message ListResponse{
+    repeated string names =1;
+}
+message DownloadRequest{
+    string name =1;
+}

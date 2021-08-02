@@ -1,0 +1,19 @@
+<h1 mat-dialog-title i18n>properties of {{data.name}}</h1>
+
+<form #form="ngForm">
+    <div mat-dialog-content class="dialog-content">
+        <mat-form-field appearance="outline" class="fullwidth">
+            <mat-label i18n>Nickname</mat-label>
+            <input matInput type="text" cdkFocusInitial [disabled]="disabled"  [(ngModel)]="nickname" name="nickname">
+        </mat-form-field>
+        <div class="fill">
+            <mat-checkbox *ngFor="let authorization of authorizations;" [checked]="set.has(authorization)" (change)="onCheckedChange(authorization,$event)">{{name(this.authorization)}}</mat-checkbox>
+        </div>
+    </div>
+    <div mat-dialog-actions>
+        <button type="button" mat-stroked-button i18n [disabled]="disabled || form.invalid || isNotChanged"
+            (click)="onSubmit()">Submit</button>
+        <button type="button" mat-stroked-button i18n [disabled]="disabled" (click)="onClose()">Close</button>
+        <mat-spinner diameter='36' *ngIf="disabled"></mat-spinner>
+    </div>
+</form>
