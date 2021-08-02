@@ -2,16 +2,17 @@ package register
 
 import (
 	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/powerpuffpenguin/webpc/logger"
 	"github.com/powerpuffpenguin/webpc/m/helper"
 	"github.com/powerpuffpenguin/webpc/m/web"
 	"github.com/powerpuffpenguin/webpc/m/web/api"
 	"github.com/powerpuffpenguin/webpc/m/web/view"
-	"google.golang.org/grpc"
-	"github.com/gin-gonic/gin"
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/rakyll/statik/fs"
 	"go.uber.org/zap"
+	"google.golang.org/grpc"
 )
 
 func HTTP(cc *grpc.ClientConn, engine *gin.Engine, gateway *runtime.ServeMux, swagger bool) {
@@ -37,6 +38,16 @@ func HTTP(cc *grpc.ClientConn, engine *gin.Engine, gateway *runtime.ServeMux, sw
 			}
 		}
 		gateway.ServeHTTP(c.Writer, c.Request)
+	})
+	engine.Group(`/api/slave/:id/*filepath`, func(c *gin.Context) {
+		var req struct {
+			ID       int64
+			Filepath string
+		}
+		e := w.BindURI(c, &req)
+		if e != nil {
+			return
+		}
 	})
 	if swagger {
 		document, e := fs.NewWithNamespace(`document`)

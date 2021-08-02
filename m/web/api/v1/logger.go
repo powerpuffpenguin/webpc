@@ -3,14 +3,16 @@ package v1
 import (
 	"errors"
 	"net/http"
+
 	"github.com/powerpuffpenguin/webpc/db"
 	"github.com/powerpuffpenguin/webpc/logger"
 	"github.com/powerpuffpenguin/webpc/m/web"
-	
-	"google.golang.org/grpc"
+
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/powerpuffpenguin/sessionid"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 )
 
 type Logger struct {
@@ -44,7 +46,7 @@ func (h Logger) checkRoot(c *gin.Context) (code int, msg string) {
 func (h Logger) attach(c *gin.Context) {
 	ws, e := h.Upgrade(c.Writer, c.Request, nil)
 	if e != nil {
-		h.NegotiateError(c, http.StatusBadRequest, e)
+		h.Error(c, http.StatusBadRequest, codes.InvalidArgument, e.Error())
 		return
 	}
 	defer ws.Close()

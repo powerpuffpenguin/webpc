@@ -12,23 +12,24 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	"google.golang.org/grpc/codes"
 	"gopkg.in/yaml.v2"
 )
 
 func (h Helper) ToHTTPError(c *gin.Context, name string, e error) {
 	if os.IsNotExist(e) {
-		h.NegotiateErrorString(c, http.StatusNotFound, `not exists : `+name)
+		h.Error(c, http.StatusNotFound, codes.NotFound, `not exists : `+name)
 		return
 	}
 	if os.IsExist(e) {
-		h.NegotiateErrorString(c, http.StatusForbidden, `already exists : `+name)
+		h.Error(c, http.StatusForbidden, codes.PermissionDenied, `already exists : `+name)
 		return
 	}
 	if os.IsPermission(e) {
-		h.NegotiateErrorString(c, http.StatusForbidden, `forbidden : `+name)
+		h.Error(c, http.StatusForbidden, codes.PermissionDenied, `forbidden : `+name)
 		return
 	}
-	h.NegotiateError(c, http.StatusInternalServerError, e)
+	h.Error(c, http.StatusInternalServerError, codes.Unknown, e.Error())
 }
 
 func (h Helper) NegotiateFilesystem(c *gin.Context, fs http.FileSystem, path string, index bool) {
@@ -58,7 +59,7 @@ func (h Helper) NegotiateFilesystem(c *gin.Context, fs http.FileSystem, path str
 	}
 	if stat.IsDir() {
 		f.Close()
-		h.NegotiateErrorString(c, http.StatusForbidden, `not a file`)
+		h.Error(c, http.StatusForbidden, codes.PermissionDenied, `not a file`)
 		return
 	}
 

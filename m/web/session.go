@@ -4,8 +4,10 @@ import (
 	"errors"
 	"net/http"
 	"strings"
+
 	"github.com/powerpuffpenguin/webpc/db"
 	"github.com/powerpuffpenguin/webpc/sessions"
+	"google.golang.org/grpc/codes"
 
 	"github.com/gin-gonic/gin"
 	"github.com/powerpuffpenguin/sessionid"
@@ -64,7 +66,7 @@ func (h Helper) ShouldBindSession(c *gin.Context) (session *sessionid.Session, e
 func (h Helper) BindSession(c *gin.Context) (session *sessionid.Session) {
 	session, e := h.ShouldBindSession(c)
 	if e != nil {
-		h.NegotiateError(c, http.StatusUnauthorized, e)
+		h.Error(c, http.StatusUnauthorized, codes.Unauthenticated, e.Error())
 		return
 	}
 	return
@@ -91,11 +93,11 @@ func (h Helper) BindUserdata(c *gin.Context) (userdata sessions.Userdata, e erro
 }
 func (h Helper) NegotiateTokenError(c *gin.Context, e error) {
 	if sessionid.IsTokenExpired(e) {
-		h.NegotiateError(c, http.StatusUnauthorized, e)
+		h.Error(c, http.StatusUnauthorized, codes.Unauthenticated, e.Error())
 	} else if errors.Is(e, sessionid.ErrTokenNotExists) {
-		h.NegotiateError(c, http.StatusForbidden, e)
+		h.Error(c, http.StatusForbidden, codes.PermissionDenied, e.Error())
 	} else {
-		h.NegotiateError(c, http.StatusInternalServerError, e)
+		h.Error(c, http.StatusInternalServerError, codes.Unknown, e.Error())
 	}
 }
 
@@ -108,6 +110,6 @@ func (h Helper) CheckRoot(c *gin.Context) {
 	if userdata.AuthAny(db.Root) {
 		return
 	}
-	h.NegotiateErrorString(c, http.StatusForbidden, `permission denied`)
+	h.Error(c, http.StatusForbidden, codes.PermissionDenied, `permission denied`)
 	c.Abort()
 }

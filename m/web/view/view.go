@@ -7,6 +7,7 @@ import (
 
 	"github.com/powerpuffpenguin/webpc/logger"
 	"github.com/powerpuffpenguin/webpc/m/web"
+	"google.golang.org/grpc/codes"
 
 	"github.com/gin-gonic/gin"
 	"github.com/rakyll/statik/fs"
@@ -138,6 +139,6 @@ func (h Helper) view(c *gin.Context) {
 		c.Header("Cache-Control", "max-age=2419200")
 		h.NegotiateFilesystem(c, f, obj.Path, true)
 	} else {
-		h.NegotiateErrorString(c, http.StatusNotFound, `not support locale`)
+		h.Error(c, http.StatusNotFound, codes.NotFound, `not support locale`)
 	}
 }

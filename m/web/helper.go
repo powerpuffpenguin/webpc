@@ -3,7 +3,9 @@ package web
 import (
 	"encoding/binary"
 	"net/http"
+
 	"github.com/powerpuffpenguin/webpc/m/web/contrib/compression"
+	"google.golang.org/grpc/codes"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -17,8 +19,6 @@ var upgrader = websocket.Upgrader{
 
 var Offered = []string{
 	binding.MIMEJSON,
-	binding.MIMEXML,
-	binding.MIMEYAML,
 }
 var _compression = compression.Compression(
 	compression.BrDefaultCompression,
@@ -28,32 +28,23 @@ var _compression = compression.Compression(
 type Helper int
 
 func (h Helper) NegotiateData(c *gin.Context, code int, data interface{}) {
-	switch c.NegotiateFormat(Offered...) {
-	case binding.MIMEXML:
-		c.XML(code, data)
-	case binding.MIMEYAML:
-		c.YAML(code, data)
-	default:
-		// default use json
-		c.JSON(code, data)
-	}
+	c.JSON(code, data)
 }
 
 func (h Helper) BindURI(c *gin.Context, obj interface{}) (e error) {
 	e = c.ShouldBindUri(obj)
 	if e != nil {
-		h.NegotiateError(c, http.StatusBadRequest, e)
+		h.Error(c, http.StatusBadRequest, codes.InvalidArgument, e.Error())
 		return
 	}
 	return
 }
 
-func (h Helper) NegotiateError(c *gin.Context, code int, e error) {
-	c.String(code, e.Error())
-}
-
-func (h Helper) NegotiateErrorString(c *gin.Context, code int, e string) {
-	c.String(code, e)
+func (h Helper) Error(c *gin.Context, code int, gcode codes.Code, msg string) {
+	c.JSON(code, gin.H{
+		`code`:    gcode,
+		`message`: msg,
+	})
 }
 
 func (h Helper) Bind(c *gin.Context, obj interface{}) error {
@@ -64,7 +55,7 @@ func (h Helper) Bind(c *gin.Context, obj interface{}) error {
 func (h Helper) BindWith(c *gin.Context, obj interface{}, b binding.Binding) (e error) {
 	e = c.ShouldBindWith(obj, b)
 	if e != nil {
-		h.NegotiateError(c, http.StatusBadRequest, e)
+		h.Error(c, http.StatusBadRequest, codes.InvalidArgument, e.Error())
 		return
 	}
 	return
