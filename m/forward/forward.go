@@ -1,4 +1,4 @@
-package register
+package forward
 
 import (
 	"net/http"
@@ -14,7 +14,7 @@ import (
 
 var defaultForward = newForward()
 
-func DefaultForward() *Forward {
+func Default() *Forward {
 	return defaultForward
 }
 

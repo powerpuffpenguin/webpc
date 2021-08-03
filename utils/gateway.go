@@ -1,4 +1,4 @@
-package master
+package utils
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-func newGateway() *runtime.ServeMux {
+func NewGateway() *runtime.ServeMux {
 	return runtime.NewServeMux(
 		runtime.WithMarshalerOption(runtime.MIMEWildcard, &HTTPBodyMarshaler{
 			Marshaler: &runtime.JSONPb{

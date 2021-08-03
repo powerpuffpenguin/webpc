@@ -9,6 +9,7 @@ import (
 	"github.com/powerpuffpenguin/webpc/configure"
 	"github.com/powerpuffpenguin/webpc/logger"
 	"github.com/powerpuffpenguin/webpc/m/register"
+	"github.com/powerpuffpenguin/webpc/utils"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -41,7 +42,7 @@ func newServer(system *configure.System, l net.Listener, swagger, debug bool, cn
 		)
 	}
 
-	gateway := newGateway()
+	gateway := utils.NewGateway()
 	mux := gin.Default()
 
 	register.HTTP(clientConn, mux, gateway, swagger)

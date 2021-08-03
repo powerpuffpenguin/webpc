@@ -16,7 +16,18 @@ type Listener struct {
 }
 
 func newListener() *Listener {
-	return &Listener{}
+	return &Listener{
+		ch:    make(chan *Conn),
+		close: make(chan struct{}),
+	}
+}
+func (l *Listener) Put(c *Conn) (e error) {
+	select {
+	case l.ch <- c:
+		return nil
+	case <-l.close:
+		return vnet.ErrListenerClosed
+	}
 }
 
 // Accept waits for and returns the next connection to the listener.

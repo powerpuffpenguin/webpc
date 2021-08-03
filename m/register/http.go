@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/powerpuffpenguin/webpc/logger"
+	"github.com/powerpuffpenguin/webpc/m/forward"
 	"github.com/powerpuffpenguin/webpc/m/helper"
 	"github.com/powerpuffpenguin/webpc/m/web"
 	"github.com/powerpuffpenguin/webpc/m/web/api"
@@ -46,7 +47,7 @@ func HTTP(cc *grpc.ClientConn, engine *gin.Engine, gateway *runtime.ServeMux, sw
 			if e != nil {
 				return
 			}
-			DefaultForward().Forward(query.ID, c)
+			forward.Default().Forward(query.ID, c)
 		} else {
 			gateway.ServeHTTP(c.Writer, c.Request)
 		}
