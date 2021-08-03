@@ -43,7 +43,7 @@ func localeResolution(accept string) string {
 		} else if locale == `en` {
 			return `en-US`
 		} else if strings.HasPrefix(locale, `zh-`) {
-			if strings.Index(locale, `cn`) != -1 || strings.Index(locale, `hans`) != -1 {
+			if strings.Contains(locale, `cn`) || strings.Contains(locale, `hans`) {
 				return `zh-Hans`
 			}
 			return `zh-Hant`
@@ -74,41 +74,24 @@ func (h Helper) Register(router *gin.RouterGroup) {
 	}
 
 	router.GET(``, h.redirect)
+	router.HEAD(``, h.redirect)
 	router.GET(`index`, h.redirect)
+	router.HEAD(`index`, h.redirect)
 	router.GET(`index.html`, h.redirect)
+	router.HEAD(`index.html`, h.redirect)
 	router.GET(`view`, h.redirect)
+	router.HEAD(`view`, h.redirect)
 	router.GET(`view/`, h.redirect)
+	router.HEAD(`view/`, h.redirect)
 
 	r := router.Group(BaseURL)
 	r.Use(h.Compression())
 	r.GET(`:locale`, h.viewOrRedirect)
+	r.HEAD(`:locale`, h.viewOrRedirect)
 	r.GET(`:locale/*path`, h.view)
+	r.HEAD(`:locale/*path`, h.view)
 }
 
-func (h Helper) redirectAngular(c *gin.Context) {
-	var obj struct {
-		Path string `uri:"path"`
-	}
-	e := h.BindURI(c, &obj)
-	if e != nil {
-		return
-	}
-	request := c.Request
-	str := strings.ToLower(strings.TrimSpace(request.Header.Get(`Accept-Language`)))
-	strs := strings.Split(str, `;`)
-	str = strings.TrimSpace(strs[0])
-	strs = strings.Split(str, `,`)
-	str = strings.TrimSpace(strs[0])
-	if strings.HasPrefix(str, `zh-`) {
-		if strings.Index(str, `cn`) != -1 || strings.Index(str, `hans`) != -1 {
-			c.Redirect(http.StatusFound, `/view/zh-Hans/`+obj.Path)
-			return
-		}
-		c.Redirect(http.StatusFound, `/view/zh-Hant/`+obj.Path)
-		return
-	}
-	c.Redirect(http.StatusFound, `/view/en-US/`+obj.Path)
-}
 func (h Helper) redirect(c *gin.Context) {
 	c.Redirect(http.StatusFound, `/view/`+localeResolution(c.Request.Header.Get(`Accept-Language`))+`/`)
 }

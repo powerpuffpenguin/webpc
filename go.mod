@@ -15,7 +15,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.7
 	github.com/powerpuffpenguin/sessionid v0.0.0-20210526073144-ca6285fc8dec
 	github.com/powerpuffpenguin/sessionid_server v1.0.0
-	github.com/powerpuffpenguin/vnet v0.0.0-20210802025916-207c679e83b8 // indirect
+	github.com/powerpuffpenguin/vnet v0.0.0-20210802025916-207c679e83b8
 	github.com/rakyll/statik v0.1.7
 	github.com/spf13/cobra v1.0.1-0.20201006035406-b97b5ead31f7
 	github.com/stretchr/testify v1.7.0
