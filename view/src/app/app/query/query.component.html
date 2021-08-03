@@ -1,6 +1,6 @@
 <div class="view">
     <mat-form-field class="query">
-        <mat-label i18n>Name</mat-label>
+        <mat-label i18n>Device Name</mat-label>
         <input matInput [disabled]="disabled" cdkFocusInitial [(ngModel)]="request.name" name="name">
     </mat-form-field>
     <mat-checkbox class="query" [disabled]="disabled" [(ngModel)]="request.nameFuzzy" name="nameFuzzy">
@@ -24,24 +24,24 @@
             <th mat-header-cell *matHeaderCellDef i18n>Name</th>
             <td mat-cell *matCellDef="let element"> {{element.name}} </td>
         </ng-container>
-        <ng-container matColumnDef="nickname">
-            <th mat-header-cell *matHeaderCellDef i18n>Nickname</th>
-            <td mat-cell *matCellDef="let element"> {{element.nickname}} </td>
+        <ng-container matColumnDef="description">
+            <th mat-header-cell *matHeaderCellDef i18n>Description</th>
+            <td mat-cell *matCellDef="let element"> {{element.description}} </td>
         </ng-container>
-        <ng-container matColumnDef="authorization">
-            <th mat-header-cell *matHeaderCellDef i18n>Authorization</th>
-            <td mat-cell *matCellDef="let element"> {{getAuthorization(element.authorization)}} </td>
+        <ng-container matColumnDef="code">
+            <th mat-header-cell *matHeaderCellDef i18n>Code</th>
+            <td mat-cell *matCellDef="let element"> {{element.code}} </td>
         </ng-container>
         <ng-container matColumnDef="buttons">
             <th mat-header-cell *matHeaderCellDef [width]="200">
-                <button mat-icon-button i18n-matTooltip matTooltip="Add User" [disabled]="disabled"
+                <button mat-icon-button i18n-matTooltip matTooltip="Add Device" [disabled]="disabled"
                     (click)="onClickAdd()">
                     <mat-icon>add</mat-icon>
                 </button>
             </th>
             <td mat-cell *matCellDef="let element">
-                <button mat-icon-button [disabled]="disabled" i18n-matTooltip matTooltip="Password"
-                    (click)="onClickPassword(element)">
+                <button mat-icon-button [disabled]="disabled" i18n-matTooltip matTooltip="Change Code"
+                    (click)="onClickCode(element)">
                     <mat-icon>lock</mat-icon>
                 </button>
                 <button mat-icon-button [disabled]="disabled" i18n-matTooltip matTooltip="Edit"

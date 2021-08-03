@@ -89,8 +89,8 @@ export class Request {
 export interface Data {
     id: string
     name: string
-    nickname: string
-    authorization: Array<number>
+    description: string
+    code: string
 }
 export interface Response {
     result: 'DATA' | 'COUNT' | 'DATA_COUNT'

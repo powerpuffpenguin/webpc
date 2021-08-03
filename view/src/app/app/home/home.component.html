@@ -1,1 +1,10 @@
-<p class="viewcard">home works!</p>
+<ng-container *ngIf="session;then sessionView;else notSessionView"></ng-container>
+
+<ng-template #sessionView>
+    <app-query></app-query>
+</ng-template>
+<ng-template #notSessionView>
+    <div class="view">
+        <p style="text-align: center;" i18n>Welcome, you are using the webpc, please sign in first.</p>
+    </div>
+</ng-template>

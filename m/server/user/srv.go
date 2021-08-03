@@ -25,7 +25,7 @@ var emptyFindResponse grpc_user.FindResponse
 
 func (s server) Find(ctx context.Context, req *grpc_user.FindRequest) (resp *grpc_user.FindResponse, e error) {
 	TAG := `user Find`
-	s.SetHTTPCacheMaxAge(ctx, 60)
+	s.SetHTTPCacheMaxAge(ctx, 5)
 	e = s.ServeMessage(ctx, db.LastModified(), func(nobody bool) error {
 		if nobody {
 			resp = &emptyFindResponse

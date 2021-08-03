@@ -1,18 +1,17 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToasterService } from 'angular2-toaster';
 import { finalize, takeUntil } from 'rxjs/operators';
-import { AuthorizationName, ServerAPI } from 'src/app/core/core/api';
+import { ServerAPI } from 'src/app/core/core/api';
 import { Closed } from 'src/app/core/utils/closed';
-import { AddComponent } from '../dialog/add/add.component';
-import { DeleteComponent } from '../dialog/delete/delete.component';
-import { EditComponent } from '../dialog/edit/edit.component';
-import { PasswordComponent } from '../dialog/password/password.component';
+import { AddComponent } from 'src/app/app/dialog/add/add.component';
 import { Request, Response, Data, DefaultLimit } from './query'
-
+import { CodeComponent } from '../dialog/code/code.component';
+import { SessionService } from 'src/app/core/session/session.service';
+import { EditComponent } from 'src/app/app/dialog/edit/edit.component';
 @Component({
   selector: 'app-query',
   templateUrl: './query.component.html',
@@ -24,8 +23,9 @@ export class QueryComponent implements OnInit, OnDestroy {
   request = new Request()
   lastRequest: Request | undefined
   source = new Array<Data>()
-  readonly displayedColumns: string[] = ['id', 'name', 'nickname', 'authorization', 'buttons']
+  readonly displayedColumns: string[] = ['id', 'name', 'description', 'code', 'buttons']
   constructor(
+    private readonly sessionService: SessionService,
     private readonly httpClient: HttpClient,
     private readonly activatedRoute: ActivatedRoute,
     private readonly router: Router,
@@ -64,8 +64,12 @@ export class QueryComponent implements OnInit, OnDestroy {
       return
     }
     this.disabled = true
-    ServerAPI.v1.users.get<Response>(this.httpClient, {
-      params: request.toArgs()
+    const params: any = request.toArgs()
+    if (this.sessionService?.session?.root) {
+      params['_r'] = 1
+    }
+    ServerAPI.v1.slaves.get<Response>(this.httpClient, {
+      params: params
     }).pipe(
       takeUntil(this.closed_.observable),
       finalize(() => {
@@ -109,7 +113,7 @@ export class QueryComponent implements OnInit, OnDestroy {
     const reuqest = new Request()
     this.request.cloneTo(reuqest)
     reuqest.offset = 0
-    this.router.navigate(['/user'], {
+    this.router.navigate(['/'], {
       queryParams: reuqest.toQuery(),
     })
   }
@@ -122,7 +126,7 @@ export class QueryComponent implements OnInit, OnDestroy {
     reuqest.offset = evt.pageIndex * evt.pageSize
     reuqest.limit = evt.pageSize
     this.lastRequest = reuqest
-    this.router.navigate(['/user'], {
+    this.router.navigate(['/'], {
       queryParams: reuqest.toQuery(),
     })
   }
@@ -147,13 +151,8 @@ export class QueryComponent implements OnInit, OnDestroy {
     }
     return DefaultLimit
   }
-  getAuthorization(authorization: Array<number>): Array<string> {
-    return authorization?.map((v) => {
-      return AuthorizationName(v)
-    })
-  }
-  onClickPassword(data: Data) {
-    this.matDialog.open(PasswordComponent, {
+  onClickCode(data: Data) {
+    this.matDialog.open(CodeComponent, {
       data: data,
       disableClose: true,
     })
@@ -165,29 +164,29 @@ export class QueryComponent implements OnInit, OnDestroy {
     })
   }
   onClickDelete(data: Data) {
-    this.matDialog.open(DeleteComponent, {
-      data: data,
-      disableClose: true,
-    }).afterClosed().toPromise<boolean>().then((deleted) => {
+    // this.matDialog.open(DeleteComponent, {
+    //   data: data,
+    //   disableClose: true,
+    // }).afterClosed().toPromise<boolean>().then((deleted) => {
 
-      if (this.closed_.isClosed || !deleted || typeof deleted !== "boolean") {
-        return
-      }
-      const index = this.source.indexOf(data)
+    //   if (this.closed_.isClosed || !deleted || typeof deleted !== "boolean") {
+    //     return
+    //   }
+    //   const index = this.source.indexOf(data)
 
-      if (index > -1) {
-        const source = new Array<Data>()
-        this.source.splice(index, 1)
-        source.push(...this.source)
-        this.source = source
-        if (this.request.count > 0) {
-          this.request.count--
-        }
-        if (this.request_.count > 0) {
-          this.request_.count--
-        }
-      }
-    })
+    //   if (index > -1) {
+    //     const source = new Array<Data>()
+    //     this.source.splice(index, 1)
+    //     source.push(...this.source)
+    //     this.source = source
+    //     if (this.request.count > 0) {
+    //       this.request.count--
+    //     }
+    //     if (this.request_.count > 0) {
+    //       this.request_.count--
+    //     }
+    //   }
+    // })
   }
   onClickAdd() {
     this.matDialog.open(AddComponent, {

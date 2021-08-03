@@ -1,0 +1,22 @@
+<h1 mat-dialog-title i18n>properties of {{data.name}}</h1>
+
+<form #form="ngForm">
+    <div mat-dialog-content class="dialog-content">
+        <mat-form-field appearance="outline" class="fullwidth">
+            <mat-label i18n>Device Name</mat-label>
+            <input matInput [disabled]="disabled" cdkFocusInitial required [(ngModel)]="name" name="name">
+            <mat-error i18n>Name Invalid</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="fullwidth">
+            <mat-label i18n>Description</mat-label>
+            <input matInput type="text" [disabled]="disabled" [(ngModel)]="description" name="description">
+        </mat-form-field>
+    </div>
+    <div mat-dialog-actions>
+        <button type="button" mat-stroked-button i18n [disabled]="disabled || form.invalid || isNotChanged"
+            (click)="onSubmit()">Submit</button>
+        <button type="button" mat-stroked-button i18n [disabled]="disabled" (click)="onClose()">Close</button>
+        <mat-spinner diameter='36' *ngIf="disabled"></mat-spinner>
+    </div>
+</form>

@@ -1,0 +1,15 @@
+<h1 mat-dialog-title i18n>code of {{data.name}}</h1>
+
+<form #form="ngForm">
+    <div mat-dialog-content class="dialog-content">
+        <ng-container>Changing the code will make the device using the code unable to register, please confirm the
+            operation!</ng-container>
+    </div>
+    <div mat-dialog-actions>
+        <button type="button" mat-stroked-button i18n [disabled]="disabled || form.invalid "
+            (click)="onSubmit()">Submit</button>
+        <button type="button" cdkFocusInitial mat-stroked-button i18n [disabled]="disabled"
+            (click)="onClose()">Close</button>
+        <mat-spinner diameter='36' *ngIf="disabled"></mat-spinner>
+    </div>
+</form>

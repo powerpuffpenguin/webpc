@@ -27,8 +27,7 @@ func (s server) Find(ctx context.Context, req *grpc_slave.FindRequest) (resp *gr
 	if e != nil {
 		return
 	}
-
-	s.SetHTTPCacheMaxAge(ctx, 60)
+	s.SetHTTPCacheMaxAge(ctx, 5)
 	e = s.ServeMessage(ctx, db.LastModified(), func(nobody bool) error {
 		if nobody {
 			resp = &emptyFindResponse
