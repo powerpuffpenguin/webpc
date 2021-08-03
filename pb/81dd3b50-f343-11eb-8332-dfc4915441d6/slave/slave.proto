@@ -1,0 +1,100 @@
+syntax = "proto3";
+
+package jsgenerate_webpc.slave;
+option go_package = "github.com/powerpuffpenguin/webpc/protocol/slave";
+
+import "google/api/annotations.proto";
+
+service Slave {
+    // return find slave
+    rpc Find (FindRequest) returns (FindResponse){
+        option (google.api.http) = {
+            get: "/api/v1/slaves"
+        };
+    }
+    // add slave
+    rpc Add (AddRequest) returns (AddResponse){
+        option (google.api.http) = {
+            post: "/api/v1/slaves"
+            body: "*"
+        };
+    }
+    // change the code to the new random
+    rpc Code (CodeRequest) returns (CodeResponse){
+        option (google.api.http) = {
+            post: "/api/v1/slaves/code/{id}"
+        };
+    }
+    // change slaves properties
+    rpc Change (ChangeRequest) returns (ChangeResponse){
+        option (google.api.http) = {
+            post: "/api/v1/slaves/change/{id}"
+            body: "*"
+        };
+    }
+    // remove user
+    rpc Remove (RemoveRequest) returns (RemoveResponse){
+        option (google.api.http) = {
+            delete: "/api/v1/slaves/id/{id}"
+        };
+    }
+}
+
+message Data {
+    int64 id = 1;
+    string name = 2;   
+    string description = 3;
+    // only root will return
+    string code = 4;
+}
+message FindRequest{
+    enum Result {
+        UNIVERSAL = 0;
+        DATA = 1;   // get user data
+        COUNT = 2; // only get user count
+        DATA_COUNT = 3; // get user data and count
+    };
+    Result result = 1;
+    // on return data set limit
+    int64 limit = 2;
+    // on return data set offset
+    int64 offset = 3;
+
+    string name = 4;
+    // if true Fuzzy matching
+    bool nameFuzzy = 5;
+}
+message FindResponse{
+    FindRequest.Result result = 1;
+    repeated Data data = 2;
+    int64 count = 3;
+}
+message AddRequest{
+    string name = 1;   
+    string description = 2;
+}
+message AddResponse{
+    int64 id = 1;
+    string code = 2;
+}
+message CodeRequest{
+    int64 id = 1;
+}
+message CodeResponse{
+    bool changed = 1;
+    string code = 2;
+}
+message ChangeRequest{
+    int64 id = 1; 
+    string name = 2;
+    string description = 3;
+}
+message ChangeResponse{
+    bool changed = 1;
+}
+message RemoveRequest{
+    repeated int64 id = 1; 
+}
+message RemoveResponse{
+    int64 rowsAffected = 1;
+}

@@ -2,9 +2,10 @@ package manipulator
 
 import (
 	"strconv"
+	"time"
+
 	"github.com/powerpuffpenguin/webpc/db/data"
 	"github.com/powerpuffpenguin/webpc/logger"
-	"time"
 
 	"errors"
 
@@ -12,7 +13,8 @@ import (
 )
 
 const (
-	ModtimeUser = 1
+	ModtimeUser  = 1
+	ModtimeSlave = 2
 )
 
 func SetLastModified(id int32, modtime time.Time) (int64, error) {

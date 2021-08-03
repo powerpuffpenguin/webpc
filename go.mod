@@ -8,6 +8,7 @@ require (
 	github.com/gin-gonic/gin v1.7.1
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/google/go-jsonnet v0.17.0
+	github.com/google/uuid v1.3.0
 	github.com/gorilla/websocket v1.4.2
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.4.0

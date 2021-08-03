@@ -5,14 +5,14 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+	"strconv"
+	"time"
+
 	"github.com/powerpuffpenguin/webpc/db"
 	"github.com/powerpuffpenguin/webpc/db/manipulator"
 	"github.com/powerpuffpenguin/webpc/logger"
 	signal_session "github.com/powerpuffpenguin/webpc/signal/session"
 	"github.com/powerpuffpenguin/webpc/utils"
-	"strconv"
-	"sync"
-	"time"
 
 	"go.uber.org/zap"
 )
@@ -23,8 +23,6 @@ func LastModified() (modtime time.Time) {
 	modtime, _ = modtimeHelper.LastModified()
 	return
 }
-
-var once sync.Once
 
 func Init() {
 	e := doInit()

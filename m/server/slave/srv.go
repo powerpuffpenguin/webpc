@@ -1,30 +1,33 @@
-package user
+package slave
 
 import (
 	"context"
 	"net/http"
+	"strings"
 
+	db0 "github.com/powerpuffpenguin/webpc/db"
 	"github.com/powerpuffpenguin/webpc/logger"
 	"github.com/powerpuffpenguin/webpc/m/helper"
-	"github.com/powerpuffpenguin/webpc/sessions"
-	"github.com/powerpuffpenguin/webpc/utils"
-
-	"github.com/powerpuffpenguin/webpc/m/server/user/internal/db"
-	grpc_user "github.com/powerpuffpenguin/webpc/protocol/user"
-
+	"github.com/powerpuffpenguin/webpc/m/server/slave/internal/db"
+	grpc_slave "github.com/powerpuffpenguin/webpc/protocol/slave"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 )
 
 type server struct {
-	grpc_user.UnimplementedUserServer
+	grpc_slave.UnimplementedSlaveServer
 	helper.Helper
 }
 
-var emptyFindResponse grpc_user.FindResponse
+var emptyFindResponse grpc_slave.FindResponse
 
-func (s server) Find(ctx context.Context, req *grpc_user.FindRequest) (resp *grpc_user.FindResponse, e error) {
-	TAG := `user Find`
+func (s server) Find(ctx context.Context, req *grpc_slave.FindRequest) (resp *grpc_slave.FindResponse, e error) {
+	TAG := `slave Find`
+	_, userdata, e := s.Userdata(ctx)
+	if e != nil {
+		return
+	}
+
 	s.SetHTTPCacheMaxAge(ctx, 60)
 	e = s.ServeMessage(ctx, db.LastModified(), func(nobody bool) error {
 		if nobody {
@@ -34,6 +37,12 @@ func (s server) Find(ctx context.Context, req *grpc_user.FindRequest) (resp *grp
 			if err != nil {
 				return err
 			}
+			if !userdata.AuthAny(db0.Root) {
+				for _, item := range tmp.Data {
+					item.Code = ``
+				}
+			}
+
 			resp = tmp
 		}
 		return nil
@@ -47,34 +56,36 @@ func (s server) Find(ctx context.Context, req *grpc_user.FindRequest) (resp *grp
 	}
 	return
 }
-func (s server) Add(ctx context.Context, req *grpc_user.AddRequest) (resp *grpc_user.AddResponse, e error) {
-	TAG := `user Add`
+func (s server) Add(ctx context.Context, req *grpc_slave.AddRequest) (resp *grpc_slave.AddResponse, e error) {
+	TAG := `slave Add`
 	_, userdata, e := s.Userdata(ctx)
 	if e != nil {
 		return
 	}
-	if !utils.MatchName(req.Name) {
+
+	req.Name = strings.TrimSpace(req.Name)
+	if req.Name == `` {
 		e = s.Error(codes.InvalidArgument, `invalid name`)
 		return
-	} else if !utils.MatchPassword(req.Password) {
-		e = s.Error(codes.InvalidArgument, `invalid password`)
-		return
 	}
-	id, e := db.Add(req.Name, req.Nickname, req.Password, req.Authorization)
+	req.Description = strings.TrimSpace(req.Description)
+
+	id, code, e := db.Add(req.Name, req.Description)
 	if e != nil {
 		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
 			ce.Write(
 				zap.Error(e),
 				zap.String(`who`, userdata.Who()),
 				zap.String(`name`, req.Name),
-				zap.String(`nickname`, req.Nickname),
-				zap.Int32s(`authorization`, req.Authorization),
+				zap.String(`description`, req.Description),
 			)
 		}
 		return
 	}
-	resp = &grpc_user.AddResponse{
-		Id: id,
+
+	resp = &grpc_slave.AddResponse{
+		Id:   id,
+		Code: code,
 	}
 	s.SetHTTPCode(ctx, http.StatusCreated)
 	if ce := logger.Logger.Check(zap.InfoLevel, TAG); ce != nil {
@@ -82,29 +93,21 @@ func (s server) Add(ctx context.Context, req *grpc_user.AddRequest) (resp *grpc_
 			zap.String(`who`, userdata.Who()),
 			zap.Int64(`id`, id),
 			zap.String(`name`, req.Name),
-			zap.String(`nickname`, req.Nickname),
-			zap.Int32s(`authorization`, req.Authorization),
+			zap.String(`description`, req.Description),
+			zap.String(`code`, code),
 		)
 	}
 	return
 }
 
-var (
-	changedPasswordResponse    = grpc_user.PasswordResponse{Changed: true}
-	notChangedPasswordResponse grpc_user.PasswordResponse
-)
-
-func (s server) Password(ctx context.Context, req *grpc_user.PasswordRequest) (resp *grpc_user.PasswordResponse, e error) {
-	TAG := `user Password`
+func (s server) Code(ctx context.Context, req *grpc_slave.CodeRequest) (resp *grpc_slave.CodeResponse, e error) {
+	TAG := `slave Code`
 	_, userdata, e := s.Userdata(ctx)
 	if e != nil {
 		return
 	}
-	if !utils.MatchPassword(req.Value) {
-		e = s.Error(codes.InvalidArgument, `invalid password`)
-		return
-	}
-	changed, e := db.Password(req.Id, req.Value)
+
+	changed, code, e := db.Code(req.Id)
 	if e != nil {
 		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
 			ce.Write(
@@ -114,52 +117,50 @@ func (s server) Password(ctx context.Context, req *grpc_user.PasswordRequest) (r
 			)
 		}
 		return
-	}
-	if changed {
-		resp = &changedPasswordResponse
+	} else if changed {
 		if ce := logger.Logger.Check(zap.InfoLevel, TAG); ce != nil {
 			ce.Write(
+				zap.Error(e),
 				zap.String(`who`, userdata.Who()),
 				zap.Int64(`id`, req.Id),
+				zap.String(`code`, code),
 			)
 		}
-
-		ed := sessions.DestroyID(req.Id)
-		if ed != nil {
-			if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
-				ce.Write(
-					zap.Error(ed),
-					zap.String(`who`, userdata.Who()),
-					zap.Int64(`id`, req.Id),
-				)
-			}
-		}
-	} else {
-		resp = &notChangedPasswordResponse
+	}
+	resp = &grpc_slave.CodeResponse{
+		Changed: changed,
+		Code:    code,
 	}
 	return
 }
 
 var (
-	changedChangeResponse    = grpc_user.ChangeResponse{Changed: true}
-	notChangedChangeResponse grpc_user.ChangeResponse
+	changedChangeResponse    = grpc_slave.ChangeResponse{Changed: true}
+	notChangedChangeResponse grpc_slave.ChangeResponse
 )
 
-func (s server) Change(ctx context.Context, req *grpc_user.ChangeRequest) (resp *grpc_user.ChangeResponse, e error) {
-	TAG := `user Change`
+func (s server) Change(ctx context.Context, req *grpc_slave.ChangeRequest) (resp *grpc_slave.ChangeResponse, e error) {
+	TAG := `slave Change`
 	_, userdata, e := s.Userdata(ctx)
 	if e != nil {
 		return
 	}
-	changed, e := db.Change(req.Id, req.Nickname, req.Authorization)
+
+	req.Name = strings.TrimSpace(req.Name)
+	if req.Name == `` {
+		e = s.Error(codes.InvalidArgument, `invalid name`)
+		return
+	}
+	req.Description = strings.TrimSpace(req.Description)
+	changed, e := db.Change(req.Id, req.Name, req.Description)
 	if e != nil {
 		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
 			ce.Write(
 				zap.Error(e),
 				zap.String(`who`, userdata.Who()),
 				zap.Int64(`id`, req.Id),
-				zap.String(`nickname`, req.Nickname),
-				zap.Int32s(`authorization`, req.Authorization),
+				zap.String(`name`, req.Name),
+				zap.String(`description`, req.Description),
 			)
 		}
 		return
@@ -170,8 +171,8 @@ func (s server) Change(ctx context.Context, req *grpc_user.ChangeRequest) (resp 
 			ce.Write(
 				zap.String(`who`, userdata.Who()),
 				zap.Int64(`id`, req.Id),
-				zap.String(`nickname`, req.Nickname),
-				zap.Int32s(`authorization`, req.Authorization),
+				zap.String(`name`, req.Name),
+				zap.String(`description`, req.Description),
 			)
 		}
 	} else {
@@ -179,7 +180,7 @@ func (s server) Change(ctx context.Context, req *grpc_user.ChangeRequest) (resp 
 	}
 	return
 }
-func (s server) Remove(ctx context.Context, req *grpc_user.RemoveRequest) (resp *grpc_user.RemoveResponse, e error) {
+func (s server) Remove(ctx context.Context, req *grpc_slave.RemoveRequest) (resp *grpc_slave.RemoveResponse, e error) {
 	TAG := `user Remove`
 	_, userdata, e := s.Userdata(ctx)
 	if e != nil {
@@ -196,7 +197,7 @@ func (s server) Remove(ctx context.Context, req *grpc_user.RemoveRequest) (resp 
 		}
 		return
 	}
-	resp = &grpc_user.RemoveResponse{
+	resp = &grpc_slave.RemoveResponse{
 		RowsAffected: rowsAffected,
 	}
 	if ce := logger.Logger.Check(zap.InfoLevel, TAG); ce != nil {
