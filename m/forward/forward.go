@@ -33,11 +33,11 @@ func newForward() *Forward {
 		keys: make(map[int64]element),
 	}
 }
-func (f *Forward) Del(id int64, cc *grpc.ClientConn) {
+func (f *Forward) Del(id int64) {
 	f.rw.Lock()
 	defer f.rw.Unlock()
-	old, exists := f.keys[id]
-	if exists && old.cc == cc {
+	_, exists := f.keys[id]
+	if exists {
 		delete(f.keys, id)
 	}
 }

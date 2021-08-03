@@ -48,7 +48,7 @@ func (l *Listener) Close() (e error) {
 		defer l.m.Unlock()
 		if l.done == 0 {
 			defer atomic.StoreUint32(&l.done, 1)
-			close(l.ch)
+			close(l.close)
 			return
 		}
 	}

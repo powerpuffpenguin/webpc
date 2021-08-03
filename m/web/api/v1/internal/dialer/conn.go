@@ -1,11 +1,14 @@
 package dialer
 
-import "net"
+import (
+	"net"
+)
 
 type Conn struct {
 	id int64
 	net.Conn
-	close chan struct{}
+	close    chan struct{}
+	callback func(id int64)
 }
 
 func NewConn(id int64, c net.Conn) *Conn {
@@ -19,6 +22,9 @@ func (c *Conn) Close() (e error) {
 	e = c.Conn.Close()
 	if e == nil {
 		close(c.close)
+		if c.callback != nil {
+			c.callback(c.id)
+		}
 	}
 	return
 }
