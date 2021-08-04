@@ -11,10 +11,10 @@
             "mode": "debug",
             "program": "${workspaceRoot}/main.go",
             "args": [
-                "daemon",
+                "master",
                 "-d",
                 "-c",
-                "${workspaceRoot}/bin/etc/webpc.jsonnet"
+                "${workspaceRoot}/bin/etc/master.jsonnet"
             ]
         }
     ]

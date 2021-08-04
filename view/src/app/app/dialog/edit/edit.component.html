@@ -3,7 +3,7 @@
 <form #form="ngForm">
     <div mat-dialog-content class="dialog-content">
         <mat-form-field appearance="outline" class="fullwidth">
-            <mat-label i18n>Device Name</mat-label>
+            <mat-label i18n>Name</mat-label>
             <input matInput [disabled]="disabled" cdkFocusInitial required [(ngModel)]="name" name="name">
             <mat-error i18n>Name Invalid</mat-error>
         </mat-form-field>

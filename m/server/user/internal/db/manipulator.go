@@ -164,7 +164,8 @@ func Remove(ctx context.Context, ids []int64) (int64, error) {
 	if e != nil {
 		return 0, e
 	}
-	if rowsAffected != 0 {
+	changed := rowsAffected != 0
+	if changed {
 		_, e = modtimeHelper.Modified(session, time.Now())
 		if e != nil {
 			return 0, e
@@ -175,6 +176,9 @@ func Remove(ctx context.Context, ids []int64) (int64, error) {
 	e = session.Commit()
 	if e != nil {
 		return 0, e
+	}
+	if changed {
+		manipulator.DeleteCache(tableName, args...)
 	}
 	return rowsAffected, nil
 }

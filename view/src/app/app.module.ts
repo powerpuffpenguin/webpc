@@ -27,6 +27,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AddComponent } from './app/dialog/add/add.component';
 import { CodeComponent } from './app/dialog/code/code.component';
 import { EditComponent } from './app/dialog/edit/edit.component';
+import { DeleteComponent } from './app/dialog/delete/delete.component';
 
 @NgModule({
   declarations: [
@@ -36,6 +37,7 @@ import { EditComponent } from './app/dialog/edit/edit.component';
     AddComponent,
     CodeComponent,
     EditComponent,
+    DeleteComponent,
   ],
   imports: [
     BrowserModule, BrowserAnimationsModule, FormsModule,

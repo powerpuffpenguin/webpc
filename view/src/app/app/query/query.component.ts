@@ -12,6 +12,7 @@ import { Request, Response, Data, DefaultLimit } from './query'
 import { CodeComponent } from '../dialog/code/code.component';
 import { SessionService } from 'src/app/core/session/session.service';
 import { EditComponent } from 'src/app/app/dialog/edit/edit.component';
+import { DeleteComponent } from '../dialog/delete/delete.component';
 @Component({
   selector: 'app-query',
   templateUrl: './query.component.html',
@@ -164,29 +165,29 @@ export class QueryComponent implements OnInit, OnDestroy {
     })
   }
   onClickDelete(data: Data) {
-    // this.matDialog.open(DeleteComponent, {
-    //   data: data,
-    //   disableClose: true,
-    // }).afterClosed().toPromise<boolean>().then((deleted) => {
+    this.matDialog.open(DeleteComponent, {
+      data: data,
+      disableClose: true,
+    }).afterClosed().toPromise<boolean>().then((deleted) => {
 
-    //   if (this.closed_.isClosed || !deleted || typeof deleted !== "boolean") {
-    //     return
-    //   }
-    //   const index = this.source.indexOf(data)
+      if (this.closed_.isClosed || !deleted || typeof deleted !== "boolean") {
+        return
+      }
+      const index = this.source.indexOf(data)
 
-    //   if (index > -1) {
-    //     const source = new Array<Data>()
-    //     this.source.splice(index, 1)
-    //     source.push(...this.source)
-    //     this.source = source
-    //     if (this.request.count > 0) {
-    //       this.request.count--
-    //     }
-    //     if (this.request_.count > 0) {
-    //       this.request_.count--
-    //     }
-    //   }
-    // })
+      if (index > -1) {
+        const source = new Array<Data>()
+        this.source.splice(index, 1)
+        source.push(...this.source)
+        this.source = source
+        if (this.request.count > 0) {
+          this.request.count--
+        }
+        if (this.request_.count > 0) {
+          this.request_.count--
+        }
+      }
+    })
   }
   onClickAdd() {
     this.matDialog.open(AddComponent, {

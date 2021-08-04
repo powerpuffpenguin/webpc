@@ -2,6 +2,7 @@ package manipulator
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/powerpuffpenguin/webpc/configure"
 	"github.com/powerpuffpenguin/webpc/db/data"
@@ -10,6 +11,7 @@ import (
 	"go.uber.org/zap"
 	"xorm.io/xorm"
 	"xorm.io/xorm/caches"
+	"xorm.io/xorm/schemas"
 )
 
 var _Engine *xorm.EngineGroup
@@ -77,8 +79,8 @@ func Init(cnf *configure.DB) {
 	}
 	// table
 	initTable(engine)
-	return
 }
+
 func initTable(engine *xorm.EngineGroup) {
 	session, e := Begin()
 	if e != nil {
@@ -184,9 +186,26 @@ func Begin(ctx ...context.Context) (*xorm.Session, error) {
 	}
 	return s, nil
 }
-func ClearCache(beans ...interface{}) error {
-	return _Engine.ClearCache(beans...)
-}
-func ClearCacheBean(bean interface{}, id string) error {
-	return _Engine.ClearCacheBean(bean, id)
+func DeleteCache(tableName string, pk ...interface{}) error {
+	if len(pk) == 0 {
+		return nil
+	}
+	cacher := _Engine.GetCacher(tableName)
+	if cacher == nil {
+		return nil
+	}
+	id, e := schemas.NewPK(pk...).ToString()
+	if e != nil {
+		if ce := logger.Logger.Check(zap.WarnLevel, `DeleteCache`); ce != nil {
+			ce.Write(
+				zap.Error(e),
+				zap.String(`table name`, tableName),
+				zap.String(`pk`, fmt.Sprint(pk...)),
+			)
+		}
+		return e
+	}
+	cacher.ClearIds(tableName)
+	cacher.DelBean(tableName, id)
+	return nil
 }
