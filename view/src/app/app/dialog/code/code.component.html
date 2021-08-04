@@ -2,8 +2,7 @@
 
 <form #form="ngForm">
     <div mat-dialog-content class="dialog-content">
-        <ng-container>Changing the code will make the device using the code unable to register, please confirm the
-            operation!</ng-container>
+        <ng-container i18n>Changing the code will make the device using the code unable to register, please confirm the operation!</ng-container>
     </div>
     <div mat-dialog-actions>
         <button type="button" mat-stroked-button i18n [disabled]="disabled || form.invalid "

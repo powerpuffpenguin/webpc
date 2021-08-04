@@ -41,7 +41,7 @@ export class DeleteComponent implements OnInit, OnDestroy {
         this.disabled = false
       })
     ).subscribe(() => {
-      this.toasterService.pop('success', undefined, this.i18nService.get('user deleted'))
+      this.toasterService.pop('success', undefined, this.i18nService.get('device deleted'))
       this.matDialogRef.close(true)
     }, (e) => {
       this.toasterService.pop('error', undefined, e)
