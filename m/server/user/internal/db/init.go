@@ -17,7 +17,7 @@ import (
 	"go.uber.org/zap"
 )
 
-var modtimeHelper = manipulator.NewModtimeHelper(manipulator.ModtimeUser, true, false)
+var modtimeHelper = manipulator.ModtimeHelper(manipulator.ModtimeUser)
 
 func LastModified() (modtime time.Time) {
 	modtime, _ = modtimeHelper.LastModified()
@@ -35,18 +35,18 @@ func Init() {
 	}
 	signal_session.ConnectSignin(soltSignin)
 	signal_session.ConnectPassword(soltPassword)
-	return
 }
 func doInit() (e error) {
-	e = modtimeHelper.Init(time.Now().Unix(), ``, `user`)
-	if e != nil {
-		return
-	}
 	session, e := manipulator.Begin()
 	if e != nil {
 		return
 	}
 	defer session.Close()
+	// modtime
+	e = modtimeHelper.Init(session, time.Now().Unix(), ``, `user`)
+	if e != nil {
+		return
+	}
 	// sync
 	bean := &DataOfUser{}
 	e = manipulator.SyncTable(session, bean)

@@ -8,7 +8,7 @@ import (
 	"go.uber.org/zap"
 )
 
-var modtimeHelper = manipulator.NewModtimeHelper(manipulator.ModtimeSlave, true, false)
+var modtimeHelper = manipulator.ModtimeHelper(manipulator.ModtimeSlave)
 
 func LastModified() (modtime time.Time) {
 	modtime, _ = modtimeHelper.LastModified()
@@ -25,15 +25,16 @@ func Init() {
 	}
 }
 func doInit() (e error) {
-	e = modtimeHelper.Init(time.Now().Unix(), ``, `slave`)
-	if e != nil {
-		return
-	}
 	session, e := manipulator.Begin()
 	if e != nil {
 		return
 	}
 	defer session.Close()
+	// modtime
+	e = modtimeHelper.Init(session, time.Now().Unix(), ``, `slave`)
+	if e != nil {
+		return
+	}
 	// sync
 	bean := &DataOfSlave{}
 	e = manipulator.SyncTable(session, bean)

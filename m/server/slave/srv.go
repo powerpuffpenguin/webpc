@@ -69,7 +69,7 @@ func (s server) Add(ctx context.Context, req *grpc_slave.AddRequest) (resp *grpc
 	}
 	req.Description = strings.TrimSpace(req.Description)
 
-	id, code, e := db.Add(req.Name, req.Description)
+	id, code, e := db.Add(ctx, req.Name, req.Description)
 	if e != nil {
 		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
 			ce.Write(
@@ -106,7 +106,7 @@ func (s server) Code(ctx context.Context, req *grpc_slave.CodeRequest) (resp *gr
 		return
 	}
 
-	changed, code, e := db.Code(req.Id)
+	changed, code, e := db.Code(ctx, req.Id)
 	if e != nil {
 		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
 			ce.Write(
@@ -151,7 +151,7 @@ func (s server) Change(ctx context.Context, req *grpc_slave.ChangeRequest) (resp
 		return
 	}
 	req.Description = strings.TrimSpace(req.Description)
-	changed, e := db.Change(req.Id, req.Name, req.Description)
+	changed, e := db.Change(ctx, req.Id, req.Name, req.Description)
 	if e != nil {
 		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
 			ce.Write(

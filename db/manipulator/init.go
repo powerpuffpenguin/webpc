@@ -1,6 +1,8 @@
 package manipulator
 
 import (
+	"context"
+
 	"github.com/powerpuffpenguin/webpc/configure"
 	"github.com/powerpuffpenguin/webpc/db/data"
 	"github.com/powerpuffpenguin/webpc/logger"
@@ -166,18 +168,21 @@ func Engine() *xorm.Engine {
 func Slave() *xorm.Engine {
 	return _Engine.Slave()
 }
-func Session() *xorm.Session {
-	return _Engine.NewSession()
+func Session(ctx ...context.Context) *xorm.Session {
+	s := _Engine.NewSession()
+	for _, c := range ctx {
+		s = s.Context(c)
+	}
+	return s
 }
-func Begin() (s *xorm.Session, e error) {
-	s = _Engine.NewSession()
-	e = s.Begin()
+func Begin(ctx ...context.Context) (*xorm.Session, error) {
+	s := Session(ctx...)
+	e := s.Begin()
 	if e != nil {
 		s.Close()
-		s = nil
-		return
+		return nil, e
 	}
-	return
+	return s, nil
 }
 func ClearCache(beans ...interface{}) error {
 	return _Engine.ClearCache(beans...)

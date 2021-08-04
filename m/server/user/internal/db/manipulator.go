@@ -3,9 +3,10 @@ package db
 import (
 	"context"
 	"strconv"
+	"time"
+
 	"github.com/powerpuffpenguin/webpc/db/manipulator"
 	grpc_user "github.com/powerpuffpenguin/webpc/protocol/user"
-	"time"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -17,7 +18,7 @@ func Find(ctx context.Context, request *grpc_user.FindRequest) (*grpc_user.FindR
 		return nil, status.Error(codes.InvalidArgument, `not support result enum : `+strconv.FormatInt(int64(request.Result), 10))
 	}
 
-	session := manipulator.Session().Context(ctx)
+	session := manipulator.Session(ctx)
 	defer session.Close()
 	var beans []DataOfUser
 	var response grpc_user.FindResponse
@@ -56,25 +57,45 @@ func Find(ctx context.Context, request *grpc_user.FindRequest) (*grpc_user.FindR
 	}
 	return &response, nil
 }
-func Add(name, nickname, password string, authorization []int32) (int64, error) {
+func Add(ctx context.Context, name, nickname, password string, authorization []int32) (id int64, e error) {
 	bean := &DataOfUser{
 		Name:          name,
 		Nickname:      nickname,
 		Password:      password,
 		Authorization: authorization,
 	}
-	_, e := manipulator.Engine().InsertOne(bean)
+
+	// begin
+	session, e := manipulator.Begin(ctx)
 	if e != nil {
-		return 0, e
+		return
 	}
-	modtimeHelper.Modified(time.Now())
-	return bean.ID, nil
+	defer session.Close()
+
+	// exec
+	_, e = session.InsertOne(bean)
+	if e != nil {
+		return
+	}
+	_, e = modtimeHelper.Modified(session, time.Now())
+	if e != nil {
+		return
+	}
+
+	// commit
+	e = session.Commit()
+	if e != nil {
+		return
+	}
+	id = bean.ID
+	return
 }
 
 // Password change password
-func Password(id int64, value string) (bool, error) {
+func Password(ctx context.Context, id int64, value string) (bool, error) {
 	rowsAffected, e := manipulator.Engine().
 		ID(id).
+		Context(ctx).
 		Cols(colPassword).
 		Update(&DataOfUser{
 			Password: value,
@@ -86,8 +107,16 @@ func Password(id int64, value string) (bool, error) {
 }
 
 // Change properties
-func Change(id int64, nickname string, authorization []int32) (bool, error) {
-	rowsAffected, e := manipulator.Engine().
+func Change(ctx context.Context, id int64, nickname string, authorization []int32) (bool, error) {
+	// begin
+	session, e := manipulator.Begin(ctx)
+	if e != nil {
+		return false, e
+	}
+	defer session.Close()
+
+	// exec
+	rowsAffected, e := session.
 		ID(id).
 		Cols(colNickname, colAuthorization).
 		Update(&DataOfUser{
@@ -99,7 +128,16 @@ func Change(id int64, nickname string, authorization []int32) (bool, error) {
 	}
 	changed := rowsAffected != 0
 	if changed {
-		modtimeHelper.Modified(time.Now())
+		_, e = modtimeHelper.Modified(session, time.Now())
+		if e != nil {
+			return false, e
+		}
+	}
+
+	// commit
+	e = session.Commit()
+	if e != nil {
+		return false, e
 	}
 	return changed, nil
 }
@@ -111,15 +149,32 @@ func Remove(ctx context.Context, ids []int64) (int64, error) {
 	for i, id := range ids {
 		args[i] = id
 	}
-	rowsAffected, e := manipulator.Engine().
-		Context(ctx).
+
+	// begin
+	session, e := manipulator.Begin(ctx)
+	if e != nil {
+		return 0, e
+	}
+	defer session.Close()
+
+	// exec
+	rowsAffected, e := session.
 		In(colID, args...).
 		Delete(&DataOfUser{})
 	if e != nil {
 		return 0, e
 	}
 	if rowsAffected != 0 {
-		modtimeHelper.Modified(time.Now())
+		_, e = modtimeHelper.Modified(session, time.Now())
+		if e != nil {
+			return 0, e
+		}
+	}
+
+	// commit
+	e = session.Commit()
+	if e != nil {
+		return 0, e
 	}
 	return rowsAffected, nil
 }

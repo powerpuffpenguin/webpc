@@ -28,7 +28,7 @@ func Find(ctx context.Context, request *grpc_slave.FindRequest) (*grpc_slave.Fin
 		return nil, status.Error(codes.InvalidArgument, `not support result enum : `+strconv.FormatInt(int64(request.Result), 10))
 	}
 
-	session := manipulator.Session().Context(ctx)
+	session := manipulator.Session(ctx)
 	defer session.Close()
 	var beans []DataOfSlave
 	var response grpc_slave.FindResponse
@@ -67,48 +67,92 @@ func Find(ctx context.Context, request *grpc_slave.FindRequest) (*grpc_slave.Fin
 	}
 	return &response, nil
 }
-func Add(name, description string) (id int64, code string, e error) {
-	code, e = newCode()
+func Add(ctx context.Context, name, description string) (int64, string, error) {
+	code, e := newCode()
 	if e != nil {
-		return
+		return 0, ``, e
 	}
-
 	bean := &DataOfSlave{
 		Name:        name,
 		Description: description,
 		Code:        code,
 	}
-	_, e = manipulator.Engine().InsertOne(bean)
+
+	// begin
+	session, e := manipulator.Begin(ctx)
 	if e != nil {
-		return
+		return 0, ``, e
 	}
-	id = bean.ID
-	modtimeHelper.Modified(time.Now())
-	return
+	defer session.Close()
+
+	// exec
+	_, e = session.InsertOne(bean)
+	if e != nil {
+		return 0, ``, e
+	}
+	_, e = modtimeHelper.Modified(session, time.Now())
+	if e != nil {
+		return 0, ``, e
+	}
+
+	// commit
+	e = session.Commit()
+	if e != nil {
+		return 0, ``, e
+	}
+	return bean.ID, code, nil
 }
 
-func Code(id int64) (changed bool, code string, e error) {
-	code, e = newCode()
+func Code(ctx context.Context, id int64) (bool, string, error) {
+	code, e := newCode()
 	if e != nil {
-		return
+		return false, ``, e
 	}
 
-	rowsAffected, e := manipulator.Engine().
+	// begin
+	session, e := manipulator.Begin(ctx)
+	if e != nil {
+		return false, ``, e
+	}
+	defer session.Close()
+
+	// exec
+	rowsAffected, e := session.
 		ID(id).
 		Cols(colCode).
 		Update(&DataOfSlave{
 			Code: code,
 		})
 	if e != nil {
-		return
+		return false, ``, e
 	}
-	changed = rowsAffected != 0
-	return
+	changed := rowsAffected != 0
+	if changed {
+		_, e = modtimeHelper.Modified(session, time.Now())
+		if e != nil {
+			return false, ``, e
+		}
+	}
+
+	// commit
+	e = session.Commit()
+	if e != nil {
+		return false, ``, e
+	}
+	return changed, code, nil
 }
 
 // Change properties
-func Change(id int64, name, description string) (bool, error) {
-	rowsAffected, e := manipulator.Engine().
+func Change(ctx context.Context, id int64, name, description string) (bool, error) {
+	// begin
+	session, e := manipulator.Begin(ctx)
+	if e != nil {
+		return false, e
+	}
+	defer session.Close()
+
+	// exec
+	rowsAffected, e := session.
 		ID(id).
 		Cols(colName, colDescription).
 		Update(&DataOfSlave{
@@ -120,7 +164,16 @@ func Change(id int64, name, description string) (bool, error) {
 	}
 	changed := rowsAffected != 0
 	if changed {
-		modtimeHelper.Modified(time.Now())
+		_, e = modtimeHelper.Modified(session, time.Now())
+		if e != nil {
+			return false, e
+		}
+	}
+
+	// commit
+	e = session.Commit()
+	if e != nil {
+		return false, e
 	}
 	return changed, nil
 }
@@ -132,7 +185,16 @@ func Remove(ctx context.Context, ids []int64) (int64, error) {
 	for i, id := range ids {
 		args[i] = id
 	}
-	rowsAffected, e := manipulator.Engine().
+
+	// begin
+	session, e := manipulator.Begin(ctx)
+	if e != nil {
+		return 0, e
+	}
+	defer session.Close()
+
+	// exec
+	rowsAffected, e := session.
 		Context(ctx).
 		In(colID, args...).
 		Delete(&DataOfSlave{})
@@ -140,7 +202,16 @@ func Remove(ctx context.Context, ids []int64) (int64, error) {
 		return 0, e
 	}
 	if rowsAffected != 0 {
-		modtimeHelper.Modified(time.Now())
+		_, e = modtimeHelper.Modified(session, time.Now())
+		if e != nil {
+			return 0, e
+		}
+	}
+
+	// commit
+	e = session.Commit()
+	if e != nil {
+		return 0, e
 	}
 	return rowsAffected, nil
 }

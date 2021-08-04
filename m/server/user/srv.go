@@ -60,7 +60,7 @@ func (s server) Add(ctx context.Context, req *grpc_user.AddRequest) (resp *grpc_
 		e = s.Error(codes.InvalidArgument, `invalid password`)
 		return
 	}
-	id, e := db.Add(req.Name, req.Nickname, req.Password, req.Authorization)
+	id, e := db.Add(ctx, req.Name, req.Nickname, req.Password, req.Authorization)
 	if e != nil {
 		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
 			ce.Write(
@@ -104,7 +104,7 @@ func (s server) Password(ctx context.Context, req *grpc_user.PasswordRequest) (r
 		e = s.Error(codes.InvalidArgument, `invalid password`)
 		return
 	}
-	changed, e := db.Password(req.Id, req.Value)
+	changed, e := db.Password(ctx, req.Id, req.Value)
 	if e != nil {
 		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
 			ce.Write(
@@ -151,7 +151,7 @@ func (s server) Change(ctx context.Context, req *grpc_user.ChangeRequest) (resp 
 	if e != nil {
 		return
 	}
-	changed, e := db.Change(req.Id, req.Nickname, req.Authorization)
+	changed, e := db.Change(ctx, req.Id, req.Nickname, req.Authorization)
 	if e != nil {
 		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
 			ce.Write(
