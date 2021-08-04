@@ -38,6 +38,13 @@ service Slave {
             delete: "/api/v1/slaves/id/{id}"
         };
     }
+    // change group
+    rpc Group (GroupRequest) returns (GroupResponse){
+        option (google.api.http) = {
+            post: "/api/v1/slaves/group/{id}"
+            body: "*"
+        };
+    }
 }
 
 message Data {
@@ -46,6 +53,8 @@ message Data {
     string description = 3;
     // only root will return
     string code = 4;
+    // group id
+    int64 parent = 5;
 }
 message FindRequest{
     enum Result {
@@ -97,4 +106,12 @@ message RemoveRequest{
 }
 message RemoveResponse{
     int64 rowsAffected = 1;
+}
+message GroupRequest{
+    int64 id = 1;
+    // group id
+    int64 parent = 2;
+}
+message GroupResponse{
+    bool changed = 1;
 }

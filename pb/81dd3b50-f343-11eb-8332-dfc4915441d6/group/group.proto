@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+package jsgenerate_webpc.group;
+option go_package = "github.com/powerpuffpenguin/webpc/protocol/group";
+
+import "google/api/annotations.proto";
+
+service Group {
+    rpc List (ListRequest) returns (ListResponse){
+        option (google.api.http) = {
+            get: "/api/v1/groups"
+        };
+    }
+    // add group
+    rpc Add (AddRequest) returns (AddResponse){
+        option (google.api.http) = {
+            post: "/api/v1/groups"
+            body: "*"
+        };
+    }
+    // move group
+    rpc Move (MoveRequest) returns (MoveResponse){
+        option (google.api.http) = {
+            post: "/api/v1/groups"
+            body: "*"
+        };
+    }
+    // change group properties
+    rpc Change (ChangeRequest) returns (ChangeResponse){
+        option (google.api.http) = {
+            post: "/api/v1/groups/change/{id}"
+            body: "*"
+        };
+    }
+    // remove group
+    rpc Remove (RemoveRequest) returns (RemoveResponse){
+        option (google.api.http) = {
+            delete: "/api/v1/groups/id/{id}"
+        };
+    }
+}
+
+message Data {
+    int64 id = 1;
+    string name = 2;   
+    string description = 3;
+    repeated int64 children = 4;
+}
+message ListRequest{
+}
+message ListResponse{
+    repeated Data items = 1;
+}
+message AddRequest{
+    int64 parent = 1;
+
+    string name = 2;   
+    string description = 3;
+}
+message AddResponse{
+    int64 id = 1;
+}
+message MoveRequest{
+    int64 id = 1;
+    int64 parent  = 2;
+}
+message MoveResponse{
+    bool changed = 1;
+}
+message ChangeRequest{
+    int64 id = 1;
+    string name = 2;   
+    string description = 3;
+}
+message ChangeResponse{
+    bool changed = 1;
+}
+message RemoveRequest{
+    int64 id = 1; 
+}
+message RemoveResponse{
+    int64 rowsAffected = 1;
+}

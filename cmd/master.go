@@ -10,6 +10,7 @@ import (
 	"github.com/powerpuffpenguin/webpc/db/manipulator"
 	"github.com/powerpuffpenguin/webpc/logger"
 	"github.com/powerpuffpenguin/webpc/sessions"
+	"github.com/powerpuffpenguin/webpc/signal/group"
 	"github.com/powerpuffpenguin/webpc/utils"
 
 	"github.com/spf13/cobra"
@@ -50,6 +51,7 @@ func init() {
 			// init db
 			manipulator.Init(&cnf.DB)
 			sessions.Init(&cnf.Session)
+			group.DefaultTree().Init()
 
 			master.Run(&cnf.HTTP, &cnf.System, debug)
 		},

@@ -16,6 +16,7 @@ Protos=(
     user/user.proto
     logger/logger.proto
     slave/slave.proto
+    group/group.proto
 
     forward/fs/fs.proto
 )

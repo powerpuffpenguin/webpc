@@ -179,6 +179,44 @@ func (s server) Change(ctx context.Context, req *grpc_slave.ChangeRequest) (resp
 	}
 	return
 }
+
+var (
+	changedGroupResponse    = grpc_slave.GroupResponse{Changed: true}
+	notChangedGrouoResponse grpc_slave.GroupResponse
+)
+
+func (s server) Group(ctx context.Context, req *grpc_slave.GroupRequest) (resp *grpc_slave.GroupResponse, e error) {
+	TAG := `slave Group`
+	_, userdata, e := s.Userdata(ctx)
+	if e != nil {
+		return
+	}
+	changed, e := db.Parent(ctx, req.Id, req.Parent)
+	if e != nil {
+		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
+			ce.Write(
+				zap.Error(e),
+				zap.String(`who`, userdata.Who()),
+				zap.Int64(`id`, req.Id),
+				zap.Int64(`parent`, req.Parent),
+			)
+		}
+		return
+	}
+	if changed {
+		resp = &changedGroupResponse
+		if ce := logger.Logger.Check(zap.InfoLevel, TAG); ce != nil {
+			ce.Write(
+				zap.String(`who`, userdata.Who()),
+				zap.Int64(`id`, req.Id),
+				zap.Int64(`parent`, req.Parent),
+			)
+		}
+	} else {
+		resp = &notChangedGrouoResponse
+	}
+	return
+}
 func (s server) Remove(ctx context.Context, req *grpc_slave.RemoveRequest) (resp *grpc_slave.RemoveResponse, e error) {
 	TAG := `user Remove`
 	_, userdata, e := s.Userdata(ctx)

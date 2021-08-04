@@ -16,6 +16,7 @@ import (
 const (
 	ModtimeUser  = 1
 	ModtimeSlave = 2
+	ModtimeGroup = 3
 )
 
 func SetLastModified(id int32, modtime time.Time) (int64, error) {

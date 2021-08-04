@@ -11,13 +11,15 @@ const (
 	colName        = `name`
 	colDescription = `description`
 	colCode        = `code`
+	colParent      = `parent`
 )
 
 type DataOfSlave struct {
 	ID          int64  `xorm:"pk autoincr 'id'"`
-	Name        string `xorm:"unique 'name'"`
-	Description string `xorm:"'description'"`
-	Code        string `xorm:"unique 'code'"`
+	Name        string `xorm:"unique 'name' default('') "`
+	Description string `xorm:"'description' default('') "`
+	Code        string `xorm:"unique 'code' default('') "`
+	Parent      int64  `xorm:"index 'parent' default(0) "`
 }
 
 func (DataOfSlave) TableName() string {
@@ -30,5 +32,6 @@ func (d *DataOfSlave) ToPB() *grpc_slave.Data {
 		Name:        d.Name,
 		Description: d.Description,
 		Code:        d.Code,
+		Parent:      d.Parent,
 	}
 }

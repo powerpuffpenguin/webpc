@@ -2,6 +2,7 @@ package register
 
 import (
 	"github.com/powerpuffpenguin/webpc/logger"
+	m_group "github.com/powerpuffpenguin/webpc/m/server/group"
 	m_logger "github.com/powerpuffpenguin/webpc/m/server/logger"
 	m_session "github.com/powerpuffpenguin/webpc/m/server/session"
 	m_slave "github.com/powerpuffpenguin/webpc/m/server/slave"
@@ -19,6 +20,7 @@ func GRPC(srv *grpc.Server, gateway *runtime.ServeMux, cc *grpc.ClientConn) {
 		m_session.Module(0),
 		m_user.Module(0),
 		m_slave.Module(0),
+		m_group.Module(0),
 		m_logger.Module(0),
 	}
 	for _, m := range ms {

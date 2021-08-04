@@ -161,10 +161,10 @@ func syncTable(session *xorm.Session, bean interface{}) (e error) {
 	return
 }
 
-func EngineGroup() *xorm.EngineGroup {
+func Engine() *xorm.EngineGroup {
 	return _Engine
 }
-func Engine() *xorm.Engine {
+func Master() *xorm.Engine {
 	return _Engine.Master()
 }
 func Slave() *xorm.Engine {

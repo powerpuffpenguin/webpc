@@ -16,9 +16,9 @@ const (
 
 type DataOfUser struct {
 	ID            int64   `xorm:"pk autoincr 'id'"`
-	Name          string  `xorm:"unique 'name'"`
-	Nickname      string  `xorm:"'nickname'"`
-	Password      string  `xorm:"'password'"`
+	Name          string  `xorm:"unique 'name' default('') "`
+	Nickname      string  `xorm:"'nickname' default('') "`
+	Password      string  `xorm:"'password' default('') "`
 	Authorization []int32 `xorm:"'authorization'"`
 }
 

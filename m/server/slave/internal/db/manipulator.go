@@ -177,6 +177,39 @@ func Change(ctx context.Context, id int64, name, description string) (bool, erro
 	}
 	return changed, nil
 }
+func Parent(ctx context.Context, id, parent int64) (bool, error) {
+	// begin
+	session, e := manipulator.Begin(ctx)
+	if e != nil {
+		return false, e
+	}
+	defer session.Close()
+
+	// exec
+	rowsAffected, e := session.
+		ID(id).
+		Cols(colParent).
+		Update(&DataOfSlave{
+			Parent: parent,
+		})
+	if e != nil {
+		return false, e
+	}
+	changed := rowsAffected != 0
+	if changed {
+		_, e = modtimeHelper.Modified(session, time.Now())
+		if e != nil {
+			return false, e
+		}
+	}
+
+	// commit
+	e = session.Commit()
+	if e != nil {
+		return false, e
+	}
+	return changed, nil
+}
 func Remove(ctx context.Context, ids []int64) (int64, error) {
 	if len(ids) == 0 {
 		return 0, nil
