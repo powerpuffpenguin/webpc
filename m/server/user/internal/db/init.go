@@ -11,6 +11,7 @@ import (
 	"github.com/powerpuffpenguin/webpc/db"
 	"github.com/powerpuffpenguin/webpc/db/manipulator"
 	"github.com/powerpuffpenguin/webpc/logger"
+	signal_group "github.com/powerpuffpenguin/webpc/signal/group"
 	signal_session "github.com/powerpuffpenguin/webpc/signal/session"
 	"github.com/powerpuffpenguin/webpc/utils"
 
@@ -35,6 +36,7 @@ func Init() {
 	}
 	signal_session.ConnectSignin(soltSignin)
 	signal_session.ConnectPassword(soltPassword)
+	signal_group.ConnectDelete(soltGroupDelete)
 }
 func doInit() (e error) {
 	session, e := manipulator.Begin()
@@ -109,5 +111,21 @@ func soltPassword(req *signal_session.PasswordRequest, resp *signal_session.Pass
 		return
 	}
 	resp.Changed = rows != 0
+	return
+}
+func soltGroupDelete(req *signal_group.DeleteRequest, resp *signal_group.DeleteResponse) (e error) {
+	rowsAffected, e := req.Session.
+		In(colParent, req.Args...).
+		Cols(colParent).
+		Update(&DataOfUser{
+			Parent: 0,
+		})
+	if e != nil {
+		return
+	}
+	resp.RowsAffected += rowsAffected
+	if rowsAffected != 0 {
+		modtimeHelper.Modified(req.Session, time.Now())
+	}
 	return
 }

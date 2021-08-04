@@ -1,4 +1,4 @@
-package group
+package tree
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/powerpuffpenguin/webpc/signal/group/internal/db"
+	"github.com/powerpuffpenguin/webpc/m/server/group/internal/db"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -15,7 +15,7 @@ const rootID = 1
 
 var defaultTree = newTree()
 
-func DefaultTree() *Tree {
+func Default() *Tree {
 	return defaultTree
 }
 

@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/powerpuffpenguin/webpc/db/manipulator"
-	signal_slave "github.com/powerpuffpenguin/webpc/signal/slave"
+	signal_group "github.com/powerpuffpenguin/webpc/signal/group"
 	"golang.org/x/net/context"
 )
 
@@ -119,7 +119,7 @@ func Remove(ctx context.Context, args []interface{}) (time.Time, error) {
 	if e != nil {
 		return time.Time{}, e
 	}
-	_, e = signal_slave.Group(ctx, session, args)
+	_, e = signal_group.Delete(ctx, session, args)
 	if e != nil {
 		return time.Time{}, e
 	}

@@ -12,10 +12,12 @@ const (
 	colNickname      = `nickname`
 	colPassword      = `password`
 	colAuthorization = `authorization`
+	colParent        = `parent`
 )
 
 type DataOfUser struct {
 	ID            int64   `xorm:"pk autoincr 'id'"`
+	Parent        int64   `xorm:"index 'parent' default(0) "`
 	Name          string  `xorm:"unique 'name' default('') "`
 	Nickname      string  `xorm:"'nickname' default('') "`
 	Password      string  `xorm:"'password' default('') "`

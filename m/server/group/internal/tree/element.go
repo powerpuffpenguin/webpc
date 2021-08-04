@@ -1,4 +1,4 @@
-package group
+package tree
 
 type Element struct {
 	Parent      *Element

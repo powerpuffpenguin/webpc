@@ -6,7 +6,7 @@ import (
 
 	"github.com/powerpuffpenguin/webpc/logger"
 	"github.com/powerpuffpenguin/webpc/m/helper"
-	"github.com/powerpuffpenguin/webpc/signal/group"
+	tree "github.com/powerpuffpenguin/webpc/m/server/group/internal/tree"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 
@@ -22,14 +22,14 @@ var emptyListResponse grpc_group.ListResponse
 
 func (s server) List(ctx context.Context, req *grpc_group.ListRequest) (resp *grpc_group.ListResponse, e error) {
 	TAG := `groud List`
-	t := group.DefaultTree()
+	t := tree.Default()
 	s.SetHTTPCacheMaxAge(ctx, 5)
 	e = s.ServeMessage(ctx, t.LastModified(), func(nobody bool) error {
 		if nobody {
 			resp = &emptyListResponse
 		} else {
 			items := make([]*grpc_group.Data, 0, t.Len())
-			err := t.Foreach(func(ele *group.Element) (e error) {
+			err := t.Foreach(func(ele *tree.Element) (e error) {
 				var children []int64
 				if len(ele.Children) != 0 {
 					children = make([]int64, len(ele.Children))
@@ -78,7 +78,7 @@ func (s server) Add(ctx context.Context, req *grpc_group.AddRequest) (resp *grpc
 		return
 	}
 
-	id, e := group.DefaultTree().Add(ctx, req.Parent, req.Name, req.Description)
+	id, e := tree.Default().Add(ctx, req.Parent, req.Name, req.Description)
 	if e != nil {
 		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
 			ce.Write(
@@ -120,7 +120,7 @@ func (s server) Move(ctx context.Context, req *grpc_group.MoveRequest) (resp *gr
 		return
 	}
 
-	changed, e := group.DefaultTree().Move(ctx, req.Id, req.Parent)
+	changed, e := tree.Default().Move(ctx, req.Id, req.Parent)
 	if e != nil {
 		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
 			ce.Write(
@@ -159,7 +159,7 @@ func (s server) Change(ctx context.Context, req *grpc_group.ChangeRequest) (resp
 		return
 	}
 
-	changed, e := group.DefaultTree().Change(ctx, req.Id, req.Name, req.Description)
+	changed, e := tree.Default().Change(ctx, req.Id, req.Name, req.Description)
 	if e != nil {
 		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
 			ce.Write(
@@ -197,7 +197,7 @@ func (s server) Remove(ctx context.Context, req *grpc_group.RemoveRequest) (resp
 		return
 	}
 
-	rowsAffected, e := group.DefaultTree().Remove(ctx, req.Id)
+	rowsAffected, e := tree.Default().Remove(ctx, req.Id)
 	if e != nil {
 		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
 			ce.Write(

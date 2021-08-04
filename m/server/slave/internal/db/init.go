@@ -5,7 +5,7 @@ import (
 
 	"github.com/powerpuffpenguin/webpc/db/manipulator"
 	"github.com/powerpuffpenguin/webpc/logger"
-	signal_slave "github.com/powerpuffpenguin/webpc/signal/slave"
+	signal_group "github.com/powerpuffpenguin/webpc/signal/group"
 	"go.uber.org/zap"
 )
 
@@ -25,7 +25,7 @@ func Init() {
 		return
 	}
 
-	signal_slave.ConnectGroup(soltGroup)
+	signal_group.ConnectDelete(soltGroupDelete)
 }
 func doInit() (e error) {
 	session, e := manipulator.Begin()
@@ -47,7 +47,7 @@ func doInit() (e error) {
 	e = session.Commit()
 	return
 }
-func soltGroup(req *signal_slave.GroupRequest, resp *signal_slave.GroupResponse) (e error) {
+func soltGroupDelete(req *signal_group.DeleteRequest, resp *signal_group.DeleteResponse) (e error) {
 	rowsAffected, e := req.Session.
 		In(colParent, req.Args...).
 		Cols(colParent).
@@ -57,6 +57,9 @@ func soltGroup(req *signal_slave.GroupRequest, resp *signal_slave.GroupResponse)
 	if e != nil {
 		return
 	}
-	resp.RowsAffected = rowsAffected
+	resp.RowsAffected += rowsAffected
+	if rowsAffected != 0 {
+		modtimeHelper.Modified(req.Session, time.Now())
+	}
 	return
 }
