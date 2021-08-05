@@ -6,7 +6,7 @@ import { ServerAPI } from 'src/app/core/core/api';
 import { Closed } from 'src/app/core/utils/closed';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
-import { Tree, NetElement, Helper, FlatNode, NestedNode } from './tree';
+import { Tree, NetElement, Helper, FlatNode, NestedNode } from 'src/app/shared/tree/tree';
 import { NodeEvent } from './node/node.component';
 
 interface ListResponse {
@@ -23,9 +23,11 @@ export class ListComponent implements OnInit, OnDestroy {
   err: any
   ready = false
   tree: Tree | undefined
+  private keys_ = new Map<string, NestedNode>()
   private flatNodeMap_ = new Map<FlatNode, NestedNode>()
   private nestedNodeMap_ = new Map<NestedNode, FlatNode>()
   private _transformer = (node: NestedNode, level: number) => {
+    this.keys_.set(node.data.id, node)
     const nestedNodeMap = this.nestedNodeMap_
     const flatNodeMap = this.flatNodeMap_
     const existingNode = nestedNodeMap.get(node)
@@ -123,13 +125,66 @@ export class ListComponent implements OnInit, OnDestroy {
         const index = parent.children.indexOf(node)
         parent.children.splice(index, 1)
         this._remove(node)
+        const pf = this.nestedNodeMap_.get(parent)
+        if (pf) {
+          pf.update = true
+        }
         this.helper.updateView()
+      } else if (evt.what === 'move') {
+        const parent = evt.data
+        if (!parent) {
+          throw new Error(`parent null`)
+        }
+        this.tree?.move(node.data, parent)
+        const p = this.keys_.get(parent.id)
+        if (p && this._move(node, p)) {
+          this._setUpdate(evt.node)
+          this.helper.updateView()
+        }
       }
     } catch (e) {
       this.toasterService.pop('error', undefined, e)
     }
   }
+  private _setUpdate(flat: FlatNode) {
+    flat.update = true
+    const node = this.flatNodeMap_.get(flat)
+    node?.children.forEach((node) => {
+      const flat = this.nestedNodeMap_.get(node)
+      if (flat) {
+        this._setUpdate(flat)
+      }
+    })
+  }
+  private _move(node: NestedNode, parent: NestedNode): boolean {
+    const po = node.parent
+    if (!po) {
+      return false
+    }
+    if (po == parent) {
+      return false
+    }
+
+    // rm from old
+    let children = po.children
+    children.splice(children.indexOf(node), 1)
+    let fp = this.nestedNodeMap_.get(po)
+    if (fp) {
+      fp.update = true
+    }
+    // add to new
+    fp = this.nestedNodeMap_.get(parent)
+    if (fp) {
+      fp.update = true
+    }
+    node.parent = parent
+    children = parent.children
+    children.push(node)
+    children.sort(NestedNode.compareFn)
+    return true
+  }
   private _remove(node: NestedNode) {
+    this.keys_.delete(node.data.id)
     const flat = this.nestedNodeMap_.get(node)
     if (flat) {
       this.flatNodeMap_.delete(flat)

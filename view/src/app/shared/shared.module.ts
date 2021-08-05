@@ -14,22 +14,28 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTreeModule } from '@angular/material/tree';
+import { MatListModule } from '@angular/material/list';
+import { MatRadioModule } from '@angular/material/radio';
 
 import { NavigationBarComponent } from './navigation-bar/navigation-bar.component';
 import { SignInComponent } from './sign-in/sign-in.component';
 import { PasswordComponent } from './password/password.component';
+import { TreeComponent } from './tree/tree.component';
 
 
 @NgModule({
-  declarations: [NavigationBarComponent, SignInComponent, PasswordComponent],
+  declarations: [NavigationBarComponent, SignInComponent, PasswordComponent, TreeComponent],
   imports: [
     CommonModule, RouterModule, FormsModule,
 
     MatToolbarModule, MatTooltipModule, MatIconModule,
     MatMenuModule, MatButtonModule, MatDividerModule,
     MatDialogModule, MatFormFieldModule, MatCheckboxModule,
-    MatInputModule, MatProgressSpinnerModule,
+    MatInputModule, MatProgressSpinnerModule, MatTreeModule,
+    MatRadioModule,
+    MatListModule,
   ],
-  exports: [NavigationBarComponent]
+  exports: [NavigationBarComponent, TreeComponent]
 })
 export class SharedModule { }

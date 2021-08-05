@@ -17,10 +17,14 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialogModule } from '@angular/material/dialog';
 
+import { SharedModule } from '../shared/shared.module';
+
 import { NodeComponent } from './list/node/node.component';
 import { EditComponent } from './dialog/edit/edit.component';
 import { AddComponent } from './dialog/add/add.component';
 import { DeleteComponent } from './dialog/delete/delete.component';
+import { SelectComponent } from './dialog/select/select.component';
+
 
 @NgModule({
   declarations: [
@@ -28,7 +32,8 @@ import { DeleteComponent } from './dialog/delete/delete.component';
     NodeComponent,
     EditComponent,
     AddComponent,
-    DeleteComponent
+    DeleteComponent,
+    SelectComponent
   ],
   imports: [
     CommonModule, FormsModule,
@@ -36,6 +41,7 @@ import { DeleteComponent } from './dialog/delete/delete.component';
     MatTreeModule, MatIconModule, MatListModule,
     MatTooltipModule, MatFormFieldModule, MatInputModule,
     MatProgressSpinnerModule, MatDialogModule,
+    SharedModule,
     GroupRoutingModule
   ]
 })

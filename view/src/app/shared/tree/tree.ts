@@ -97,6 +97,21 @@ export class Tree {
             })
         }
     }
+    move(current: Element, parent: Element) {
+        const keys = this.keys
+        let ele = keys.get(current.id)
+        if (ele != current) {
+            throw new Error(`current expired: ${current.id}`)
+        } else if (current.parent?.id == parent.id) {
+            return
+        }
+        ele = keys.get(parent.id)
+        if (ele != parent) {
+            throw new Error(`parent expired: ${parent.id}`)
+        }
+
+        parent.addChild(current)
+    }
     add(node: NestedNode, data: Element) {
         const keys = this.keys
         const parent = keys.get(node.data.id)

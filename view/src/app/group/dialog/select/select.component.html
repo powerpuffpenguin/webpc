@@ -1,0 +1,10 @@
+<h1 mat-dialog-title i18n>move {{data.name}} to</h1>
+<div mat-dialog-content class="dialog-content">
+    <shared-tree [disabled]="disabled" [data]="root" (valChange)="onChanged($event)"></shared-tree>
+</div>
+<div mat-dialog-actions>
+    <button type="button" mat-stroked-button i18n [disabled]="disabled || isNotChanged"
+        (click)="onSubmit()">Submit</button>
+    <button type="button" mat-stroked-button i18n [disabled]="disabled" (click)="onClose()">Close</button>
+    <mat-spinner diameter='36' *ngIf="disabled"></mat-spinner>
+</div>

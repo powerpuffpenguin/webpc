@@ -6,7 +6,7 @@ import { finalize, takeUntil } from 'rxjs/operators';
 import { ServerAPI } from 'src/app/core/core/api';
 import { I18nService } from 'src/app/core/i18n/i18n.service';
 import { Closed } from 'src/app/core/utils/closed';
-import { Element } from '../../list/tree';
+import { Element } from '../../../shared/tree/tree';
 @Component({
   selector: 'app-edit',
   templateUrl: './edit.component.html',
@@ -47,7 +47,6 @@ export class EditComponent implements OnInit, OnDestroy {
     const name = this.name.trim()
     const description = this.description.trim()
     ServerAPI.v1.groups.child('change', this.data.id).post(this.httpClient, {
-      id: this.data.id,
       name: name,
       description: description,
     }).pipe(

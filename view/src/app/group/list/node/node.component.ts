@@ -3,11 +3,12 @@ import { MatDialog } from '@angular/material/dialog';
 import { Closed } from 'src/app/core/utils/closed';
 import { EditComponent } from 'src/app/group/dialog/edit/edit.component';
 import { AddComponent } from 'src/app/group/dialog/add/add.component';
-import { FlatNode, Element } from '../tree';
+import { FlatNode, Element } from '../../../shared/tree/tree';
 import { DeleteComponent } from '../../dialog/delete/delete.component';
 import { takeUntil } from 'rxjs/operators';
+import { SelectComponent } from '../../dialog/select/select.component';
 export interface NodeEvent {
-  what: 'add' | 'delete' | 'changed'
+  what: 'add' | 'delete' | 'changed' | 'move'
   node: FlatNode
   data?: Element
 }
@@ -62,7 +63,20 @@ export class NodeComponent implements OnInit, OnDestroy {
     })
   }
   onClickMove(node: FlatNode) {
-    console.log(`move`, node)
+    this.matDialog.open(SelectComponent, {
+      data: node.data,
+      disableClose: false,
+    }).afterClosed().pipe(
+      takeUntil(this.closed_.observable)
+    ).subscribe((data: Element) => {
+      if (data instanceof Element) {
+        this.valChange.next({
+          what: 'move',
+          node: node,
+          data: data
+        })
+      }
+    })
   }
   onClickDelete(node: FlatNode) {
     this.matDialog.open(DeleteComponent, {
