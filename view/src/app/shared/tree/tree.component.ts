@@ -3,7 +3,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 import { takeUntil } from 'rxjs/operators';
 import { Closed } from 'src/app/core/utils/closed';
-import { NestedNode, Helper, FlatNode, Element } from './tree';
+import { NestedNode, Helper, FlatNode, Element } from '../../core/group/tree';
 
 @Component({
   selector: 'shared-tree',

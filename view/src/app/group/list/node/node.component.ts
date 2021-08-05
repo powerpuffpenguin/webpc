@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Closed } from 'src/app/core/utils/closed';
 import { EditComponent } from 'src/app/group/dialog/edit/edit.component';
 import { AddComponent } from 'src/app/group/dialog/add/add.component';
-import { FlatNode, Element } from '../../../shared/tree/tree';
+import { FlatNode, Element } from '../../../core/group/tree';
 import { DeleteComponent } from '../../dialog/delete/delete.component';
 import { takeUntil } from 'rxjs/operators';
 import { SelectComponent } from '../../dialog/select/select.component';

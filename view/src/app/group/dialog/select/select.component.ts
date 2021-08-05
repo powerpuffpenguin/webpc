@@ -6,7 +6,7 @@ import { finalize, takeUntil } from 'rxjs/operators';
 import { ServerAPI } from 'src/app/core/core/api';
 import { I18nService } from 'src/app/core/i18n/i18n.service';
 import { Closed } from 'src/app/core/utils/closed';
-import { Element, NestedNode } from '../../../shared/tree/tree';
+import { Element, NestedNode } from '../../../core/group/tree';
 
 @Component({
   selector: 'app-select',
