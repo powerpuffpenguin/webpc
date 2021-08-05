@@ -193,6 +193,9 @@ export class QueryComponent implements OnInit, OnDestroy {
     this.matDialog.open(AddComponent, {
       data: {
         onAdded: (data: Data) => {
+          if (this.closed_.isClosed) {
+            return
+          }
           if (this.request.count >= 0) {
             this.request.count++
           }

@@ -6,28 +6,22 @@ import { finalize, takeUntil } from 'rxjs/operators';
 import { ServerAPI } from 'src/app/core/core/api';
 import { I18nService } from 'src/app/core/i18n/i18n.service';
 import { Closed } from 'src/app/core/utils/closed';
-import { Data } from '../../query/query';
+import { Element } from '../../list/tree';
 
 @Component({
-  selector: 'app-edit',
-  templateUrl: './edit.component.html',
-  styleUrls: ['./edit.component.scss']
+  selector: 'app-delete',
+  templateUrl: './delete.component.html',
+  styleUrls: ['./delete.component.scss']
 })
-export class EditComponent implements OnInit, OnDestroy {
+export class DeleteComponent implements OnInit, OnDestroy {
   disabled = false
-  name = ''
-  description = ''
   private closed_ = new Closed()
-  constructor(@Inject(MAT_DIALOG_DATA) public readonly data: Data,
+  constructor(@Inject(MAT_DIALOG_DATA) public readonly data: Element,
     private httpClient: HttpClient,
     private toasterService: ToasterService,
-    private matDialogRef: MatDialogRef<EditComponent>,
+    private matDialogRef: MatDialogRef<DeleteComponent>,
     private i18nService: I18nService,
-  ) {
-    this.name = data.name
-    this.description = data.description
-  }
-
+  ) { }
   ngOnInit(): void {
   }
   ngOnDestroy() {
@@ -36,30 +30,18 @@ export class EditComponent implements OnInit, OnDestroy {
   onClose() {
     this.matDialogRef.close()
   }
-  get isNotChanged(): boolean {
-    return this.name.trim() == this.data.name.trim() &&
-      this.description.trim() == this.data.description.trim()
-  }
   onSubmit() {
-    if (this.disabled || this.isNotChanged) {
+    if (this.disabled) {
       return
     }
     this.disabled = true
-    const name = this.name.trim()
-    const description = this.description.trim()
-    ServerAPI.v1.slaves.child('change', this.data.id).post(this.httpClient, {
-      id: this.data.id,
-      name: name,
-      description: description,
-    }).pipe(
+    ServerAPI.v1.groups.child(`id`, this.data.id).delete(this.httpClient).pipe(
       takeUntil(this.closed_.observable),
       finalize(() => {
         this.disabled = false
       })
     ).subscribe(() => {
-      this.toasterService.pop('success', undefined, this.i18nService.get('device properties changed'))
-      this.data.name = name
-      this.data.description = description
+      this.toasterService.pop('success', undefined, this.i18nService.get('group deleted'))
       this.matDialogRef.close(true)
     }, (e) => {
       this.toasterService.pop('error', undefined, e)

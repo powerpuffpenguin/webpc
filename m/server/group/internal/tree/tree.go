@@ -41,13 +41,17 @@ func (t *Tree) Init() {
 	for _, item := range items {
 		parent := keys[item.Parent]
 		if parent == nil {
-			return
+			continue
 		}
 		ele := keys[item.ID]
 		ele.Parent = parent
 		parent.Children = append(parent.Children, ele)
 	}
 	t.root = keys[db.RootID]
+	t.foreach(t.root, func(ele *Element) (e error) {
+		t.keys[ele.ID] = ele
+		return nil
+	})
 	t.modtime = db.LastModified()
 }
 
@@ -98,8 +102,10 @@ func (t *Tree) Add(ctx context.Context, pid int64, name, description string) (id
 		return
 	}
 	// update memory
-	parent.AddChild(NewElement(id, name, description))
+	child := NewElement(id, name, description)
+	parent.AddChild(child)
 
+	t.keys[id] = child
 	t.modtime = at
 	return
 }
@@ -129,7 +135,10 @@ func (t *Tree) foreach(ele *Element, callback func(ele *Element) (e error)) (e e
 	return
 }
 func (t *Tree) LastModified() (modtime time.Time) {
-	return t.modtime
+	t.rw.RLock()
+	modtime = t.modtime
+	t.rw.RUnlock()
+	return
 }
 func (t *Tree) Change(ctx context.Context, id int64, name, description string) (changed bool, e error) {
 	t.rw.Lock()
@@ -181,6 +190,10 @@ func (t *Tree) Remove(ctx context.Context, id int64) (rowsAffected int, e error)
 
 	// update memory
 	ele.Parent.RemoveChild(ele)
+
+	for _, v := range args {
+		delete(t.keys, v.(int64))
+	}
 
 	rowsAffected = len(args)
 	t.modtime = at

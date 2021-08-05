@@ -1,0 +1,23 @@
+<mat-list *ngIf="node">
+    <mat-list-item>
+        <mat-icon mat-list-icon>group</mat-icon>
+        <div mat-line>{{node.data.name}}</div>
+        <div mat-line>{{node.data.description}}</div>
+
+
+        <button mat-icon-button i18n-matTooltip matTooltip="Edit" (click)="onClickEdit(node)">
+            <mat-icon>edit</mat-icon>
+        </button>
+        <ng-container *ngIf="!node.data.root">
+            <button mat-icon-button i18n-matTooltip matTooltip="Move" (click)="onClickMove(node)">
+                <mat-icon>trending_up</mat-icon>
+            </button>
+            <button mat-icon-button i18n-matTooltip matTooltip="Delete" (click)="onClickDelete(node)">
+                <mat-icon>delete</mat-icon>
+            </button>
+        </ng-container>
+        <button mat-icon-button i18n-matTooltip matTooltip="Add" (click)="onClickAdd(node)">
+            <mat-icon>add</mat-icon>
+        </button>
+    </mat-list-item>
+</mat-list>

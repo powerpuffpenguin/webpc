@@ -79,5 +79,6 @@ func doInit() (keys map[int64]*DataOfGroup, e error) {
 		}
 		keys[RootID] = item
 	}
+	e = session.Commit()
 	return
 }

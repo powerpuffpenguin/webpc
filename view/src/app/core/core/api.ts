@@ -5,6 +5,7 @@ export const ServerAPI = {
     v1: {
         sessions: MakeRESTful(root, 'v1', 'sessions'),
         system: MakeRESTful(root, 'v1', 'system'),
+        groups: MakeRESTful(root, 'v1', 'groups'),
         users: MakeRESTful(root, 'v1', 'users'),
         slaves: MakeRESTful(root, 'v1', 'slaves'),
         logger: MakeRESTful(root, 'v1', 'logger'),

@@ -6,27 +6,31 @@ import { finalize, takeUntil } from 'rxjs/operators';
 import { ServerAPI } from 'src/app/core/core/api';
 import { I18nService } from 'src/app/core/i18n/i18n.service';
 import { Closed } from 'src/app/core/utils/closed';
-import { Data } from '../../query/query';
+import { Element } from '../../list/tree';
 
+interface Response {
+  id: string
+}
+interface InjectData {
+  onAdded(data: Element): void
+  parent: Element
+}
 @Component({
-  selector: 'app-edit',
-  templateUrl: './edit.component.html',
-  styleUrls: ['./edit.component.scss']
+  selector: 'app-add',
+  templateUrl: './add.component.html',
+  styleUrls: ['./add.component.scss']
 })
-export class EditComponent implements OnInit, OnDestroy {
+export class AddComponent implements OnInit, OnDestroy {
   disabled = false
   name = ''
   description = ''
   private closed_ = new Closed()
-  constructor(@Inject(MAT_DIALOG_DATA) public readonly data: Data,
+  constructor(@Inject(MAT_DIALOG_DATA) private readonly data_: InjectData,
     private httpClient: HttpClient,
     private toasterService: ToasterService,
-    private matDialogRef: MatDialogRef<EditComponent>,
+    private matDialogRef: MatDialogRef<AddComponent>,
     private i18nService: I18nService,
-  ) {
-    this.name = data.name
-    this.description = data.description
-  }
+  ) { }
 
   ngOnInit(): void {
   }
@@ -36,19 +40,18 @@ export class EditComponent implements OnInit, OnDestroy {
   onClose() {
     this.matDialogRef.close()
   }
-  get isNotChanged(): boolean {
-    return this.name.trim() == this.data.name.trim() &&
-      this.description.trim() == this.data.description.trim()
+  get parent(): string {
+    return this.data_.parent.name
   }
   onSubmit() {
-    if (this.disabled || this.isNotChanged) {
+    if (this.disabled) {
       return
     }
     this.disabled = true
     const name = this.name.trim()
     const description = this.description.trim()
-    ServerAPI.v1.slaves.child('change', this.data.id).post(this.httpClient, {
-      id: this.data.id,
+    ServerAPI.v1.groups.post<Response>(this.httpClient, {
+      parent: this.data_.parent.id,
       name: name,
       description: description,
     }).pipe(
@@ -56,11 +59,9 @@ export class EditComponent implements OnInit, OnDestroy {
       finalize(() => {
         this.disabled = false
       })
-    ).subscribe(() => {
-      this.toasterService.pop('success', undefined, this.i18nService.get('device properties changed'))
-      this.data.name = name
-      this.data.description = description
-      this.matDialogRef.close(true)
+    ).subscribe((response) => {
+      this.data_?.onAdded(new Element(response.id, name, description))
+      this.toasterService.pop('success', undefined, this.i18nService.get('add group successed'))
     }, (e) => {
       this.toasterService.pop('error', undefined, e)
     })

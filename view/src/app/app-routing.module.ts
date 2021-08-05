@@ -26,6 +26,11 @@ const routes: Routes = [
     loadChildren: () => import('./user/user.module').then(m => m.UserModule),
     canActivate: [RootGuard],
   },
+  {
+    path: 'group',
+    loadChildren: () => import('./group/group.module').then(m => m.GroupModule),
+    canActivate: [RootGuard],
+  },
 ];
 
 @NgModule({

@@ -21,7 +21,7 @@ service Group {
     // move group
     rpc Move (MoveRequest) returns (MoveResponse){
         option (google.api.http) = {
-            post: "/api/v1/groups"
+            post: "/api/v1/groups/move"
             body: "*"
         };
     }
