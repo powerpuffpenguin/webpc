@@ -4,6 +4,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ToasterService } from 'angular2-toaster';
 import { finalize, takeUntil } from 'rxjs/operators';
 import { ServerAPI } from 'src/app/core/core/api';
+import { GroupService } from 'src/app/core/group/group.service';
 import { I18nService } from 'src/app/core/i18n/i18n.service';
 import { Closed } from 'src/app/core/utils/closed';
 import { Element } from '../../../core/group/tree';
@@ -18,10 +19,11 @@ export class EditComponent implements OnInit, OnDestroy {
   description = ''
   private closed_ = new Closed()
   constructor(@Inject(MAT_DIALOG_DATA) public readonly data: Element,
-    private httpClient: HttpClient,
-    private toasterService: ToasterService,
-    private matDialogRef: MatDialogRef<EditComponent>,
-    private i18nService: I18nService,
+    private readonly httpClient: HttpClient,
+    private readonly toasterService: ToasterService,
+    private readonly matDialogRef: MatDialogRef<EditComponent>,
+    private readonly i18nService: I18nService,
+    private readonly groupService: GroupService,
   ) {
     this.name = data.name
     this.description = data.description
@@ -60,6 +62,8 @@ export class EditComponent implements OnInit, OnDestroy {
       if (this.data.name != name) {
         this.data.name = name
         changed = true
+      } else {
+        this.groupService.reset()
       }
       this.data.description = description
       this.matDialogRef.close(changed)

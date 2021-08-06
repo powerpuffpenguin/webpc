@@ -6,12 +6,10 @@ import { ServerAPI } from 'src/app/core/core/api';
 import { Closed } from 'src/app/core/utils/closed';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
-import { Tree, NetElement, Helper, FlatNode, NestedNode } from 'src/app/shared/tree/tree';
+import { Tree, Helper, FlatNode, NestedNode } from 'src/app/core/group/tree';
 import { NodeEvent } from './node/node.component';
+import { GroupService } from 'src/app/core/group/group.service';
 
-interface ListResponse {
-  items: Array<NetElement>
-}
 @Component({
   selector: 'app-list',
   templateUrl: './list.component.html',
@@ -56,6 +54,7 @@ export class ListComponent implements OnInit, OnDestroy {
     private readonly helper: Helper,
     private readonly httpClient: HttpClient,
     private readonly toasterService: ToasterService,
+    private readonly groupService: GroupService,
   ) {
   }
 
@@ -74,17 +73,14 @@ export class ListComponent implements OnInit, OnDestroy {
   }
   onClickRefresh() {
     this.err = undefined
-    ServerAPI.v1.groups.get<ListResponse>(this.httpClient).pipe(
-      takeUntil(this.closed_.observable)
-    ).subscribe((resp) => {
-      try {
-        const tree = new Tree(this.helper, resp.items)
-        this.tree = tree
-        this.ready = true
-      } catch (e) {
-        this.err = e
+    this.groupService.promise.then((items) => {
+      if (this.closed_.isClosed) {
+        return
       }
-    }, (e) => {
+      const tree = new Tree(this.helper, items)
+      this.tree = tree
+      this.ready = true
+    }).catch((e) => {
       this.err = e
     })
   }
@@ -92,6 +88,7 @@ export class ListComponent implements OnInit, OnDestroy {
     return node.expandable
   }
   onNodeChanged(evt: NodeEvent) {
+    this.groupService.reset()
     if (this.closed_.isClosed) {
       return
     }

@@ -79,6 +79,13 @@
           <context context-type="linenumber">42</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="1f5a7665676903501b56711ed60afe84d7779871" datatype="html">
+        <source>group move changed</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.html</context>
+          <context context-type="linenumber">43</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="8a3e5253b801997bb641fd367390cdae7e987656" datatype="html">
         <source>Add Device</source>
         <context-group purpose="location">
@@ -214,6 +221,10 @@
           <context context-type="linenumber">18</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/group/dialog/select/select.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/password/password.component.html</context>
           <context context-type="linenumber">18</context>
         </context-group>
@@ -267,6 +278,10 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/group/dialog/edit/edit.component.html</context>
           <context context-type="linenumber">19</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/group/dialog/select/select.component.html</context>
+          <context context-type="linenumber">8</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/password/password.component.html</context>
@@ -403,7 +418,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/group/list/node/node.component.html</context>
-          <context context-type="linenumber">8</context>
+          <context context-type="linenumber">7</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/user/query/query.component.html</context>
@@ -418,7 +433,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/group/list/node/node.component.html</context>
-          <context context-type="linenumber">15</context>
+          <context context-type="linenumber">14</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/user/query/query.component.html</context>
@@ -450,6 +465,13 @@
         <source>Add Group For <x id="INTERPOLATION" equiv-text="{{parent}}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/group/dialog/add/add.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8b412b2044c957ddf0b20d906fadf4bc22f61c93" datatype="html">
+        <source>move <x id="INTERPOLATION" equiv-text="{{data.name}}"/> to</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/group/dialog/select/select.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
       </trans-unit>
@@ -494,14 +516,14 @@
         <source>Move</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/group/list/node/node.component.html</context>
-          <context context-type="linenumber">12</context>
+          <context context-type="linenumber">11</context>
         </context-group>
       </trans-unit>
       <trans-unit id="f6755cff4957d5c3c89bafce5651f1b6fa2b1fd9" datatype="html">
         <source>Add</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/group/list/node/node.component.html</context>
-          <context context-type="linenumber">19</context>
+          <context context-type="linenumber">18</context>
         </context-group>
       </trans-unit>
       <trans-unit id="44fda12d62d20b1b66e58ede52ba342a5341d730" datatype="html">
