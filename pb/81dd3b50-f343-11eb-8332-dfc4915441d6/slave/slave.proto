@@ -72,6 +72,9 @@ message FindRequest{
     string name = 4;
     // if true Fuzzy matching
     bool nameFuzzy = 5;
+
+    // group id
+    int64 parent =  6;
 }
 message FindResponse{
     FindRequest.Result result = 1;
@@ -81,6 +84,7 @@ message FindResponse{
 message AddRequest{
     string name = 1;   
     string description = 2;
+    int64 parent =  3;
 }
 message AddResponse{
     int64 id = 1;

@@ -94,14 +94,36 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/query/query.component.html</context>
-          <context context-type="linenumber">37</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4c90059afafb7e160384d9f512797c95bb95c6dc" datatype="html">
+        <source>Group</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app/dialog/add/add.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app/query/query.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app/query/query.component.html</context>
+          <context context-type="linenumber">40</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b66b160bed02c56e27dd54b8fc3460525f42f012" datatype="html">
+        <source>Group Invalid</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app/dialog/add/add.component.html</context>
+          <context context-type="linenumber">11</context>
         </context-group>
       </trans-unit>
       <trans-unit id="cff1428d10d59d14e45edec3c735a27b5482db59" datatype="html">
         <source>Name</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/dialog/add/add.component.html</context>
-          <context context-type="linenumber">6</context>
+          <context context-type="linenumber">15</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/dialog/edit/edit.component.html</context>
@@ -113,7 +135,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/query/query.component.html</context>
-          <context context-type="linenumber">24</context>
+          <context context-type="linenumber">32</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/group/dialog/add/add.component.html</context>
@@ -144,7 +166,7 @@
         <source>Name Invalid</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/dialog/add/add.component.html</context>
-          <context context-type="linenumber">8</context>
+          <context context-type="linenumber">17</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/dialog/edit/edit.component.html</context>
@@ -171,7 +193,7 @@
         <source>Description</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/dialog/add/add.component.html</context>
-          <context context-type="linenumber">12</context>
+          <context context-type="linenumber">21</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/dialog/edit/edit.component.html</context>
@@ -179,7 +201,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/query/query.component.html</context>
-          <context context-type="linenumber">28</context>
+          <context context-type="linenumber">36</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/group/dialog/add/add.component.html</context>
@@ -194,7 +216,7 @@
         <source>Submit</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/dialog/add/add.component.html</context>
-          <context context-type="linenumber">18</context>
+          <context context-type="linenumber">27</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/dialog/code/code.component.html</context>
@@ -207,6 +229,10 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/dialog/edit/edit.component.html</context>
           <context context-type="linenumber">18</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app/dialog/group/group.component.html</context>
+          <context context-type="linenumber">17</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/group/dialog/add/add.component.html</context>
@@ -233,6 +259,10 @@
           <context context-type="linenumber">37</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/tree-select/tree-select.component.html</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/user/dialog/add/add.component.html</context>
           <context context-type="linenumber">28</context>
         </context-group>
@@ -253,7 +283,7 @@
         <source>Close</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/dialog/add/add.component.html</context>
-          <context context-type="linenumber">19</context>
+          <context context-type="linenumber">28</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/dialog/code/code.component.html</context>
@@ -266,6 +296,10 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/dialog/edit/edit.component.html</context>
           <context context-type="linenumber">19</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app/dialog/group/group.component.html</context>
+          <context context-type="linenumber">18</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/group/dialog/add/add.component.html</context>
@@ -290,6 +324,10 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/sign-in/sign-in.component.html</context>
           <context context-type="linenumber">38</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/tree-select/tree-select.component.html</context>
+          <context context-type="linenumber">16</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/user/dialog/add/add.component.html</context>
@@ -367,6 +405,32 @@
           <context context-type="linenumber">1</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="6080b77234e92ad41bb52653b239c4c4f851317d" datatype="html">
+        <source>Error</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app/dialog/group/group.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/group/list/list.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/tree-select/tree-select.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="40e5ae909aae89ca8dfb367e79f3ec4346f7075e" datatype="html">
+        <source>Change Group</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app/dialog/group/group.component.html</context>
+          <context context-type="linenumber">10</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app/query/query.component.html</context>
+          <context context-type="linenumber">59</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="f075d15302200c5cf3c1ac636dd82a343c2408bb" datatype="html">
         <source>Welcome, you are using the webpc, please sign in first.</source>
         <context-group purpose="location">
@@ -389,7 +453,7 @@
         <source>Query</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/query/query.component.html</context>
-          <context context-type="linenumber">9</context>
+          <context context-type="linenumber">17</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/user/query/query.component.html</context>
@@ -400,21 +464,21 @@
         <source>Code</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/query/query.component.html</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">44</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3cb410619c186877f1bde944deb7d96513d8609e" datatype="html">
         <source>Change Code</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/query/query.component.html</context>
-          <context context-type="linenumber">43</context>
+          <context context-type="linenumber">55</context>
         </context-group>
       </trans-unit>
       <trans-unit id="28f86ffd419b869711aa13f5e5ff54be6d70731c" datatype="html">
         <source>Edit</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/query/query.component.html</context>
-          <context context-type="linenumber">47</context>
+          <context context-type="linenumber">63</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/group/list/node/node.component.html</context>
@@ -429,7 +493,7 @@
         <source>Delete</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/query/query.component.html</context>
-          <context context-type="linenumber">51</context>
+          <context context-type="linenumber">67</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/group/list/node/node.component.html</context>
@@ -488,13 +552,6 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/logger/view/view.component.html</context>
           <context context-type="linenumber">22</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="6080b77234e92ad41bb52653b239c4c4f851317d" datatype="html">
-        <source>Error</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/group/list/list.component.html</context>
-          <context context-type="linenumber">13</context>
         </context-group>
       </trans-unit>
       <trans-unit id="c8d1785038d461ec66b5799db21864182b35900a" datatype="html">
@@ -762,6 +819,13 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/sign-in/sign-in.component.html</context>
           <context context-type="linenumber">32</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5b0fc03d07a4295f98aacdd28dedbb1e0fb2844d" datatype="html">
+        <source>Select Group</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/tree-select/tree-select.component.html</context>
+          <context context-type="linenumber">10</context>
         </context-group>
       </trans-unit>
       <trans-unit id="94be6ae6ec1f87bedc67020629343b27fdbece0a" datatype="html">

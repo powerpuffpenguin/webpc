@@ -6,6 +6,14 @@
     <mat-checkbox class="query" [disabled]="disabled" [(ngModel)]="request.nameFuzzy" name="nameFuzzy">
         <ng-container i18n>fuzzy matching</ng-container>
     </mat-checkbox>
+    <mat-form-field class="query">
+        <mat-label i18n>Group</mat-label>
+        <input matInput type="text" [disabled]="disabled" readonly [value]="selectName" name="parent">
+        <button type="button" [disabled]="disabled" mat-icon-button matSuffix (click)="onClickSelect()">
+            <mat-icon>mode_edit</mat-icon>
+        </button>
+    </mat-form-field>
+
     <button mat-icon-button i18n-matTooltip matTooltip="Query" [disabled]="disabled||isNotQueryChange"
         (click)="onClickQuery()">
         <mat-icon>search</mat-icon>
@@ -28,6 +36,10 @@
             <th mat-header-cell *matHeaderCellDef i18n>Description</th>
             <td mat-cell *matCellDef="let element"> {{element.description}} </td>
         </ng-container>
+        <ng-container matColumnDef="group">
+            <th mat-header-cell *matHeaderCellDef i18n>Group</th>
+            <td mat-cell *matCellDef="let element"> {{parentName(element)}} </td>
+        </ng-container>
         <ng-container matColumnDef="code">
             <th mat-header-cell *matHeaderCellDef i18n>Code</th>
             <td mat-cell *matCellDef="let element"> {{element.code}} </td>
@@ -43,6 +55,10 @@
                 <button mat-icon-button [disabled]="disabled" i18n-matTooltip matTooltip="Change Code"
                     (click)="onClickCode(element)">
                     <mat-icon>lock</mat-icon>
+                </button>
+                <button mat-icon-button [disabled]="disabled" i18n-matTooltip matTooltip="Change Group"
+                    (click)="onClickGroup(element)">
+                    <mat-icon>group</mat-icon>
                 </button>
                 <button mat-icon-button [disabled]="disabled" i18n-matTooltip matTooltip="Edit"
                     (click)="onClickEdit(element)">

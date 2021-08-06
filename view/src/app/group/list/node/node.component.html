@@ -1,7 +1,7 @@
 <mat-list *ngIf="node">
     <mat-list-item>
         <mat-icon mat-list-icon>group</mat-icon>
-        <div mat-line>{{node.data.name}}</div>
+        <div mat-line>{{getName(node.data)}}</div>
         <div mat-line>{{node.data.description}}</div>
 
         <button mat-icon-button i18n-matTooltip matTooltip="Edit" (click)="onClickEdit(node)">

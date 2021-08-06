@@ -7,6 +7,7 @@ import { FlatNode, Element } from '../../../core/group/tree';
 import { DeleteComponent } from '../../dialog/delete/delete.component';
 import { takeUntil } from 'rxjs/operators';
 import { SelectComponent } from '../../dialog/select/select.component';
+import { environment } from 'src/environments/environment';
 export interface NodeEvent {
   what: 'add' | 'delete' | 'changed' | 'move'
   node: FlatNode
@@ -92,5 +93,11 @@ export class NodeComponent implements OnInit, OnDestroy {
         })
       }
     })
+  }
+  getName(data: Element): string {
+    if (environment.production) {
+      return data.name
+    }
+    return `${data.name} -> ${data.id}`
   }
 }

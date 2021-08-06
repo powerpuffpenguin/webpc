@@ -13,10 +13,8 @@ func (s server) AuthFuncOverride(ctx context.Context, fullMethodName string) (co
 	ctx, userdata, e := s.Userdata(ctx)
 	if e != nil {
 		return ctx, e
-	} else if userdata.AuthAny(db.Root) {
-		return ctx, nil
-	}
-	if strings.HasSuffix(fullMethodName, `/Find`) {
+	} else if strings.HasSuffix(fullMethodName, `/Find`) ||
+		userdata.AuthAny(db.Root) {
 		return ctx, nil
 	}
 	return ctx, s.Error(codes.PermissionDenied, `permission denied`)

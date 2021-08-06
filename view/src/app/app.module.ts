@@ -28,6 +28,7 @@ import { AddComponent } from './app/dialog/add/add.component';
 import { CodeComponent } from './app/dialog/code/code.component';
 import { EditComponent } from './app/dialog/edit/edit.component';
 import { DeleteComponent } from './app/dialog/delete/delete.component';
+import { GroupComponent } from './app/dialog/group/group.component';
 
 @NgModule({
   declarations: [
@@ -38,6 +39,7 @@ import { DeleteComponent } from './app/dialog/delete/delete.component';
     CodeComponent,
     EditComponent,
     DeleteComponent,
+    GroupComponent,
   ],
   imports: [
     BrowserModule, BrowserAnimationsModule, FormsModule,

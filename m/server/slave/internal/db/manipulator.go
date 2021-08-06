@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/powerpuffpenguin/webpc/db/manipulator"
 	grpc_slave "github.com/powerpuffpenguin/webpc/protocol/slave"
-
+	signal_group "github.com/powerpuffpenguin/webpc/signal/group"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -30,6 +30,17 @@ func Find(ctx context.Context, request *grpc_slave.FindRequest) (*grpc_slave.Fin
 
 	session := manipulator.Session(ctx)
 	defer session.Close()
+	if request.Parent > 1 {
+		resp, e := signal_group.IDS(ctx, request.Parent, true)
+		if e != nil {
+			return nil, e
+		} else if len(resp.Args) == 0 {
+			return &grpc_slave.FindResponse{
+				Result: request.Result,
+			}, nil
+		}
+		session.In(colParent, resp.Args...)
+	}
 	var beans []DataOfSlave
 	var response grpc_slave.FindResponse
 	response.Result = request.Result
@@ -67,15 +78,22 @@ func Find(ctx context.Context, request *grpc_slave.FindRequest) (*grpc_slave.Fin
 	}
 	return &response, nil
 }
-func Add(ctx context.Context, name, description string) (int64, string, error) {
+func Add(ctx context.Context, parent int64, name, description string) (int64, string, error) {
 	code, e := newCode()
 	if e != nil {
 		return 0, ``, e
 	}
 	bean := &DataOfSlave{
+		Parent:      parent,
 		Name:        name,
 		Description: description,
 		Code:        code,
+	}
+	resp, e := signal_group.Exists(ctx, parent)
+	if e != nil {
+		return 0, ``, e
+	} else if !resp.Exists {
+		return 0, ``, status.Error(codes.NotFound, `group not exists: `+strconv.FormatInt(parent, 10))
 	}
 
 	// begin
@@ -178,6 +196,13 @@ func Change(ctx context.Context, id int64, name, description string) (bool, erro
 	return changed, nil
 }
 func Parent(ctx context.Context, id, parent int64) (bool, error) {
+	resp, e := signal_group.Exists(ctx, parent)
+	if e != nil {
+		return false, e
+	} else if !resp.Exists {
+		return false, status.Error(codes.NotFound, `group not exists: `+strconv.FormatInt(parent, 10))
+	}
+
 	// begin
 	session, e := manipulator.Begin(ctx)
 	if e != nil {

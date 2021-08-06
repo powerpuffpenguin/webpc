@@ -8,11 +8,16 @@ import { finalize, takeUntil } from 'rxjs/operators';
 import { ServerAPI } from 'src/app/core/core/api';
 import { Closed } from 'src/app/core/utils/closed';
 import { AddComponent } from 'src/app/app/dialog/add/add.component';
-import { Request, Response, Data, DefaultLimit } from './query'
+import { Request, Response, Data, DefaultLimit, GroupData } from './query'
 import { CodeComponent } from '../dialog/code/code.component';
 import { SessionService } from 'src/app/core/session/session.service';
 import { EditComponent } from 'src/app/app/dialog/edit/edit.component';
 import { DeleteComponent } from '../dialog/delete/delete.component';
+import { KeysService } from 'src/app/core/group/keys.service';
+import { GroupComponent } from '../dialog/group/group.component';
+import { TreeSelectComponent } from 'src/app/shared/tree-select/tree-select.component';
+import { Element } from 'src/app/core/group/tree';
+
 @Component({
   selector: 'app-query',
   templateUrl: './query.component.html',
@@ -24,7 +29,7 @@ export class QueryComponent implements OnInit, OnDestroy {
   request = new Request()
   lastRequest: Request | undefined
   source = new Array<Data>()
-  readonly displayedColumns: string[] = ['id', 'name', 'description', 'code', 'buttons']
+  readonly displayedColumns: string[] = ['id', 'name', 'description', 'group', 'code', 'buttons']
   constructor(
     private readonly sessionService: SessionService,
     private readonly httpClient: HttpClient,
@@ -32,6 +37,7 @@ export class QueryComponent implements OnInit, OnDestroy {
     private readonly router: Router,
     private readonly toasterService: ToasterService,
     private readonly matDialog: MatDialog,
+    private readonly keysService: KeysService,
   ) {
   }
   private closed_ = new Closed()
@@ -47,6 +53,7 @@ export class QueryComponent implements OnInit, OnDestroy {
           if (request.count == 0) {
             request.cloneTo(this.request)
             request.cloneTo(this.request_)
+            this._updateAll()
           } else {
             this._query(request)
           }
@@ -60,6 +67,29 @@ export class QueryComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.closed_.close()
   }
+  private sets_ = new Set<GroupData>()
+  private _updateAll() {
+    this._updateParentName(this.request.parent)
+    this._updateParentName(this.request_.parent)
+  }
+  private _updateParentName(data: GroupData) {
+    const set = this.sets_
+    if (!data || set.has(data)) {
+      return
+    }
+    set.add(data)
+    this.keysService.get(data.id).then((ele) => {
+      data.name = ele?.name ?? ''
+    }).catch((e) => {
+      if (this.closed_.isClosed) {
+        return
+      }
+      console.warn(e)
+    }).finally(() => {
+      set.delete(data)
+    })
+  }
+
   private _query(request: Request) {
     if (this.disabled) {
       return
@@ -91,21 +121,38 @@ export class QueryComponent implements OnInit, OnDestroy {
       this.request.last = undefined
       request.cloneTo(this.request)
       request.cloneTo(this.request_)
+      this._updateAll()
       this.source = response.data
+      this.keysService.promise.then((keys) => {
+        if (this.closed_.isClosed) {
+          return
+        }
+        response.data.forEach((data: Data) => {
+          const ele = keys.get(data.parent)
+          if (ele) {
+            data.parentName = ele.name
+          }
+        })
+      }).catch((e) => {
+        if (this.closed_.isClosed) {
+          return
+        }
+        console.warn(e)
+      })
     }, (e) => {
       this.request.last = Date.now()
       this.toasterService.pop('error', undefined, e)
     })
   }
   get isNotQueryChange(): boolean {
-    let lname = this.request.name
-    let rname = this.request_.name
-
+    const lname = this.request.name
+    const rname = this.request_.name
     return typeof lname === "string" &&
       typeof rname === "string" &&
       lname.trim().toLowerCase() == rname.trim().toLowerCase() &&
       (lname.length == 0 || this.request.nameFuzzy == this.request_.nameFuzzy) &&
-      this.request.limit == this.request_.limit && this.request_.offset == 0
+      this.request.limit == this.request_.limit && this.request_.offset == 0 &&
+      this.request.parent.id == this.request_.parent.id
   }
   onClickQuery() {
     if (this.disabled || this.isNotQueryChange) {
@@ -152,6 +199,9 @@ export class QueryComponent implements OnInit, OnDestroy {
     }
     return DefaultLimit
   }
+  parentName(data: Data): string {
+    return this.keysService.parentName(data.parent, data.parentName)
+  }
   onClickCode(data: Data) {
     this.matDialog.open(CodeComponent, {
       data: data,
@@ -160,6 +210,12 @@ export class QueryComponent implements OnInit, OnDestroy {
   }
   onClickEdit(data: Data) {
     this.matDialog.open(EditComponent, {
+      data: data,
+      disableClose: true,
+    })
+  }
+  onClickGroup(data: Data) {
+    this.matDialog.open(GroupComponent, {
       data: data,
       disableClose: true,
     })
@@ -210,5 +266,25 @@ export class QueryComponent implements OnInit, OnDestroy {
       },
       disableClose: true,
     })
+  }
+  onClickSelect() {
+    const parent = this.request.parent
+    this.matDialog.open(TreeSelectComponent, {
+      data: new Element(parent.id, parent.name ?? '')
+    }).afterClosed().pipe(
+      takeUntil(this.closed_.observable)
+    ).subscribe((v) => {
+      if (v) {
+        this.request.parent.id = v.id
+        this.request.parent.name = v.name
+      }
+    })
+  }
+  get selectName(): string {
+    const parent = this.request.parent
+    if (parent.id == '0' || parent.id == '') {
+      return ''
+    }
+    return this.keysService.parentName(parent.id, parent.name, true)
   }
 }

@@ -1,0 +1,18 @@
+<ng-container *ngIf="err;then errView;else okView"></ng-container>
+
+<ng-template #errView>
+    <h1 mat-dialog-title i18n>Error</h1>
+    <div mat-dialog-content class="dialog-content">
+        {{err}}
+    </div>
+</ng-template>
+<ng-template #okView>
+    <h1 mat-dialog-title i18n>Select Group</h1>
+    <div mat-dialog-content class="dialog-content">
+        <shared-tree [data]="items" [checked]="checkedID" (valChange)="onChanged($event)"></shared-tree>
+    </div>
+    <div mat-dialog-actions>
+        <button type="button" mat-stroked-button i18n (click)="onSubmit()">Submit</button>
+        <button type="button" mat-stroked-button i18n (click)="onClose()">Close</button>
+    </div>
+</ng-template>

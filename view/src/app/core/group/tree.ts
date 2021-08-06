@@ -13,7 +13,7 @@ export class Element {
     children: Array<Element> = []
     constructor(public id: string,
         public name: string,
-        public description: string,
+        public description: string = '',
     ) { }
     get root(): boolean {
         return this.id == RootID
@@ -45,10 +45,11 @@ export class Element {
         this.children.splice(index, 1)
     }
 }
-export class Tree {
+
+export class Keys {
     keys = new Map<string, Element>()
     root: Element | undefined
-    constructor(public readonly helper: Helper, items: Array<NetElement>) {
+    constructor(items: Array<NetElement>) {
         const keys = new Map<string, Element>()
         items?.forEach((item) => {
             keys.set(item.id, new Element(item.id, item.name, item.description))
@@ -71,10 +72,26 @@ export class Tree {
         this.forEach((ele) => {
             this.keys.set(ele.id, ele)
         })
-        // update
+    }
+    forEach(callback: (ele: Element) => void, root?: Element) {
+        const ele = root ?? this.root
+        if (ele) {
+            callback(ele)
+            ele?.children?.forEach((child) => {
+                this.forEach(callback, child)
+            })
+        }
+    }
+    createNested(root?: Element): NestedNode {
+        if (!root) {
+            root = this.root
+            if (!root) {
+                throw new Error(`createNested from undefined`)
+            }
+        }
         const rootNode = new NestedNode(root)
         this._appendChildren(rootNode)
-        helper.dataChange.next([rootNode])
+        return rootNode
     }
     private _appendChildren(node: NestedNode) {
         const ele = node.data
@@ -87,18 +104,25 @@ export class Tree {
 
         node.children.sort(NestedNode.compareFn)
     }
+}
+export class Tree {
+    keys: Keys | undefined
+    constructor(public readonly helper: Helper, items: Array<NetElement>) {
+        const keys = new Keys(items)
+        this.keys = keys
 
+        // update
+        const rootNode = keys.createNested(keys.root)
+        helper.dataChange.next([rootNode])
+    }
     forEach(callback: (ele: Element) => void, root?: Element) {
-        const ele = root ?? this.root
-        if (ele) {
-            callback(ele)
-            ele?.children?.forEach((child) => {
-                this.forEach(callback, child)
-            })
-        }
+        this.keys?.forEach(callback, root)
     }
     move(current: Element, parent: Element) {
-        const keys = this.keys
+        const keys = this.keys?.keys
+        if (!keys) {
+            throw new Error(`keys not exists`)
+        }
         let ele = keys.get(current.id)
         if (ele != current) {
             throw new Error(`current expired: ${current.id}`)
@@ -113,7 +137,10 @@ export class Tree {
         parent.addChild(current)
     }
     add(node: NestedNode, data: Element) {
-        const keys = this.keys
+        const keys = this.keys?.keys
+        if (!keys) {
+            throw new Error(`keys not exists`)
+        }
         const parent = keys.get(node.data.id)
         if (!parent) {
             throw new Error(`parent not exists: ${node.data.id}`)
@@ -134,7 +161,10 @@ export class Tree {
         this.helper.updateView()
     }
     remove(current: Element) {
-        const keys = this.keys
+        const keys = this.keys?.keys
+        if (!keys) {
+            throw new Error(`keys not exists`)
+        }
         if (keys.get(current.id) != current) {
             throw new Error(`parent expired: ${current.id}`)
         }

@@ -69,12 +69,13 @@ func (s server) Add(ctx context.Context, req *grpc_slave.AddRequest) (resp *grpc
 	}
 	req.Description = strings.TrimSpace(req.Description)
 
-	id, code, e := db.Add(ctx, req.Name, req.Description)
+	id, code, e := db.Add(ctx, req.Parent, req.Name, req.Description)
 	if e != nil {
 		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
 			ce.Write(
 				zap.Error(e),
 				zap.String(`who`, userdata.Who()),
+				zap.Int64(`parent`, req.Parent),
 				zap.String(`name`, req.Name),
 				zap.String(`description`, req.Description),
 			)
@@ -91,6 +92,7 @@ func (s server) Add(ctx context.Context, req *grpc_slave.AddRequest) (resp *grpc
 		ce.Write(
 			zap.String(`who`, userdata.Who()),
 			zap.Int64(`id`, id),
+			zap.Int64(`parent`, req.Parent),
 			zap.String(`name`, req.Name),
 			zap.String(`description`, req.Description),
 			zap.String(`code`, code),

@@ -22,10 +22,11 @@ import { NavigationBarComponent } from './navigation-bar/navigation-bar.componen
 import { SignInComponent } from './sign-in/sign-in.component';
 import { PasswordComponent } from './password/password.component';
 import { TreeComponent } from './tree/tree.component';
+import { TreeSelectComponent } from './tree-select/tree-select.component';
 
 
 @NgModule({
-  declarations: [NavigationBarComponent, SignInComponent, PasswordComponent, TreeComponent],
+  declarations: [NavigationBarComponent, SignInComponent, PasswordComponent, TreeComponent, TreeSelectComponent],
   imports: [
     CommonModule, RouterModule, FormsModule,
 
@@ -36,6 +37,6 @@ import { TreeComponent } from './tree/tree.component';
     MatRadioModule,
     MatListModule,
   ],
-  exports: [NavigationBarComponent, TreeComponent]
+  exports: [NavigationBarComponent, TreeComponent, TreeSelectComponent]
 })
 export class SharedModule { }

@@ -3,6 +3,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
 import { takeUntil } from 'rxjs/operators';
 import { Closed } from 'src/app/core/utils/closed';
+import { environment } from 'src/environments/environment';
 import { NestedNode, Helper, FlatNode, Element } from '../../core/group/tree';
 
 @Component({
@@ -21,13 +22,14 @@ export class TreeComponent implements OnInit {
   @Output() valChange = new EventEmitter<Element>();
 
   private checked_ = ''
+  @Input()
   set checked(id: string) {
     if (this.checked_ == id) {
       return
     }
     const node = this.keys_.get(id)
+    this.checked_ = id
     if (node) {
-      this.checked_ = id
       this.valChange.next(node.data)
     }
   }
@@ -83,5 +85,11 @@ export class TreeComponent implements OnInit {
   }
   ngOnDestroy() {
     this.closed_.close()
+  }
+  getName(data: Element): string {
+    if (environment.production) {
+      return data.name
+    }
+    return `${data.name} -> ${data.id}`
   }
 }

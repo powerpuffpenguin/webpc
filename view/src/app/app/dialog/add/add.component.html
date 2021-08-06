@@ -3,6 +3,15 @@
 <form #form="ngForm">
     <div mat-dialog-content class="dialog-content">
         <mat-form-field appearance="outline" class="fullwidth">
+            <mat-label i18n>Group</mat-label>
+            <input matInput type="text" [disabled]="disabled" readonly required [value]="parentName" name="parent">
+            <button type="button" [disabled]="disabled" mat-icon-button matSuffix (click)="onClickSelect()">
+                <mat-icon>mode_edit</mat-icon>
+            </button>
+            <mat-error i18n>Group Invalid</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="fullwidth">
             <mat-label i18n>Name</mat-label>
             <input matInput [disabled]="disabled" cdkFocusInitial required [(ngModel)]="name" name="name">
             <mat-error i18n>Name Invalid</mat-error>
