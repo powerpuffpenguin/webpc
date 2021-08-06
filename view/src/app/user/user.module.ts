@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 
 import { UserRoutingModule } from './user-routing.module';
 
+import { SharedModule } from "../shared/shared.module";
+
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -20,12 +22,14 @@ import { PasswordComponent } from './dialog/password/password.component';
 import { DeleteComponent } from './dialog/delete/delete.component';
 import { EditComponent } from './dialog/edit/edit.component';
 import { AddComponent } from './dialog/add/add.component';
+import { GroupComponent } from './dialog/group/group.component';
 
 
 @NgModule({
-  declarations: [QueryComponent, PasswordComponent, DeleteComponent, EditComponent, AddComponent],
+  declarations: [QueryComponent, PasswordComponent, DeleteComponent, EditComponent, AddComponent, GroupComponent],
   imports: [
     CommonModule, FormsModule,
+    SharedModule,
     MatButtonModule, MatFormFieldModule, MatCheckboxModule,
     MatInputModule, MatPaginatorModule, MatTableModule,
     MatTooltipModule, MatIconModule, MatDialogModule,

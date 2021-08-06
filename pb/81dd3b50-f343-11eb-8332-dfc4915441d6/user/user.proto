@@ -39,6 +39,13 @@ service User {
             delete: "/api/v1/users/id/{id}"
         };
     }
+    // change group
+    rpc Group (GroupRequest) returns (GroupResponse){
+        option (google.api.http) = {
+            post: "/api/v1/users/group/{id}"
+            body: "*"
+        };
+    }
 }
 message Data {
     int64 id = 1;
@@ -47,6 +54,8 @@ message Data {
     string nickname = 3;
     // * 1 Root
     repeated int32 authorization = 4;
+    // group id
+    int64 parent = 5;
 }
 
 message FindRequest{
@@ -65,6 +74,8 @@ message FindRequest{
     string name = 4;
     // if true Fuzzy matching
     bool nameFuzzy = 5;
+
+    int64 parent = 6;
 }
 message FindResponse{
     FindRequest.Result result = 1;
@@ -76,6 +87,7 @@ message AddRequest{
     string password = 2;
     string nickname = 3;
     repeated int32 authorization = 4;
+    int64 parent = 5;
 }
 message AddResponse{
     int64 id = 1; 
@@ -100,4 +112,12 @@ message RemoveRequest{
 }
 message RemoveResponse{
     int64 rowsAffected = 1;
+}
+message GroupRequest{
+    int64 id = 1;
+    // group id
+    int64 parent = 2;
+}
+message GroupResponse{
+    bool changed = 1;
 }

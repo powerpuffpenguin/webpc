@@ -31,6 +31,7 @@ func (DataOfUser) TableName() string {
 func (d *DataOfUser) ToPB() *grpc_user.Data {
 	return &grpc_user.Data{
 		Id:            d.ID,
+		Parent:        d.Parent,
 		Name:          d.Name,
 		Nickname:      d.Nickname,
 		Authorization: d.Authorization,

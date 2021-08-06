@@ -3,6 +3,15 @@
 <form #form="ngForm">
     <div mat-dialog-content class="dialog-content">
         <mat-form-field appearance="outline" class="fullwidth">
+            <mat-label i18n>Group</mat-label>
+            <input matInput type="text" [disabled]="disabled" readonly required [value]="parentName" name="parent">
+            <button type="button" [disabled]="disabled" mat-icon-button matSuffix (click)="onClickSelect()">
+                <mat-icon>mode_edit</mat-icon>
+            </button>
+            <mat-error i18n>Group Invalid</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="fullwidth">
             <mat-label i18n>Name</mat-label>
             <input matInput [disabled]="disabled" cdkFocusInitial required [(ngModel)]="name" name="name">
             <mat-error i18n>Name Invalid</mat-error>
@@ -10,17 +19,20 @@
 
         <mat-form-field appearance="outline" class="fullwidth">
             <mat-label i18n>Nickname</mat-label>
-            <input matInput type="text" [disabled]="disabled"  [(ngModel)]="nickname" name="nickname">
+            <input matInput type="text" [disabled]="disabled" [(ngModel)]="nickname" name="nickname">
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="fullwidth">
             <mat-label i18n>Password</mat-label>
-            <input matInput type="text" [disabled]="disabled" required minlength="6" [(ngModel)]="password" name="password">
+            <input matInput type="text" [disabled]="disabled" required minlength="6" [(ngModel)]="password"
+                name="password">
             <mat-error i18n>Password Invalid</mat-error>
         </mat-form-field>
 
         <div class="fill">
-            <mat-checkbox *ngFor="let authorization of authorizations;" [checked]="set.has(authorization)" (change)="onCheckedChange(authorization,$event)">{{authorizationName(this.authorization)}}</mat-checkbox>
+            <mat-checkbox *ngFor="let authorization of authorizations;" [checked]="set.has(authorization)"
+                (change)="onCheckedChange(authorization,$event)">{{authorizationName(this.authorization)}}
+            </mat-checkbox>
         </div>
     </div>
     <div mat-dialog-actions>

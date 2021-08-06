@@ -16,14 +16,41 @@ export const ServerAPI = {
     },
 }
 export enum Authorization {
-    // super administrator
+    // Super administrator
     Root = 1,
+    // access server
+    Server = 2,
+    // web shell
+    Shell = 3,
+    // filesystem read
+    Read = 4,
+    // filesystem write
+    Write = 5,
+    // vnc view
+    VNC = 6,
 }
-export const Authorizations = [Authorization.Root]
+export const Authorizations = [
+    Authorization.Root,
+    Authorization.Server,
+    Authorization.Shell,
+    Authorization.Read,
+    Authorization.Write,
+    Authorization.VNC,
+]
 export function AuthorizationName(authorization: Authorization): string {
     switch (authorization) {
         case Authorization.Root:
             return 'root'
+        case Authorization.Server:
+            return 'server'
+        case Authorization.Shell:
+            return 'shell'
+        case Authorization.Read:
+            return 'read'
+        case Authorization.Write:
+            return 'write'
+        case Authorization.VNC:
+            return 'vnc'
         default:
             return `${authorization}`
     }

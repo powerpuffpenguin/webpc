@@ -7,7 +7,7 @@ import (
 
 	"github.com/powerpuffpenguin/webpc/db/manipulator"
 	grpc_user "github.com/powerpuffpenguin/webpc/protocol/user"
-
+	signal_group "github.com/powerpuffpenguin/webpc/signal/group"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -20,6 +20,18 @@ func Find(ctx context.Context, request *grpc_user.FindRequest) (*grpc_user.FindR
 
 	session := manipulator.Session(ctx)
 	defer session.Close()
+	if request.Parent > 1 {
+		resp, e := signal_group.IDS(ctx, request.Parent, true)
+		if e != nil {
+			return nil, e
+		} else if len(resp.Args) == 0 {
+			return &grpc_user.FindResponse{
+				Result: request.Result,
+			}, nil
+		}
+		session.In(colParent, resp.Args...)
+	}
+
 	var beans []DataOfUser
 	var response grpc_user.FindResponse
 	response.Result = request.Result
@@ -57,12 +69,19 @@ func Find(ctx context.Context, request *grpc_user.FindRequest) (*grpc_user.FindR
 	}
 	return &response, nil
 }
-func Add(ctx context.Context, name, nickname, password string, authorization []int32) (id int64, e error) {
+func Add(ctx context.Context, parent int64, name, nickname, password string, authorization []int32) (id int64, e error) {
 	bean := &DataOfUser{
+		Parent:        parent,
 		Name:          name,
 		Nickname:      nickname,
 		Password:      password,
 		Authorization: authorization,
+	}
+	resp, e := signal_group.Exists(ctx, parent)
+	if e != nil {
+		return 0, e
+	} else if !resp.Exists {
+		return 0, status.Error(codes.NotFound, `group not exists: `+strconv.FormatInt(parent, 10))
 	}
 
 	// begin
@@ -122,6 +141,46 @@ func Change(ctx context.Context, id int64, nickname string, authorization []int3
 		Update(&DataOfUser{
 			Nickname:      nickname,
 			Authorization: authorization,
+		})
+	if e != nil {
+		return false, e
+	}
+	changed := rowsAffected != 0
+	if changed {
+		_, e = modtimeHelper.Modified(session, time.Now())
+		if e != nil {
+			return false, e
+		}
+	}
+
+	// commit
+	e = session.Commit()
+	if e != nil {
+		return false, e
+	}
+	return changed, nil
+}
+func Parent(ctx context.Context, id, parent int64) (bool, error) {
+	resp, e := signal_group.Exists(ctx, parent)
+	if e != nil {
+		return false, e
+	} else if !resp.Exists {
+		return false, status.Error(codes.NotFound, `group not exists: `+strconv.FormatInt(parent, 10))
+	}
+
+	// begin
+	session, e := manipulator.Begin(ctx)
+	if e != nil {
+		return false, e
+	}
+	defer session.Close()
+
+	// exec
+	rowsAffected, e := session.
+		ID(id).
+		Cols(colParent).
+		Update(&DataOfUser{
+			Parent: parent,
 		})
 	if e != nil {
 		return false, e

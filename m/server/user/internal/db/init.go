@@ -73,6 +73,7 @@ func doInit() (e error) {
 		fmt.Println(`user =`, name)
 		fmt.Println(`password =`, password)
 		_, e = session.InsertOne(&DataOfUser{
+			Parent:        1,
 			Name:          name,
 			Password:      utils.MD5String(password),
 			Authorization: []int32{db.Root},

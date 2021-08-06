@@ -1,14 +1,16 @@
 package db
 
 const (
-	// Super administrator has all permissions
+	// super administrator has all permissions
 	Root = 1
+	// access server
+	Server = 2
 	// web shell
-	Shell = 2
+	Shell = 3
 	// filesystem read
-	Read = 3
+	Read = 4
 	// filesystem write
-	Write = 4
+	Write = 5
 	// vnc view
-	VNC = 5
+	VNC = 6
 )

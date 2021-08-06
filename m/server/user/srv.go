@@ -60,12 +60,13 @@ func (s server) Add(ctx context.Context, req *grpc_user.AddRequest) (resp *grpc_
 		e = s.Error(codes.InvalidArgument, `invalid password`)
 		return
 	}
-	id, e := db.Add(ctx, req.Name, req.Nickname, req.Password, req.Authorization)
+	id, e := db.Add(ctx, req.Parent, req.Name, req.Nickname, req.Password, req.Authorization)
 	if e != nil {
 		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
 			ce.Write(
 				zap.Error(e),
 				zap.String(`who`, userdata.Who()),
+				zap.Int64(`parent`, req.Parent),
 				zap.String(`name`, req.Name),
 				zap.String(`nickname`, req.Nickname),
 				zap.Int32s(`authorization`, req.Authorization),
@@ -81,6 +82,7 @@ func (s server) Add(ctx context.Context, req *grpc_user.AddRequest) (resp *grpc_
 		ce.Write(
 			zap.String(`who`, userdata.Who()),
 			zap.Int64(`id`, id),
+			zap.Int64(`parent`, req.Parent),
 			zap.String(`name`, req.Name),
 			zap.String(`nickname`, req.Nickname),
 			zap.Int32s(`authorization`, req.Authorization),
@@ -176,6 +178,44 @@ func (s server) Change(ctx context.Context, req *grpc_user.ChangeRequest) (resp 
 		}
 	} else {
 		resp = &notChangedChangeResponse
+	}
+	return
+}
+
+var (
+	changedGroupResponse    = grpc_user.GroupResponse{Changed: true}
+	notChangedGrouoResponse grpc_user.GroupResponse
+)
+
+func (s server) Group(ctx context.Context, req *grpc_user.GroupRequest) (resp *grpc_user.GroupResponse, e error) {
+	TAG := `user Group`
+	_, userdata, e := s.Userdata(ctx)
+	if e != nil {
+		return
+	}
+	changed, e := db.Parent(ctx, req.Id, req.Parent)
+	if e != nil {
+		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
+			ce.Write(
+				zap.Error(e),
+				zap.String(`who`, userdata.Who()),
+				zap.Int64(`id`, req.Id),
+				zap.Int64(`parent`, req.Parent),
+			)
+		}
+		return
+	}
+	if changed {
+		resp = &changedGroupResponse
+		if ce := logger.Logger.Check(zap.InfoLevel, TAG); ce != nil {
+			ce.Write(
+				zap.String(`who`, userdata.Who()),
+				zap.Int64(`id`, req.Id),
+				zap.Int64(`parent`, req.Parent),
+			)
+		}
+	} else {
+		resp = &notChangedGrouoResponse
 	}
 	return
 }
