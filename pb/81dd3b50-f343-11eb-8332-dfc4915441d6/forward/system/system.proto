@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package jsgenerate_webpc.forward.system;
+option go_package = "github.com/powerpuffpenguin/webpc/protocol/forward/system";
+
+import "google/api/annotations.proto";
+
+service System {
+    // return version info
+    rpc Version (VersionRequest) returns (VersionResponse){
+        option (google.api.http) = {
+            get: "/api/forward/v1/system/version"
+        };
+    }
+    // return server start at unix
+    rpc StartAt (StartAtRequest) returns (StartAtResponse){
+        option (google.api.http) = {
+            get: "/api/forward/v1/system/start_at"
+        };
+    }
+}
+message VersionRequest{
+}
+message VersionResponse{
+    string platform = 1;
+    string version = 2;
+}
+message StartAtRequest{
+}
+message StartAtResponse{
+    int64 result = 1;
+}

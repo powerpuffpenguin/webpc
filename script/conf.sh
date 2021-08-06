@@ -19,4 +19,5 @@ Protos=(
     group/group.proto
 
     forward/fs/fs.proto
+    forward/system/system.proto
 )

@@ -10,6 +10,11 @@ export const ServerAPI = {
         slaves: MakeRESTful(root, 'v1', 'slaves'),
         logger: MakeRESTful(root, 'v1', 'logger'),
     },
+    forward: {
+        v1: {
+            system: MakeRESTful(root, 'forward', 'v1', 'system'),
+        }
+    },
     static: {
         licenses: MakeRESTful('static', '3rdpartylicenses.txt'),
         license: MakeRESTful('static', 'LICENSE.txt'),
