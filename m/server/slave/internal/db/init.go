@@ -6,6 +6,7 @@ import (
 	"github.com/powerpuffpenguin/webpc/db/manipulator"
 	"github.com/powerpuffpenguin/webpc/logger"
 	signal_group "github.com/powerpuffpenguin/webpc/signal/group"
+	signal_slave "github.com/powerpuffpenguin/webpc/signal/slave"
 	"go.uber.org/zap"
 )
 
@@ -26,6 +27,8 @@ func Init() {
 	}
 
 	signal_group.ConnectDelete(soltGroupDelete)
+	signal_slave.ConnectCode(soltCode)
+	signal_slave.ConnectGet(soltGet)
 }
 func doInit() (e error) {
 	session, e := manipulator.Begin()
@@ -45,6 +48,36 @@ func doInit() (e error) {
 		return
 	}
 	e = session.Commit()
+	return
+}
+func soltGet(req *signal_slave.GetRequest, resp *signal_slave.GetResponse) (e error) {
+	var bean DataOfSlave
+	exists, e := manipulator.
+		Engine().
+		ID(req.ID).
+		Context(req.Context).
+		Get(&bean)
+	if e != nil {
+		return
+	} else if exists {
+		resp.ID = bean.ID
+		resp.Parent = bean.Parent
+	}
+	return
+}
+func soltCode(req *signal_slave.CodeRequest, resp *signal_slave.CodeResponse) (e error) {
+	var bean DataOfSlave
+	exists, e := manipulator.
+		Engine().
+		Where(colCode+` = ?`, req.Code).
+		Context(req.Context).
+		Get(&bean)
+	if e != nil {
+		return
+	} else if exists {
+		resp.ID = bean.ID
+		resp.Parent = bean.Parent
+	}
 	return
 }
 func soltGroupDelete(req *signal_group.DeleteRequest, resp *signal_group.DeleteResponse) (e error) {

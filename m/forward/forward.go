@@ -1,13 +1,18 @@
 package forward
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"net/http"
 	"strconv"
 	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/powerpuffpenguin/webpc/db"
 	"github.com/powerpuffpenguin/webpc/m/web"
+	signal_group "github.com/powerpuffpenguin/webpc/signal/group"
+	signal_slave "github.com/powerpuffpenguin/webpc/signal/slave"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 )
@@ -64,7 +69,47 @@ func (f *Forward) Forward(id int64, c *gin.Context) {
 		return
 	}
 
+	// userdata
+	userdata, e := f.web.BindUserdata(c)
+	if e != nil {
+		return
+	}
+	b, e := json.Marshal(userdata)
+	if e != nil {
+		f.web.Error(c, http.StatusInternalServerError, codes.Unknown, e.Error())
+		return
+	}
+	// check group
+	if id == 0 {
+		if !userdata.AuthTest(db.Root) {
+			f.web.Error(c, http.StatusForbidden, codes.PermissionDenied, `permission denied`)
+			return
+		}
+	} else {
+		parents, e := signal_group.IDS(c.Request.Context(), userdata.Parent, false)
+		if e != nil {
+			f.web.Error(c, http.StatusInternalServerError, codes.Unknown, e.Error())
+			return
+		}
+		bean, e := signal_slave.Get(c.Request.Context(), id)
+		if e != nil {
+			f.web.Error(c, http.StatusInternalServerError, codes.Unknown, e.Error())
+			return
+		}
+		found := false
+		for _, parent := range parents.ID {
+			if parent == bean.Parent {
+				found = true
+				break
+			}
+		}
+		if !found {
+			f.web.Error(c, http.StatusForbidden, codes.PermissionDenied, `permission denied`)
+			return
+		}
+	}
 	// token
+	c.Request.Header.Set(`Authorization`, base64.RawURLEncoding.EncodeToString(b))
 
 	// ServeHTTP
 	ele.gateway.ServeHTTP(c.Writer, c.Request)

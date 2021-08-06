@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"time"
+
 	"github.com/powerpuffpenguin/webpc/logger"
 	"github.com/powerpuffpenguin/webpc/m/helper"
 	grpc_session "github.com/powerpuffpenguin/webpc/protocol/session"
@@ -79,6 +80,7 @@ func (s server) Signin(ctx context.Context, req *grpc_session.SigninRequest) (re
 			Key: sessions.KeyUserdata,
 			Value: &sessions.Userdata{
 				ID:            result.ID,
+				Parent:        result.Parent,
 				Name:          result.Name,
 				Nickname:      result.Nickname,
 				Authorization: result.Authorization,
@@ -296,6 +298,7 @@ func (s server) User(ctx context.Context, req *grpc_session.UserRequest) (resp *
 			}
 			resp = &grpc_session.UserResponse{
 				Id:            userdata.ID,
+				Parent:        userdata.Parent,
 				Name:          userdata.Name,
 				Nickname:      userdata.Nickname,
 				Authorization: userdata.Authorization,

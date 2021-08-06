@@ -29,14 +29,13 @@ func HTTP(cc *grpc.ClientConn, engine *gin.Engine, gateway *runtime.ServeMux, sw
 				AccessToken string `form:"access_token"`
 			}
 			c.ShouldBindQuery(&query)
-			if query.AccessToken != `` {
-				c.Request.Header.Set(`Authorization`, `Bearer `+query.AccessToken)
-			}
 			if query.AccessToken == `` {
 				query.AccessToken, _ = c.Cookie(helper.CookieName)
 				if query.AccessToken != `` {
 					c.Request.Header.Set(`Authorization`, `Bearer `+query.AccessToken)
 				}
+			} else {
+				c.Request.Header.Set(`Authorization`, `Bearer `+query.AccessToken)
 			}
 		}
 		if strings.HasPrefix(c.Request.URL.Path, `/api/forward/`) {

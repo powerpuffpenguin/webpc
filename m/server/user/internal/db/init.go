@@ -99,6 +99,7 @@ func soltSignin(req *signal_session.SigninRequest, resp *signal_session.SigninRe
 			resp.Name = bean.Name
 			resp.Nickname = bean.Nickname
 			resp.Authorization = bean.Authorization
+			resp.Parent = bean.Parent
 		}
 	}
 	return

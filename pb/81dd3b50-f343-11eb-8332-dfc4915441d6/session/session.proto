@@ -61,6 +61,7 @@ message SigninResponse{
     string name = 4;   
     string nickname = 5;
     repeated int32 authorization = 6;
+    int64 parent = 7;
 }
 message SignoutRequest{
     // cookie mode only for debug
@@ -97,4 +98,5 @@ message UserResponse{
     string name = 2;   
     string nickname = 3;
     repeated int32 authorization = 4;
+    int64 parent = 7;
 }

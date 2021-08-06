@@ -19,6 +19,7 @@ type SigninResponse struct {
 	Name          string
 	Nickname      string
 	Authorization []int32
+	Parent        int64
 }
 type SigninHandle func(req *SigninRequest, resp *SigninResponse) (e error)
 

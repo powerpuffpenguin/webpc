@@ -12,6 +12,7 @@ type Userdata struct {
 	Name          string
 	Nickname      string
 	Authorization []int32
+	Parent        int64
 }
 
 func (d *Userdata) Who() string {
