@@ -97,7 +97,12 @@ func initTable(engine *xorm.EngineGroup) {
 			zap.Error(e),
 		)
 	}
-	session.Commit()
+	e = session.Commit()
+	if e != nil {
+		logger.Logger.Panic(`sync table error`,
+			zap.Error(e),
+		)
+	}
 }
 
 // SyncTable sync table to consistent

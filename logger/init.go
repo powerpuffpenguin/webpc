@@ -6,9 +6,13 @@ import "path/filepath"
 var Logger Helper
 
 // Init init logger
-func Init(basePath string, options *Options) (e error) {
+func Init(basePath string, master bool, options *Options) (e error) {
 	if options.Filename == `` {
-		options.Filename = filepath.Clean(filepath.Join(basePath, `var`, `logs`, `webpc.log`))
+		if master {
+			options.Filename = filepath.Clean(filepath.Join(basePath, `var`, `logs`, `master`, `webpc.log`))
+		} else {
+			options.Filename = filepath.Clean(filepath.Join(basePath, `var`, `logs`, `slave`, `webpc.log`))
+		}
 	} else {
 		if filepath.IsAbs(options.Filename) {
 			options.Filename = filepath.Clean(options.Filename)

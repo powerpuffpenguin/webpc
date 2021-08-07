@@ -2,14 +2,16 @@ package slave
 
 import (
 	"context"
+	"crypto/tls"
 	"log"
 	"net"
 	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/powerpuffpenguin/vnet/reverse"
-	"github.com/powerpuffpenguin/webpc/slave"
-	"google.golang.org/grpc"
+	"github.com/powerpuffpenguin/webpc/configure"
+	"github.com/powerpuffpenguin/webpc/logger"
+	"go.uber.org/zap"
 )
 
 type Addr uint8
@@ -20,12 +22,17 @@ func (Addr) Network() string {
 func (Addr) String() string {
 	return `reverse`
 }
-func Run() {
+func Run(cnf *configure.Connect, system *configure.System, debug bool) {
 	var tempDelay time.Duration
 	for {
 		var d websocket.Dialer
+		if cnf.Insecure {
+			d.TLSClientConfig = &tls.Config{
+				InsecureSkipVerify: true,
+			}
+		}
 		l := reverse.Listen(Addr(0), reverse.WithListenerDialContext(func(ctx context.Context, network, address string) (net.Conn, error) {
-			c, _, e := d.DialContext(ctx, `ws://127.0.0.1:9000/api/v1/dialer/64048031f73a11eba3890242ac120064`, nil)
+			c, _, e := d.DialContext(ctx, cnf.URL, nil)
 			if e != nil {
 				return nil, e
 			}
@@ -33,8 +40,7 @@ func Run() {
 			return c.UnderlyingConn(), nil
 		}))
 
-		srv := grpc.NewServer()
-		slave.GRPC(srv)
+		srv := newGRPC(&cnf.Option, debug)
 
 		e := srv.Serve(l)
 		if e != nil {
@@ -49,7 +55,12 @@ func Run() {
 		if max := 40 * time.Second; tempDelay > max {
 			tempDelay = max
 		}
-		log.Printf("Serve error: %v; retrying in %v", e, tempDelay)
+		if ce := logger.Logger.Check(zap.WarnLevel, `Serve error`); ce != nil {
+			ce.Write(
+				zap.Error(e),
+				zap.String(`retrying in`, tempDelay.String()),
+			)
+		}
 		time.Sleep(tempDelay)
 	}
 }

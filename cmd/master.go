@@ -42,7 +42,7 @@ func init() {
 				return
 			}
 			// init logger
-			e = logger.Init(basePath, &cnf.Logger)
+			e = logger.Init(basePath, true, &cnf.Logger)
 			if e != nil {
 				log.Fatalln(e)
 			}

@@ -3,7 +3,7 @@ local driver = def.Driver;
 {
     Driver: driver.Sqlite3,
     Source: [
-        'var/webpc_master.db',
+        'var/webpc_slave.db',
     ],
     // max connections if < 1 not not limited
     MaxOpen: 50,
@@ -17,14 +17,6 @@ local driver = def.Driver;
         Direct: [],
         // special cache
         Special: [
-            {
-                Name: 'data_of_user',
-                Record: 100,
-            },
-            {
-                Name: 'data_of_slave',
-                Record: 100,
-            },
         ],
     },
 }

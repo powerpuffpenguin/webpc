@@ -1,9 +1,14 @@
 package cmd
 
 import (
+	"fmt"
+	"log"
 	"path/filepath"
 
 	"github.com/powerpuffpenguin/webpc/cmd/internal/slave"
+	"github.com/powerpuffpenguin/webpc/configure"
+	"github.com/powerpuffpenguin/webpc/db/manipulator"
+	"github.com/powerpuffpenguin/webpc/logger"
 	"github.com/powerpuffpenguin/webpc/utils"
 
 	"github.com/spf13/cobra"
@@ -11,18 +16,43 @@ import (
 
 func init() {
 	var (
-		filename    string
-		debug, test bool
-		basePath    = utils.BasePath()
+		filename              string
+		insecure, debug, test bool
+		basePath              = utils.BasePath()
 
-		addr string
+		url string
 	)
 
 	cmd := &cobra.Command{
 		Use:   `slave`,
 		Short: `run as slave`,
 		Run: func(cmd *cobra.Command, args []string) {
-			slave.Run()
+			// load configure
+			cnf := configure.DefaultSlave()
+			e := cnf.Load(filename)
+			if e != nil {
+				log.Fatalln(e)
+			}
+			if url != `` {
+				cnf.Connect.URL = url
+			}
+			if insecure {
+				cnf.Connect.Insecure = insecure
+			}
+			if test {
+				fmt.Println(cnf)
+				return
+			}
+			// init logger
+			e = logger.Init(basePath, false, &cnf.Logger)
+			if e != nil {
+				log.Fatalln(e)
+			}
+
+			// init db
+			manipulator.Init(&cnf.DB)
+
+			slave.Run(&cnf.Connect, &cnf.System, debug)
 		},
 	}
 	flags := cmd.Flags()
@@ -31,10 +61,15 @@ func init() {
 		utils.Abs(basePath, filepath.Join(`etc`, `slave.jsonnet`)),
 		`configure file`,
 	)
-	flags.StringVarP(&addr, `addr`,
-		`a`,
+	flags.StringVarP(&url, `url`,
+		`u`,
 		``,
-		`connect address`,
+		`connect websocket url`,
+	)
+	flags.BoolVarP(&insecure, `insecure`,
+		`k`,
+		false,
+		`allow insecure server connections when using SSL`,
 	)
 
 	flags.BoolVarP(&debug, `debug`,
