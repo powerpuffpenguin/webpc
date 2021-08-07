@@ -28,14 +28,16 @@ type element struct {
 	gateway *runtime.ServeMux
 }
 type Forward struct {
-	web  web.Helper
-	keys map[int64]element
-	rw   sync.RWMutex
+	web          web.Helper
+	keys         map[int64]element
+	subscription map[*Subscription]bool
+	rw           sync.RWMutex
 }
 
 func newForward() *Forward {
 	return &Forward{
-		keys: make(map[int64]element),
+		keys:         make(map[int64]element),
+		subscription: make(map[*Subscription]bool),
 	}
 }
 func (f *Forward) Del(id int64) {
@@ -44,11 +46,24 @@ func (f *Forward) Del(id int64) {
 	_, exists := f.keys[id]
 	if exists {
 		delete(f.keys, id)
+
+		for s := range f.subscription {
+			s.put(State{
+				ID:    id,
+				Ready: true,
+			})
+		}
 	}
 }
 func (f *Forward) Put(id int64, cc *grpc.ClientConn, gateway *runtime.ServeMux) {
 	f.rw.Lock()
 	defer f.rw.Unlock()
+	for s := range f.subscription {
+		s.put(State{
+			ID:    id,
+			Ready: true,
+		})
+	}
 
 	old, exists := f.keys[id]
 	if exists {
@@ -115,4 +130,26 @@ func (f *Forward) Forward(id int64, c *gin.Context) {
 
 	// ServeHTTP
 	ele.gateway.ServeHTTP(c.Writer, c.Request)
+}
+
+func (f *Forward) Subscribe() (s *Subscription) {
+	s = &Subscription{
+		forward: f,
+		close:   make(chan struct{}),
+		ch:      make(chan State, 100),
+		keys:    make(map[int64]bool),
+	}
+	f.rw.Lock()
+	f.subscription[s] = true
+	f.rw.Unlock()
+	return
+}
+func (f *Forward) Unsubscribe(s *Subscription) (exists bool) {
+	f.rw.Lock()
+	if _, exists = f.subscription[s]; exists {
+		close(s.close)
+		delete(f.subscription, s)
+	}
+	f.rw.Unlock()
+	return
 }

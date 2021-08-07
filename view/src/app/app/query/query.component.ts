@@ -17,6 +17,7 @@ import { KeysService } from 'src/app/core/group/keys.service';
 import { GroupComponent } from '../dialog/group/group.component';
 import { TreeSelectComponent } from 'src/app/shared/tree-select/tree-select.component';
 import { Element } from 'src/app/core/group/tree';
+import { StateManager } from './state';
 
 @Component({
   selector: 'app-query',
@@ -29,6 +30,7 @@ export class QueryComponent implements OnInit, OnDestroy {
   request = new Request()
   lastRequest: Request | undefined
   source = new Array<Data>()
+  stateManager = {} as StateManager
   readonly displayedColumns: string[] = ['id', 'name', 'description', 'group', 'code', 'buttons']
   constructor(
     private readonly sessionService: SessionService,
@@ -42,6 +44,7 @@ export class QueryComponent implements OnInit, OnDestroy {
   }
   private closed_ = new Closed()
   ngOnInit(): void {
+    this.stateManager = new StateManager(this.sessionService)
     this.request.name = undefined
     this.activatedRoute.queryParams.pipe(
       takeUntil(this.closed_.observable)
@@ -133,6 +136,14 @@ export class QueryComponent implements OnInit, OnDestroy {
             data.parentName = ele.name
           }
         })
+        if (this.stateManager) {
+          let target: Array<string> = []
+          if (this.source) {
+            target = this.source.map((v) => v.id)
+          }
+          this.stateManager.subscribe(target)
+        }
+
       }).catch((e) => {
         if (this.closed_.isClosed) {
           return
@@ -286,5 +297,8 @@ export class QueryComponent implements OnInit, OnDestroy {
       return ''
     }
     return this.keysService.parentName(parent.id, parent.name, true)
+  }
+  isReady(id: string): boolean {
+    return this.stateManager.isReady(id) ?? false
   }
 }

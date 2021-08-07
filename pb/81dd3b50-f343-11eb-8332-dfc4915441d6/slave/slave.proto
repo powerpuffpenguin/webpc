@@ -50,6 +50,8 @@ service Slave {
             body: "*"
         };
     }
+    // subscribe status
+    rpc subscribe (stream SubscribeRequest) returns (stream SubscribeResponse);
 }
 
 message Data {
@@ -126,4 +128,19 @@ message GroupRequest{
 }
 message GroupResponse{
     bool changed = 1;
+}
+
+message SubscribeRequest{
+    // * 1 ping
+    // * 2 subscribe
+    uint32 code = 1;
+    repeated int64 targets = 2;
+}
+message SubscribeData{
+    int64 id = 1;
+    bool ready = 2;
+}
+message SubscribeResponse{
+    string emsg = 1;
+    repeated SubscribeData items =2;
 }
