@@ -1,20 +1,19 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ToasterService } from 'angular2-toaster';
+import { interval } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { ServerAPI } from 'src/app/core/core/api';
 import { Closed } from 'src/app/core/utils/closed';
 import { Loader } from 'src/app/core/utils/loader';
-import { RequireNet } from 'src/app/core/utils/requirenet';
+import { RequireState } from 'src/app/core/utils/requirenet';
 import { durationString } from 'src/app/core/utils/utils';
-interface VersionResponse {
-  platform: string
-  version: string
+import { VersionState, VersionResponse, StartAtState, StartAtResponse, DataState, DataResponse } from './load_state'
+
+interface Error {
+  id: string
+  err: any
 }
-interface StartAtResponse {
-  result: number
-}
+const DefaultValue: any = {}
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
@@ -22,39 +21,87 @@ interface StartAtResponse {
 })
 export class HomeComponent implements OnInit, OnDestroy {
   private closed_ = new Closed()
-  err: any
-  response: VersionResponse | undefined
-  startAt: any
-  started: string = ''
-  loader: Loader | undefined
+  private target_ = ''
+  ready = false
+  loader: Loader = DefaultValue
+  moment: any
+  data: DataResponse = DefaultValue
+  version: VersionResponse = DefaultValue
+  startAt: StartAtResponse = DefaultValue
+  errs: Array<Error> = []
+  hasErr = false
   constructor(private readonly activatedRoute: ActivatedRoute,
     private readonly httpClient: HttpClient,
-    private readonly toasterService: ToasterService,
   ) {
-    this.loader = new Loader([
-
-    ])
   }
-
   ngOnInit(): void {
+    const opts = {
+      httpClient: this.httpClient,
+      target: this.activatedRoute.snapshot.params["id"],
+      cancel: this.closed_.observable,
+    }
+    this.target_ = opts.target
+    this.loader = new Loader([
+      new RequireState('moment', (moment) => {
+        this.moment = moment
+      }, (e) => {
+        this.errs.push({
+          id: 'moment',
+          err: e,
+        })
+      }),
+      new DataState(opts, (data) => {
+        this.data = data
+      }, (e) => {
+        this.errs.push({
+          id: 'data',
+          err: e,
+        })
+      }),
+      new VersionState(opts, (data) => {
+        this.version = data
+      }, (e) => {
+        this.errs.push({
+          id: 'VersionState',
+          err: e,
+        })
+      }),
+      new StartAtState(opts, (data) => {
+        this.startAt = data
+      }, (e) => {
+        this.errs.push({
+          id: 'StartAtState',
+          err: e,
+        })
+      }),
+    ])
+    this.onClickRefresh()
     this.onClickRefresh()
   }
   ngOnDestroy() {
     this.closed_.close()
   }
   onClickRefresh() {
-    const target = this.activatedRoute.snapshot.params["id"]
-    ServerAPI.forward.v1.system.child('version').get<VersionResponse>(this.httpClient, {
-      params: {
-        slave_id: target,
-      }
-    }).pipe(
-      takeUntil(this.closed_.observable)
-    ).subscribe((resp) => {
-      this.response = resp
-    }, (e) => {
-      this.err = e
+    this.hasErr = false
+    this.errs = []
+    this.loader.load().then(() => {
+      const moment = this.moment
+      const startAt = this.startAt
+      startAt.at = moment.unix(startAt.result)
+      const d = moment.duration(moment.unix(moment.now() / 1000).diff(startAt.at))
+      startAt.started = durationString(d)
+
+
+      interval(1000).pipe(
+        takeUntil(this.closed_.observable),
+      ).subscribe(() => {
+        const startAt = this.startAt
+        const d = moment.duration(moment.unix(moment.now() / 1000).diff(startAt.at))
+        startAt.started = durationString(d)
+      })
+      this.ready = true
+    }).catch((_) => {
+      this.hasErr = true
     })
   }
-
 }

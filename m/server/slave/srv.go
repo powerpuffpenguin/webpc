@@ -55,6 +55,40 @@ func (s server) Find(ctx context.Context, req *grpc_slave.FindRequest) (resp *gr
 	}
 	return
 }
+
+var emptyGetResponse grpc_slave.Data
+
+func (s server) Get(ctx context.Context, req *grpc_slave.GetRequest) (resp *grpc_slave.Data, e error) {
+	TAG := `slave Get`
+	_, userdata, e := s.Userdata(ctx)
+	if e != nil {
+		return
+	}
+	s.SetHTTPCacheMaxAge(ctx, 5)
+	e = s.ServeMessage(ctx, db.LastModified(), func(nobody bool) error {
+		if nobody {
+			resp = &emptyGetResponse
+		} else {
+			tmp, err := db.Get(ctx, req.Id)
+			if err != nil {
+				return err
+			}
+			if !userdata.AuthAny(db0.Root) {
+				tmp.Code = ``
+			}
+			resp = tmp
+		}
+		return nil
+	})
+	if e != nil {
+		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
+			ce.Write(
+				zap.Error(e),
+			)
+		}
+	}
+	return
+}
 func (s server) Add(ctx context.Context, req *grpc_slave.AddRequest) (resp *grpc_slave.AddResponse, e error) {
 	TAG := `slave Add`
 	_, userdata, e := s.Userdata(ctx)

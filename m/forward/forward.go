@@ -81,31 +81,33 @@ func (f *Forward) Forward(id int64, c *gin.Context) {
 	}
 	// check group
 	if id == 0 {
-		if !userdata.AuthTest(db.Root) {
+		if !userdata.AuthAny(db.Root, db.Server) {
 			f.web.Error(c, http.StatusForbidden, codes.PermissionDenied, `permission denied`)
 			return
 		}
 	} else {
-		parents, e := signal_group.IDS(c.Request.Context(), userdata.Parent, false)
-		if e != nil {
-			f.web.Error(c, http.StatusInternalServerError, codes.Unknown, e.Error())
-			return
-		}
-		bean, e := signal_slave.Get(c.Request.Context(), id)
-		if e != nil {
-			f.web.Error(c, http.StatusInternalServerError, codes.Unknown, e.Error())
-			return
-		}
-		found := false
-		for _, parent := range parents.ID {
-			if parent == bean.Parent {
-				found = true
-				break
+		if !userdata.AuthAny(db.Root) && userdata.Parent != 1 {
+			parents, e := signal_group.IDS(c.Request.Context(), userdata.Parent, false)
+			if e != nil {
+				f.web.Error(c, http.StatusInternalServerError, codes.Unknown, e.Error())
+				return
 			}
-		}
-		if !found {
-			f.web.Error(c, http.StatusForbidden, codes.PermissionDenied, `permission denied`)
-			return
+			bean, e := signal_slave.Get(c.Request.Context(), id)
+			if e != nil {
+				f.web.Error(c, http.StatusInternalServerError, codes.Unknown, e.Error())
+				return
+			}
+			found := false
+			for _, parent := range parents.ID {
+				if parent == bean.Parent {
+					found = true
+					break
+				}
+			}
+			if !found {
+				f.web.Error(c, http.StatusForbidden, codes.PermissionDenied, `permission denied`)
+				return
+			}
 		}
 	}
 	// token

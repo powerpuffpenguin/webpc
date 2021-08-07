@@ -40,7 +40,9 @@ func (s server) Version(ctx context.Context, req *grpc_system.VersionRequest) (r
 
 var (
 	emptyStartAtResponse grpc_system.StartAtResponse
-	startAtResponse      grpc_system.StartAtResponse
+	startAtResponse      = grpc_system.StartAtResponse{
+		Result: time.Now().Unix(),
+	}
 )
 
 func (s server) StartAt(ctx context.Context, req *grpc_system.StartAtRequest) (resp *grpc_system.StartAtResponse, e error) {

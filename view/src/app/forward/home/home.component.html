@@ -1,1 +1,23 @@
-<p>home works!</p>
+<div class="view">
+    <ng-container *ngIf="ready;then readyView;else loadView"></ng-container>
+</div>
+
+<ng-template #loadView>
+    <shared-load-view [hasErr]="hasErr" [errs]="errs" (valChange)="onClickRefresh()"></shared-load-view>
+</ng-template>
+
+<ng-template #readyView>
+    <mat-card>
+        <mat-card-content>
+            <mat-card-header>
+                <mat-card-title>{{data.name}} -> {{data.id}}</mat-card-title>
+                <mat-card-subtitle *ngIf="data.description?.length">{{data.description}}</mat-card-subtitle>
+            </mat-card-header>
+            <div>
+                <p>{{version.platform}}</p>
+                <p>{{version.version}}</p>
+                <p>start at {{startAt.at.format('YYYY-MM-DD HH:mm:ss')}}, started {{startAt.started}}.</p>
+            </div>
+        </mat-card-content>
+    </mat-card>
+</ng-template>

@@ -12,6 +12,11 @@ service Slave {
             get: "/api/v1/slaves"
         };
     }
+    rpc Get (GetRequest) returns (Data){
+        option (google.api.http) = {
+            get: "/api/v1/slaves/id/{id}"
+        };
+    }
     // add slave
     rpc Add (AddRequest) returns (AddResponse){
         option (google.api.http) = {
@@ -55,6 +60,9 @@ message Data {
     string code = 4;
     // group id
     int64 parent = 5;
+}
+message GetRequest{
+    int64 id = 1;
 }
 message FindRequest{
     enum Result {

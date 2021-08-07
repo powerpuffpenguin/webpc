@@ -17,16 +17,19 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTreeModule } from '@angular/material/tree';
 import { MatListModule } from '@angular/material/list';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatCardModule } from '@angular/material/card';
 
 import { NavigationBarComponent } from './navigation-bar/navigation-bar.component';
 import { SignInComponent } from './sign-in/sign-in.component';
 import { PasswordComponent } from './password/password.component';
 import { TreeComponent } from './tree/tree.component';
 import { TreeSelectComponent } from './tree-select/tree-select.component';
+import { LoadViewComponent } from './load-view/load-view.component';
 
 
 @NgModule({
-  declarations: [NavigationBarComponent, SignInComponent, PasswordComponent, TreeComponent, TreeSelectComponent],
+  declarations: [NavigationBarComponent, SignInComponent, PasswordComponent, TreeComponent, TreeSelectComponent, LoadViewComponent],
   imports: [
     CommonModule, RouterModule, FormsModule,
 
@@ -34,9 +37,9 @@ import { TreeSelectComponent } from './tree-select/tree-select.component';
     MatMenuModule, MatButtonModule, MatDividerModule,
     MatDialogModule, MatFormFieldModule, MatCheckboxModule,
     MatInputModule, MatProgressSpinnerModule, MatTreeModule,
-    MatRadioModule,
+    MatRadioModule, MatProgressBarModule, MatCardModule,
     MatListModule,
   ],
-  exports: [NavigationBarComponent, TreeComponent, TreeSelectComponent]
+  exports: [NavigationBarComponent, TreeComponent, TreeSelectComponent, LoadViewComponent]
 })
 export class SharedModule { }

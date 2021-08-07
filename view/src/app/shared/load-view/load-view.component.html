@@ -1,0 +1,20 @@
+<ng-container *ngIf="hasErr;then errorView;else refreshView"></ng-container>
+<ng-template #refreshView>
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    <p i18n>connecting to server, please wait...</p>
+</ng-template>
+<ng-template #errorView>
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title i18n>Error</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <div *ngFor="let err of errs; ">
+                {{err.id}} -> {{err.err}}
+            </div>
+        </mat-card-content>
+        <mat-card-actions>
+            <button mat-stroked-button i18n (click)="onClickRefresh($event)">Refresh</button>
+        </mat-card-actions>
+    </mat-card>
+</ng-template>

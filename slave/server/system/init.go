@@ -2,7 +2,6 @@ package system
 
 import (
 	"context"
-	"time"
 
 	grpc_system "github.com/powerpuffpenguin/webpc/protocol/forward/system"
 
@@ -16,6 +15,5 @@ func (Module) RegisterGRPC(srv *grpc.Server) {
 	grpc_system.RegisterSystemServer(srv, server{})
 }
 func (Module) RegisterGateway(gateway *runtime.ServeMux, cc *grpc.ClientConn) error {
-	startAtResponse.Result = time.Now().Unix()
 	return grpc_system.RegisterSystemHandler(context.Background(), gateway, cc)
 }

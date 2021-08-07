@@ -8,7 +8,9 @@ import { finalize, takeUntil } from 'rxjs/operators';
 import { I18nService } from 'src/app/core/i18n/i18n.service';
 import { Manager } from 'src/app/core/session/session';
 import { md5String } from 'src/app/core/utils/md5';
-
+interface Response {
+  changed: boolean
+}
 @Component({
   selector: 'app-password',
   templateUrl: './password.component.html',
@@ -31,7 +33,7 @@ export class PasswordComponent implements OnInit, OnDestroy {
   }
   onSave() {
     this.disabled = true
-    ServerAPI.v1.sessions.child('password').post(this.httpClient,
+    ServerAPI.v1.sessions.child('password').post<Response>(this.httpClient,
       {
         'old': md5String(this.old),
         'password': md5String(this.val),
@@ -41,13 +43,17 @@ export class PasswordComponent implements OnInit, OnDestroy {
       finalize(() => {
         this.disabled = false
       })
-    ).subscribe(() => {
-      this.toasterService.pop('success', undefined, this.i18nService.get('password changed'))
-      const session = Manager.instance.session
-      if (session) {
-        Manager.instance.clear(session)
+    ).subscribe((resp) => {
+      if (resp.changed) {
+        this.toasterService.pop('success', undefined, this.i18nService.get('password changed'))
+        const session = Manager.instance.session
+        if (session) {
+          Manager.instance.clear(session)
+        }
+        this.matDialogRef.close()
+      } else {
+        this.toasterService.pop('error', undefined, 'not matched or not changed')
       }
-      this.matDialogRef.close()
     }, (e) => {
       this.toasterService.pop('error', undefined, e)
     })

@@ -78,6 +78,16 @@ func Find(ctx context.Context, request *grpc_slave.FindRequest) (*grpc_slave.Fin
 	}
 	return &response, nil
 }
+func Get(ctx context.Context, id int64) (*grpc_slave.Data, error) {
+	var bean DataOfSlave
+	exists, e := manipulator.Engine().ID(id).Context(ctx).Get(&bean)
+	if e != nil {
+		return nil, e
+	} else if !exists {
+		return nil, status.Error(codes.NotFound, `id not exists: `+strconv.FormatInt(id, 10))
+	}
+	return bean.ToPB(), nil
+}
 func Add(ctx context.Context, parent int64, name, description string) (int64, string, error) {
 	code, e := newCode()
 	if e != nil {

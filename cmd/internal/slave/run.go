@@ -25,7 +25,7 @@ func Run() {
 	for {
 		var d websocket.Dialer
 		l := reverse.Listen(Addr(0), reverse.WithListenerDialContext(func(ctx context.Context, network, address string) (net.Conn, error) {
-			c, _, e := d.DialContext(ctx, `ws://127.0.0.1:9000/api/v1/dialer/7fba128ef5ce11eba2580242ac120064`, nil)
+			c, _, e := d.DialContext(ctx, `ws://127.0.0.1:9000/api/v1/dialer/64048031f73a11eba3890242ac120064`, nil)
 			if e != nil {
 				return nil, e
 			}
