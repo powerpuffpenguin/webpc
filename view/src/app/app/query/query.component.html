@@ -30,7 +30,7 @@
                 {{element.id}}
                 <a mat-icon-button [routerLink]="'/forward/view/'+element.id" i18n-matTooltip
                     matTooltip="Connect Tooltip">
-                    <ng-container *ngIf="isReady(element.id);then onlineView;else outlineView"></ng-container>
+                    <ng-container *ngIf="element.ready;then onlineView;else outlineView"></ng-container>
                     <ng-template #onlineView>
                         <mat-icon>check_circle</mat-icon>
                     </ng-template>

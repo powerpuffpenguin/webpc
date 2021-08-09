@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/powerpuffpenguin/webpc/db"
+	"github.com/powerpuffpenguin/webpc/m/helper"
 	"github.com/powerpuffpenguin/webpc/sessions"
 	"google.golang.org/grpc/codes"
 
@@ -18,6 +19,9 @@ type sessionValue struct {
 	e       error
 }
 
+func (h Helper) GetToken(c *gin.Context) string {
+	return h.getToken(c)
+}
 func (h Helper) getToken(c *gin.Context) string {
 	token := c.GetHeader(`Authorization`)
 	if token != `` {
@@ -33,6 +37,10 @@ func (h Helper) getToken(c *gin.Context) string {
 	c.ShouldBindQuery(&obj)
 	if obj.AccessToken != `` {
 		return `Bearer ` + obj.AccessToken
+	}
+	token, _ = c.Cookie(helper.CookieName)
+	if token != `` {
+		return `Bearer ` + token
 	}
 	return ``
 }

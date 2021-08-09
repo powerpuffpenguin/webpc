@@ -6,6 +6,7 @@ import (
 
 	"github.com/powerpuffpenguin/webpc/m/web/contrib/compression"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -79,10 +80,44 @@ func (h Helper) Compression() gin.HandlerFunc {
 func (h Helper) Upgrade(w http.ResponseWriter, r *http.Request, responseHeader http.Header) (*websocket.Conn, error) {
 	return upgrader.Upgrade(w, r, responseHeader)
 }
+
 func (h Helper) WSWriteClose(ws *websocket.Conn, code uint16, msg string) (e error) {
 	b := make([]byte, 2+len(msg))
 	binary.BigEndian.PutUint16(b, code)
 	copy(b[2:], msg)
 	e = ws.WriteMessage(websocket.CloseMessage, b)
 	return
+}
+func (h Helper) WSWriteError(ws *websocket.Conn, e error) {
+	ws.WriteJSON(gin.H{
+		`code`: status.Code(e),
+		`emsg`: e.Error(),
+	})
+}
+func (h Helper) WSForward(ws *websocket.Conn, f Forward) {
+	go h.wsRequest(ws, f)
+	for {
+		e := f.Response()
+		if e != nil {
+			h.WSWriteError(ws, e)
+			break
+		}
+	}
+	ws.Close()
+}
+func (h Helper) wsRequest(ws *websocket.Conn, f Forward) {
+	for {
+		t, p, e := ws.ReadMessage()
+		if e != nil {
+			h.WSWriteError(ws, e)
+			break
+		}
+		e = f.Request(t, p)
+		if e != nil {
+			h.WSWriteError(ws, e)
+			break
+		}
+	}
+	ws.Close()
+	f.CloseSend()
 }

@@ -19,6 +19,7 @@ func (h Helper) Register(cc *grpc.ClientConn, router *gin.RouterGroup) {
 	ms := []web.IHelper{
 		Logger{},
 		Dialer{},
+		&Slave{},
 	}
 	for _, m := range ms {
 		m.Register(cc, r)

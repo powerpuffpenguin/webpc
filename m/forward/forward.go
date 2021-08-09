@@ -1,6 +1,7 @@
 package forward
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"net/http"
@@ -50,7 +51,7 @@ func (f *Forward) Del(id int64) {
 		for s := range f.subscription {
 			s.put(State{
 				ID:    id,
-				Ready: true,
+				Ready: false,
 			})
 		}
 	}
@@ -132,10 +133,10 @@ func (f *Forward) Forward(id int64, c *gin.Context) {
 	ele.gateway.ServeHTTP(c.Writer, c.Request)
 }
 
-func (f *Forward) Subscribe() (s *Subscription) {
+func (f *Forward) Subscribe(ctx context.Context) (s *Subscription) {
 	s = &Subscription{
 		forward: f,
-		close:   make(chan struct{}),
+		ctx:     ctx,
 		ch:      make(chan State, 100),
 		keys:    make(map[int64]bool),
 	}
@@ -144,10 +145,26 @@ func (f *Forward) Subscribe() (s *Subscription) {
 	f.rw.Unlock()
 	return
 }
+func (f *Forward) change(s *Subscription, targets []int64) {
+	f.rw.RLock()
+	for k := range s.keys {
+		delete(s.keys, k)
+	}
+	for _, id := range targets {
+		s.keys[id] = true
+	}
+	for id := range s.keys {
+		_, exists := f.keys[id]
+		s.put(State{
+			ID:    id,
+			Ready: exists,
+		})
+	}
+	f.rw.RUnlock()
+}
 func (f *Forward) Unsubscribe(s *Subscription) (exists bool) {
 	f.rw.Lock()
 	if _, exists = f.subscription[s]; exists {
-		close(s.close)
 		delete(f.subscription, s)
 	}
 	f.rw.Unlock()

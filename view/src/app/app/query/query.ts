@@ -114,6 +114,7 @@ export interface Data {
     code: string
     parent: string
     parentName?: string
+    ready?: boolean
 }
 export interface Response {
     result: 'DATA' | 'COUNT' | 'DATA_COUNT'

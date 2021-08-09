@@ -32,6 +32,7 @@ export class QueryComponent implements OnInit, OnDestroy {
   source = new Array<Data>()
   stateManager = {} as StateManager
   readonly displayedColumns: string[] = ['id', 'name', 'description', 'group', 'code', 'buttons']
+  private keys_ = new Map<string, Data>()
   constructor(
     private readonly sessionService: SessionService,
     private readonly httpClient: HttpClient,
@@ -44,7 +45,13 @@ export class QueryComponent implements OnInit, OnDestroy {
   }
   private closed_ = new Closed()
   ngOnInit(): void {
-    this.stateManager = new StateManager(this.sessionService)
+    const keys = this.keys_
+    this.stateManager = new StateManager(this.sessionService, (id, ready) => {
+      const item = keys.get(id)
+      if (item) {
+        item.ready = ready
+      }
+    })
     this.request.name = undefined
     this.activatedRoute.queryParams.pipe(
       takeUntil(this.closed_.observable)
@@ -68,6 +75,7 @@ export class QueryComponent implements OnInit, OnDestroy {
     })
   }
   ngOnDestroy() {
+    this.stateManager.close()
     this.closed_.close()
   }
   private sets_ = new Set<GroupData>()
@@ -126,6 +134,7 @@ export class QueryComponent implements OnInit, OnDestroy {
       request.cloneTo(this.request_)
       this._updateAll()
       this.source = response.data
+      this._updateKeys(response.data)
       this.keysService.promise.then((keys) => {
         if (this.closed_.isClosed) {
           return
@@ -247,6 +256,7 @@ export class QueryComponent implements OnInit, OnDestroy {
         this.source.splice(index, 1)
         source.push(...this.source)
         this.source = source
+
         if (this.request.count > 0) {
           this.request.count--
         }
@@ -298,7 +308,12 @@ export class QueryComponent implements OnInit, OnDestroy {
     }
     return this.keysService.parentName(parent.id, parent.name, true)
   }
-  isReady(id: string): boolean {
-    return this.stateManager.isReady(id) ?? false
+  private _updateKeys(items: Array<Data>) {
+    const keys = this.keys_
+    keys.clear()
+    items.forEach((item) => {
+      keys.set(item.id, item)
+      item.ready = this.stateManager.isReady(item.id)
+    })
   }
 }

@@ -3,7 +3,6 @@ package slave
 import (
 	"context"
 	"net/http"
-	"strconv"
 	"strings"
 
 	db0 "github.com/powerpuffpenguin/webpc/db"
@@ -284,30 +283,31 @@ func (s server) Remove(ctx context.Context, req *grpc_slave.RemoveRequest) (resp
 	}
 	return
 }
-func (s server) Subscribe(serveer grpc_slave.Slave_SubscribeServer) (e error) {
-	TAG := `user Remove`
-	var req *grpc_slave.SubscribeRequest
+func (s server) Subscribe(server grpc_slave.Slave_SubscribeServer) (e error) {
+	TAG := `user Subscribe`
+	sub := newSubscription(server.Context())
+	go sub.Recv(server)
+	var resp *grpc_slave.SubscribeResponse
 	for {
-		e = serveer.RecvMsg(&req)
+		resp, e = sub.Get()
 		if e != nil {
-			break
-		}
-		if req.Code == 1 {
-
-		} else if req.Code == 2 {
-
-		} else {
-			e = s.Error(codes.InvalidArgument, `not supported code :`+strconv.Itoa(int(req.Code)))
 			if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
 				ce.Write(
 					zap.Error(e),
 				)
 			}
-			serveer.Send(&grpc_slave.SubscribeResponse{
-				Emsg: e.Error(),
-			})
+			break
+		}
+		e = server.Send(resp)
+		if e != nil {
+			if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
+				ce.Write(
+					zap.Error(e),
+				)
+			}
 			break
 		}
 	}
+	sub.Close()
 	return
 }

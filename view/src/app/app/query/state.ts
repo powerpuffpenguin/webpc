@@ -1,59 +1,149 @@
-import { filter, takeUntil } from "rxjs/operators"
+import { takeUntil } from "rxjs/operators"
 import { ServerAPI } from "src/app/core/core/api"
 import { SessionService } from "src/app/core/session/session.service"
 import { Closed } from "src/app/core/utils/closed"
-import { Completer } from "src/app/core/utils/completer"
-import { Session } from "src/app/core/session/session"
 import { HttpParams } from "@angular/common/http"
-import { interval, Observable } from "rxjs"
+import { interval } from "rxjs"
+import { environment } from "src/environments/environment"
+import { Client } from "src/app/core/net/client"
 enum EventCode {
     Ping = 1,
     Subscribe = 2,
 }
 interface Request {
-    code: EventCode.Subscribe
+    event: EventCode.Subscribe
     targets?: Array<string>
 }
 interface Response {
+    code: number
+    emsg: string
     items: Array<{
         id: string
         ready: boolean
     }>
 }
-export class StateManager {
-    constructor(
-        private readonly sessionService: SessionService,
-    ) {
-        this.sessionService.observable.pipe(
-            takeUntil(this.closed_.observable),
-            filter((session) => session?.access && session?.userdata.id ? true : false)
-        ).subscribe((session) => {
-            this.session_ = session
+function sendRequest(ws: WebSocket, evt: EventCode, targets?: Array<string>) {
+    let msg: string
+    if (targets) {
+        msg = JSON.stringify({
+            event: evt,
+            targets: targets,
+        })
+    } else {
+        msg = JSON.stringify({
+            event: evt,
         })
     }
-    private session_: Session | undefined
-    private completer_: Completer<WebSocket> | undefined
-    private ws_: WebSocket | undefined
+    if (!environment.production) {
+        console.log(`ws send: ${msg}`)
+    }
+    ws.send(msg)
+}
+
+export class StateManager {
+    private closed_ = new Closed()
+    private client_ = {} as Client
+    constructor(
+        private readonly sessionService: SessionService,
+        private readonly onchanged: (id: string, ready: boolean) => void,
+    ) {
+        const closed = this.closed_
+        const baseURL = ServerAPI.v1.slaves.websocketURL('subscribe')
+        let query = ''
+        this.sessionService.observable.pipe(
+            takeUntil(closed.observable),
+        ).subscribe((session) => {
+            if (session && session.userdata && session.userdata.id && session.access) {
+                query = new HttpParams({
+                    fromObject: {
+                        access_token: session.access,
+                    }
+                }).toString()
+            }
+        })
+        let delay = -1
+        let first = true
+        let timer: any
+        const ctx = this
+        this.client_ = new Client({
+            get url(): string {
+                let url = baseURL
+                if (environment.production) {
+                    console.log(`connect ${baseURL}`)
+                } else {
+                    url += '?' + query.toString()
+                    console.log(`connect ${url}`)
+                }
+                return url
+            },
+            get delay(): number {
+                return delay * 1000
+            },
+            onNew(ws: WebSocket) {
+                ws.binaryType = 'arraybuffer'
+            },
+            onMessage(ws: WebSocket, data) {
+                if (typeof data === "string") {
+                    const resp: Response = JSON.parse(data)
+                    if (resp.code === undefined) {
+                        resp.code == 0
+                    }
+                    if (first && (resp.code == 0)) {
+                        delay = 0
+
+                        if (!timer) {
+                            timer = interval(40 * 1000).pipe(
+                                takeUntil(closed.observable)
+                            ).subscribe(() => {
+                                ctx.client_.promise().then((ws) => {
+                                    console.log('send heart')
+                                    sendRequest(ws, EventCode.Ping)
+                                }).catch((e) => {
+                                    console.log('send heart error: ', e)
+                                })
+                            })
+                        }
+                    }
+                    ctx._onMessage(resp)
+                } else {
+                    ws.close()
+                }
+            },
+            onClose(_: WebSocket) {
+                first = true
+                if (delay == 0) {
+                    delay = -1
+                } else if (delay < 0) {
+                    delay = 2
+                } else {
+                    delay *= 2
+                    if (delay > 16) {
+                        delay = 16
+                    }
+                }
+
+                if (ctx.targets_.length != 0) {
+                    ctx.request_ = ctx.targets_
+                    ctx._subscribe()
+                }
+            }
+        })
+    }
+
     private targets_: Array<string> = []
     private request_: Array<string> | undefined
     private readys_ = new Set<string>()
-    private closed_ = new Closed()
     get isClosed(): boolean {
         return this.closed_.isClosed
     }
     get isNotClosed(): boolean {
-        return !this.closed_.isNotClosed
+        return this.closed_.isNotClosed
     }
     close() {
         if (this.isNotClosed) {
             this.closed_.close()
-            if (this.timeout_) {
-                clearTimeout(this.timeout_)
-            }
-            if (this.ws_) {
-                this.ws_.close()
-                this.ws_ = undefined
-            }
+            this.client_.close()
+            this.request_ = undefined
         }
     }
 
@@ -89,67 +179,23 @@ export class StateManager {
     }
     private async _subscribe() {
         try {
-            const ws = await this.ws()
+            const ws = await this.client_.promise()
+            if (this.isClosed) {
+                return
+            }
             if (!this.request_) {
                 return
             }
-            ws.send(JSON.stringify({
-                code: EventCode.Subscribe,
-                targets: this.request_,
-            }))
+            sendRequest(ws, EventCode.Subscribe, this.request_)
             this.request_ = undefined
         } catch (e) {
-            if (this.request_) {
-                this._subscribe()
+            if (this.isClosed || !this.request_) {
+                return
             }
+            this._subscribe()
         }
     }
-    private tempDelay_ = 0
-    private at = 0
-    private timeout_: any
-    private async ws(): Promise<WebSocket> {
-        if (this.completer_) {
-            return this.completer_.promise
-        }
-        let completer = new Completer<WebSocket>()
-        this.completer_ = completer
 
-        const tempDelay = this.tempDelay_
-        if (tempDelay) {
-            const deadline = this.at + tempDelay * 1000
-            const now = Date.now()
-            if (deadline > now) {
-                const duration = deadline - now
-                await new Promise<void>((resolve) => {
-                    console.warn(`ws connect wait ${duration / 1000}s`)
-                    this.timeout_ = setTimeout(() => {
-                        resolve()
-                    }, duration)
-                })
-            }
-        }
-        try {
-            const ws = await this._connect()
-            this.tempDelay_ = 0
-            completer.resolve(ws)
-        } catch (e) {
-            this.completer_ = undefined
-
-            if (this.tempDelay_) {
-                this.tempDelay_ *= 2
-                if (this.tempDelay_ > 16) {
-                    this.tempDelay_ = 16
-                }
-            } else {
-                this.tempDelay_ = 2
-            }
-            this.at = Date.now()
-            console.log(`ws connect error, retrying in ${this.tempDelay_}s.`)
-            completer.reject(e)
-            return completer.promise
-        }
-        return completer.promise
-    }
     private _isEqual(l: Array<string>, r: Array<string>): boolean {
         if (l.length != r.length) {
             return false
@@ -161,83 +207,18 @@ export class StateManager {
         }
         return true
     }
-    private interval_: any
-    private async _connect(): Promise<WebSocket> {
-        return new Promise<WebSocket>((resolve, reject) => {
-            try {
-                const session = this.session_
-                if (session?.access && session?.userdata?.id) {
-                    const query = new HttpParams({
-                        fromObject: {
-                            access_token: session.access,
-                        }
-                    })
-                    let url = ServerAPI.v1.slaves.websocketURL('subscribe')
-                    console.log(`connect ${url}`)
-                    url += + '?' + query.toString()
-                    const ws = new WebSocket(url)
-                    ws.binaryType = "arraybuffer"
-                    let end = false
-                    ws.onopen = () => {
-                        this.ws_ = ws
-                        end = true
-                        if (!this.interval_) {
-                            this.interval_ = interval(40 * 1000).pipe(
-                                takeUntil(this.closed_.observable)
-                            ).subscribe(() => {
-                                console.log(`send heart`)
-                                ws.send(JSON.stringify({
-                                    code: EventCode.Ping,
-                                }))
-                            })
-                        }
-                        ws.onmessage = (evt) => {
-                            if (ws != this.ws_) {
-                                return
-                            }
-                            if (typeof evt.data == "string") {
-                                this._onMessage(evt.data)
-                            }
-                        }
-                        resolve(ws)
-                    }
-                    ws.onclose = (evt) => {
-                        if (this.ws_ == ws) {
-                            this.ws_ = undefined
-                            this.completer_ = undefined
-                        }
 
-                        ws.close()
-                        if (!end) {
-                            end = true
-                            reject(new Error(`ws close: ${evt.reason}`))
-                        }
-                    }
-                    ws.onerror = (evt) => {
-                        if (this.ws_ == ws) {
-                            this.ws_ = undefined
-                            this.completer_ = undefined
-                        }
-
-                        ws.close()
-                        if (!end) {
-                            end = true
-                            reject(new Error(`ws err`))
-                        }
-                    }
-                } else {
-                    reject(new Error(`session nil`))
-                }
-            } catch (e) {
-                reject(e)
-            }
-        })
-    }
-    private _onMessage(data: string) {
-        const obj: Response = JSON.parse(data)
-        if (Array.isArray(obj.items)) {
+    private _onMessage(resp: Response) {
+        if (!environment.production) {
+            console.log('ws recv:', resp)
+        }
+        if (Array.isArray(resp.items)) {
             const readys = this.readys_
-            obj.items.forEach((item) => {
+            const onchanged = this.onchanged
+            resp.items.forEach((item) => {
+                if (onchanged) {
+                    onchanged(item.id, item.ready)
+                }
                 if (item.ready) {
                     readys.add(item.id)
                 } else {

@@ -133,7 +133,7 @@ message GroupResponse{
 message SubscribeRequest{
     // * 1 ping
     // * 2 subscribe
-    uint32 code = 1;
+    uint32 event = 1;
     repeated int64 targets = 2;
 }
 message SubscribeData{
@@ -141,6 +141,7 @@ message SubscribeData{
     bool ready = 2;
 }
 message SubscribeResponse{
-    string emsg = 1;
-    repeated SubscribeData items =2;
+    uint32 code = 1;
+    string emsg = 2;
+    repeated SubscribeData items =3;
 }
