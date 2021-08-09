@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -41,8 +40,8 @@ func (h *Slave) subscribe(c *gin.Context) {
 			`Authorization`, token,
 		))
 	}
-	fmt.Println(`token`, token)
-	defer fmt.Println(`------------ exit`)
+	// fmt.Println(`token`, token)
+	// defer fmt.Println(`------------ exit`)
 	client := grpc_slave.NewSlaveClient(h.cc)
 	stream, e := client.Subscribe(ctx)
 	if e != nil {

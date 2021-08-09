@@ -283,6 +283,8 @@ export class QueryComponent implements OnInit, OnDestroy {
           const source = [data]
           source.push(...this.source)
           this.source = source
+          const targets = source.map((v) => v.id)
+          this.stateManager.subscribe(targets)
         },
       },
       disableClose: true,

@@ -6,6 +6,7 @@ import { HttpParams } from "@angular/common/http"
 import { interval } from "rxjs"
 import { environment } from "src/environments/environment"
 import { Client } from "src/app/core/net/client"
+import { Manager } from "src/app/core/session/session"
 enum EventCode {
     Ping = 1,
     Subscribe = 2,
@@ -88,20 +89,25 @@ export class StateManager {
                     if (resp.code === undefined) {
                         resp.code == 0
                     }
-                    if (first && (resp.code == 0)) {
-                        delay = 0
-
-                        if (!timer) {
-                            timer = interval(40 * 1000).pipe(
-                                takeUntil(closed.observable)
-                            ).subscribe(() => {
-                                ctx.client_.promise().then((ws) => {
-                                    console.log('send heart')
-                                    sendRequest(ws, EventCode.Ping)
-                                }).catch((e) => {
-                                    console.log('send heart error: ', e)
+                    if (first) {
+                        if (resp.code == 0) {
+                            delay = 0
+                            if (!timer) {
+                                timer = interval(40 * 1000).pipe(
+                                    takeUntil(closed.observable)
+                                ).subscribe(() => {
+                                    ctx.client_.promise().then((ws) => {
+                                        console.log('send heart')
+                                        sendRequest(ws, EventCode.Ping)
+                                    }).catch((e) => {
+                                        console.log('send heart error: ', e)
+                                    })
                                 })
-                            })
+                            }
+                        } else {
+                            console.warn('connect err: ', resp)
+                            ws.close()
+                            return
                         }
                     }
                     ctx._onMessage(resp)
