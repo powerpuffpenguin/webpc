@@ -2,11 +2,12 @@ import { takeUntil } from "rxjs/operators"
 import { ServerAPI } from "src/app/core/core/api"
 import { SessionService } from "src/app/core/session/session.service"
 import { Closed } from "src/app/core/utils/closed"
-import { HttpParams } from "@angular/common/http"
+import { HttpClient, HttpParams } from "@angular/common/http"
 import { interval } from "rxjs"
 import { environment } from "src/environments/environment"
 import { Client } from "src/app/core/net/client"
-import { Manager } from "src/app/core/session/session"
+import { Manager, Session } from "src/app/core/session/session"
+
 enum EventCode {
     Ping = 1,
     Subscribe = 2,
@@ -45,34 +46,36 @@ export class StateManager {
     private closed_ = new Closed()
     private client_ = {} as Client
     constructor(
+        httpClient: HttpClient,
         private readonly sessionService: SessionService,
         private readonly onchanged: (id: string, ready: boolean) => void,
     ) {
         const closed = this.closed_
         const baseURL = ServerAPI.v1.slaves.websocketURL('subscribe')
-        let query = ''
+        let session: Session
         this.sessionService.observable.pipe(
             takeUntil(closed.observable),
-        ).subscribe((session) => {
-            if (session && session.userdata && session.userdata.id && session.access) {
-                query = new HttpParams({
-                    fromObject: {
-                        access_token: session.access,
-                    }
-                }).toString()
+        ).subscribe((data) => {
+            if (data && data.userdata && data.userdata.id && data.access) {
+                session = data
             }
         })
         let delay = -1
         let first = true
         let timer: any
         const ctx = this
+        let readySession: Session | undefined
         this.client_ = new Client({
             get url(): string {
-                let url = baseURL
+                const url = baseURL + '?' + new HttpParams({
+                    fromObject: {
+                        access_token: session.access,
+                    }
+                }).toString()
+                readySession = session
                 if (environment.production) {
                     console.log(`connect ${baseURL}`)
                 } else {
-                    url += '?' + query.toString()
                     console.log(`connect ${url}`)
                 }
                 return url
@@ -106,6 +109,9 @@ export class StateManager {
                             }
                         } else {
                             console.warn('connect err: ', resp)
+                            if (resp.code == 16 && readySession) {
+                                Manager.instance.refresh(httpClient, readySession)
+                            }
                             ws.close()
                             return
                         }
@@ -116,6 +122,7 @@ export class StateManager {
                 }
             },
             onClose(_: WebSocket) {
+                readySession = undefined
                 first = true
                 if (delay == 0) {
                     delay = -1

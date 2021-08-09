@@ -13,6 +13,7 @@ export const ServerAPI = {
     forward: {
         v1: {
             system: MakeRESTful(root, 'forward', 'v1', 'system'),
+            fs: MakeRESTful(root, 'forward', 'v1', 'fs'),
         }
     },
     static: {

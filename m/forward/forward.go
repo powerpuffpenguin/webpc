@@ -75,6 +75,15 @@ func (f *Forward) Put(id int64, cc *grpc.ClientConn, gateway *runtime.ServeMux) 
 		gateway: gateway,
 	}
 }
+func (f *Forward) Client(id int64) (cc *grpc.ClientConn) {
+	f.rw.RLock()
+	ele, exists := f.keys[id]
+	if exists {
+		cc = ele.cc
+	}
+	f.rw.RUnlock()
+	return
+}
 func (f *Forward) Forward(id int64, c *gin.Context) {
 	f.rw.RLock()
 	ele, exists := f.keys[id]

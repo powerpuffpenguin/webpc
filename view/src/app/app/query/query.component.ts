@@ -46,12 +46,15 @@ export class QueryComponent implements OnInit, OnDestroy {
   private closed_ = new Closed()
   ngOnInit(): void {
     const keys = this.keys_
-    this.stateManager = new StateManager(this.sessionService, (id, ready) => {
-      const item = keys.get(id)
-      if (item) {
-        item.ready = ready
-      }
-    })
+    this.stateManager = new StateManager(
+      this.httpClient,
+      this.sessionService,
+      (id, ready) => {
+        const item = keys.get(id)
+        if (item) {
+          item.ready = ready
+        }
+      })
     this.request.name = undefined
     this.activatedRoute.queryParams.pipe(
       takeUntil(this.closed_.observable)

@@ -19,5 +19,10 @@
                 <p>start at {{startAt.at.format('YYYY-MM-DD HH:mm:ss')}}, started {{startAt.started}}.</p>
             </div>
         </mat-card-content>
+        <mat-card-actions>
+            <a mat-button routerLink="/forward/fs/{{data.id}}">Filesystem</a>
+            <a mat-button routerLink="/forward/shell/{{data.id}}">Shell</a>
+            <a mat-button routerLink="/forward/vnc/{{data.id}}">VNC</a>
+        </mat-card-actions>
     </mat-card>
 </ng-template>

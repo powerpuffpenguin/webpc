@@ -6,7 +6,11 @@ const routes: Routes = [
   {
     path: 'view/:id',
     component: HomeComponent,
-  }
+  },
+  {
+    path: 'fs',
+    loadChildren: () => import('../forward-fs/forward-fs.module').then(m => m.ForwardFsModule),
+  },
 ];
 
 @NgModule({

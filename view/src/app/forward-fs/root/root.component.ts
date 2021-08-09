@@ -6,11 +6,11 @@ import { Closed } from 'src/app/core/utils/closed';
 import { State } from './state';
 
 @Component({
-  selector: 'app-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+  selector: 'app-root',
+  templateUrl: './root.component.html',
+  styleUrls: ['./root.component.scss']
 })
-export class HomeComponent implements OnInit, OnDestroy {
+export class RootComponent implements OnInit, OnDestroy {
   private closed_ = new Closed()
   state = {} as State
   constructor(private readonly activatedRoute: ActivatedRoute,
@@ -43,13 +43,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   get errs() {
     return this.state.errs
   }
-  get data() {
-    return this.state.data
-  }
-  get version() {
-    return this.state.version
-  }
-  get startAt() {
-    return this.state.startAt
+  get names() {
+    return this.state.mount.name
   }
 }
