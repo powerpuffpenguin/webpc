@@ -2,8 +2,8 @@
 
 <div class="view" #box (contextmenu)="onContextmenu($event)" (mousedown)="onStart($event)" (click)="onClick($event)">
     <div #fs>
-        <fs-file [source]="node" (menuChange)="onContextmenuNode($event)" (checkChange)="onCheckChange($event)"
-            *ngFor="let node of source"></fs-file>
+        <fs-file [source]="node" [target]="folder.id" (menuChange)="onContextmenuNode($event)"
+            (checkChange)="onCheckChange($event)" *ngFor="let node of source"></fs-file>
     </div>
     <div [style.left]="x+'px'" [style.top]="y+'px'" [style.width]="w+'px'" [style.height]="h+'px'" class="rectangle">
     </div>
@@ -39,7 +39,7 @@
         <ng-container *ngIf="target.length==1;then oneView"></ng-container>
         <ng-template #oneView>
             <a class="menu" mat-menu-item *ngIf="target[0].url" [routerLink]="target[0].url"
-                [queryParams]="{root:target[0].root,path:target[0].filename}">
+                [queryParams]="{id:folder.id,root:target[0].root,path:target[0].filename}">
                 <mat-icon>link</mat-icon>
                 <ng-container i18n>Open</ng-container>
             </a>
@@ -48,25 +48,25 @@
                 <ng-container i18n>Open as</ng-container>
             </button>
             <mat-menu #opens="matMenu">
-                <a mat-menu-item routerLink="/fs/view/video"
-                    [queryParams]="{root:target[0].root,path:target[0].filename}">
+                <a mat-menu-item routerLink="/forward/fs/view/video"
+                    [queryParams]="{id:folder.id,root:target[0].root,path:target[0].filename}">
                     <mat-icon>movie_creation</mat-icon>
                     <ng-container i18n>Video</ng-container>
                 </a>
-                <a mat-menu-item routerLink="/fs/view/audio"
-                    [queryParams]="{root:target[0].root,path:target[0].filename}">
+                <a mat-menu-item routerLink="/forward/fs/view/audio"
+                    [queryParams]="{id:folder.id,root:target[0].root,path:target[0].filename}">
 
                     <mat-icon>audiotrack</mat-icon>
                     <ng-container i18n>Audio</ng-container>
                 </a>
-                <a mat-menu-item routerLink="/fs/view/image"
-                    [queryParams]="{root:target[0].root,path:target[0].filename}">
+                <a mat-menu-item routerLink="/forward/fs/view/image"
+                    [queryParams]="{id:folder.id,root:target[0].root,path:target[0].filename}">
 
                     <mat-icon>insert_photo</mat-icon>
                     <ng-container i18n>Image</ng-container>
                 </a>
-                <a mat-menu-item routerLink="/fs/view/text"
-                    [queryParams]="{root:target[0].root,path:target[0].filename}">
+                <a mat-menu-item routerLink="/forward/fs/view/text"
+                    [queryParams]="{id:folder.id,root:target[0].root,path:target[0].filename}">
                     <mat-icon>event_note</mat-icon>
                     <ng-container i18n>Text</ng-container>
                 </a>
@@ -75,7 +75,8 @@
                 <mat-icon>edit</mat-icon>
                 <ng-container i18n>Rename</ng-container>
             </button>
-            <a class="menu" *ngIf="target[0].downloadURL" [href]="target[0].downloadURL" mat-menu-item>
+            <a class="menu" *ngIf="target[0].downloadURL(folder.id,target[0].root,target[0].filename,access)"
+                [href]="target[0].downloadURL(folder.id,target[0].root,target[0].filename,access)" mat-menu-item>
                 <mat-icon>cloud_download</mat-icon>
                 <ng-container i18n>Download</ng-container>
             </a>

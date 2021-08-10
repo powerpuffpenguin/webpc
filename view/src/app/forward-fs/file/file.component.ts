@@ -23,6 +23,8 @@ export class FileComponent implements OnInit {
   ) { }
   @Input()
   source = {} as FileInfo
+  @Input()
+  target = ''
   @Output()
   checkChange = new EventEmitter<CheckEvent>()
   @Output()
@@ -54,40 +56,45 @@ export class FileComponent implements OnInit {
   onDbclick() {
     switch (this.source.filetype) {
       case FileType.Dir:
-        this.router.navigate(['fs', 'list'], {
+        this.router.navigate(['forward', 'fs', 'list'], {
           queryParams: {
+            id: this.target,
             root: this.source.root,
             path: this.source.filename,
           }
         })
         return
       case FileType.Video:
-        this.router.navigate(['fs', 'view', 'video'], {
+        this.router.navigate(['forward', 'fs', 'view', 'video'], {
           queryParams: {
+            id: this.target,
             root: this.source.root,
             path: this.source.filename,
           }
         })
         return
       case FileType.Audio:
-        this.router.navigate(['fs', 'view', 'audio'], {
+        this.router.navigate(['forward', 'fs', 'view', 'audio'], {
           queryParams: {
+            id: this.target,
             root: this.source.root,
             path: this.source.filename,
           }
         })
         return
       case FileType.Image:
-        this.router.navigate(['fs', 'view', 'image'], {
+        this.router.navigate(['forward', 'fs', 'view', 'image'], {
           queryParams: {
+            id: this.target,
             root: this.source.root,
             path: this.source.filename,
           }
         })
         return
       case FileType.Text:
-        this.router.navigate(['fs', 'view', 'text'], {
+        this.router.navigate(['forward', 'fs', 'view', 'text'], {
           queryParams: {
+            id: this.target,
             root: this.source.root,
             path: this.source.filename,
           }

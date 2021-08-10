@@ -25,6 +25,7 @@ import { ListComponent } from './list/list.component';
 import { ManagerComponent } from './manager/manager.component';
 import { PathComponent } from './path/path.component';
 import { FileComponent } from './file/file.component';
+import { TextComponent } from './view/text/text.component';
 
 
 @NgModule({
@@ -33,7 +34,8 @@ import { FileComponent } from './file/file.component';
     ListComponent,
     ManagerComponent,
     PathComponent,
-    FileComponent
+    FileComponent,
+    TextComponent
   ],
   imports: [
     CommonModule,

@@ -1,3 +1,4 @@
+import { HttpParams } from '@angular/common/http';
 import { ServerAPI } from '../core/core/api';
 import { sizeString } from '../core/utils/utils';
 
@@ -41,10 +42,11 @@ const images = new Set();
 const texts = new Set();
 ([
     '.txt', '.text',
-    '.json', '.xml', '.yaml', '.ini',
+    '.json', '.xml', '.yaml', '.ini', '.html', '.md',
     '.sh',
     '.bat', '.cmd', '.vbs',
     '.go', '.dart', '.py', '.py3', '.js', '.ts', '.c', '.cc', '.h', '.hpp', '.cpp',
+    '.java', '.php', '.lua', '.jsonnet', '.libsonnet',
 ]).forEach(function (str: string) {
     texts.add(str)
 });
@@ -154,24 +156,31 @@ export class FileInfo {
     get url(): string {
         switch (this._filetype) {
             case FileType.Dir:
-                return '/fs/list'
+                return '/forward/fs/list'
             case FileType.Video:
-                return '/fs/view/video'
+                return '/forward/fs/view/video'
             case FileType.Audio:
-                return '/fs/view/audio'
+                return '/forward/fs/view/audio'
             case FileType.Image:
-                return '/fs/view/image'
+                return '/forward/fs/view/image'
             case FileType.Text:
-                return '/fs/view/text'
+                return '/forward/fs/view/text'
         }
         return ''
     }
-    get downloadURL(): string {
+    downloadURL(id: string, root: string, path: string, access: string): string {
         if (this.isDir) {
             return ''
         }
-        return ''
-        // return ServerAPI.forward.v1.fs.oneURL([this.root, this.filename])
+        const params = new HttpParams({
+            fromObject: {
+                slave_id: id,
+                root: root,
+                path: path,
+                access_token: access,
+            }
+        })
+        return ServerAPI.forward.v1.fs.httpURL('download') + '?' + params.toString()
     }
     get icon(): string {
         switch (this.filetype) {

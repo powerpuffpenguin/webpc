@@ -4,6 +4,7 @@ package jsgenerate_webpc.forward.fs;
 option go_package = "github.com/powerpuffpenguin/webpc/protocol/forward/fs";
 
 import "google/api/annotations.proto";
+import "google/api/httpbody.proto";
 
 service FS {
     // Get Mount list
@@ -16,6 +17,12 @@ service FS {
     rpc List (ListRequest) returns (ListResponse){
         option (google.api.http) = {
             get: "/api/forward/v1/fs/list"
+        };
+    }
+    // Download log file
+    rpc Download (DownloadRequest) returns (stream google.api.HttpBody){
+        option (google.api.http) = {
+            get: "/api/forward/v1/fs/download"
         };
     }
 }
@@ -44,4 +51,8 @@ message ListRequest{
 message ListResponse{
     Dir dir = 1;
     repeated FileInfo items = 2;
+}
+message DownloadRequest{
+    string root = 1;
+    string path =2;
 }

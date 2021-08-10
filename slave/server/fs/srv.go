@@ -2,13 +2,18 @@ package fs
 
 import (
 	"context"
+	"fmt"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/powerpuffpenguin/webpc/db"
 	"github.com/powerpuffpenguin/webpc/m/helper"
 	grpc_fs "github.com/powerpuffpenguin/webpc/protocol/forward/fs"
 	"github.com/powerpuffpenguin/webpc/single/mount"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 )
 
 var modtime = time.Now()
@@ -82,6 +87,7 @@ func (s server) List(ctx context.Context, req *grpc_fs.ListRequest) (resp *grpc_
 	if e != nil {
 		return
 	}
+	s.SetHTTPCacheMaxAge(ctx, 5)
 	e = s.ServeMessage(ctx, modtime, func(nobody bool) error {
 		if nobody {
 			resp = &emptyListResponse
@@ -109,5 +115,46 @@ func (s server) List(ctx context.Context, req *grpc_fs.ListRequest) (resp *grpc_
 		}
 		return nil
 	})
+	return
+}
+
+func (s server) Download(req *grpc_fs.DownloadRequest, server grpc_fs.FS_DownloadServer) (e error) {
+	fs := mount.Default()
+	m := fs.Root(req.Root)
+	if m == nil {
+		e = s.Error(codes.NotFound, `root not found: `+req.Root)
+		return
+	}
+	ctx := server.Context()
+	e = s.checkRead(ctx, m)
+	if e != nil {
+		return
+	}
+	filename, e := m.Filename(req.Path)
+	if e != nil {
+		return
+	}
+	f, e := os.Open(filename)
+	if e != nil {
+		e = s.ToHTTPError(ctx, req.Path, e)
+		return
+	}
+	defer f.Close()
+	stat, e := f.Stat()
+	if e != nil {
+		e = s.ToHTTPError(ctx, req.Path, e)
+		return
+	}
+	s.SetHTTPCacheMaxAge(ctx, 5)
+
+	grpc.SetHeader(ctx, metadata.Pairs(
+		`Content-Disposition`,
+		fmt.Sprintf("attachment; filename=\"%s\"", filepath.Base(req.Path)),
+	))
+	e = s.ServeContent(server,
+		`application/octet-stream`,
+		stat.ModTime(),
+		f,
+	)
 	return
 }

@@ -90,6 +90,7 @@ func (h Helper) ShouldBindUserdata(c *gin.Context) (userdata sessions.Userdata, 
 func (h Helper) BindUserdata(c *gin.Context) (userdata sessions.Userdata, e error) {
 	session, e := h.ShouldBindSession(c)
 	if e != nil {
+		h.NegotiateTokenError(c, e)
 		return
 	}
 	e = session.Get(c.Request.Context(), sessions.KeyUserdata, &userdata)

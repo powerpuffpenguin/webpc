@@ -61,6 +61,12 @@ export class ManagerComponent implements OnInit, OnDestroy {
       this.session_ = session
     })
   }
+  get access(): string {
+    if (this.session_) {
+      return this.session_.access
+    }
+    return ''
+  }
   ngOnDestroy() {
     this.closed_.close()
     if (this.subscription_) {
@@ -213,52 +219,52 @@ export class ManagerComponent implements OnInit, OnDestroy {
     return this.box_.h
   }
   onCheckChange(evt: CheckEvent) {
-    //   if (evt.event.ctrlKey || this.ctrl) {
-    //     evt.target.checked = !evt.target.checked
-    //     return
-    //   }
-    //   let start = -1
-    //   let stop = -1
-    //   let index = -1
-    //   // 清空選項
-    //   const source = this.source
-    //   if (source) {
-    //     for (let i = 0; i < source.length; i++) {
-    //       if (source[i] == evt.target) {
-    //         index = i
-    //       }
-    //       if (source[i].checked) {
-    //         if (start == -1) {
-    //           start = i
-    //         }
-    //         stop = i
-    //       }
-    //       if (source[i].checked) {
-    //         source[i].checked = false
-    //       }
-    //     }
-    //   }
-    //   if (index == -1) {
-    //     return
-    //   }
-    //   // 設置選項
-    //   if ((evt.event.shiftKey || this.shift) && start != -1) {
-    //     if (index <= start) {
-    //       for (let i = index; i <= stop; i++) {
-    //         source[i].checked = true
-    //       }
-    //     } else if (index >= stop) {
-    //       for (let i = start; i <= index; i++) {
-    //         source[i].checked = true
-    //       }
-    //     } else {
-    //       for (let i = start; i <= stop; i++) {
-    //         source[i].checked = true
-    //       }
-    //     }
-    //     return
-    //   }
-    //   source[index].checked = true
+    if (evt.event.ctrlKey || this.ctrl) {
+      evt.target.checked = !evt.target.checked
+      return
+    }
+    let start = -1
+    let stop = -1
+    let index = -1
+    // 清空選項
+    const source = this.source
+    if (source) {
+      for (let i = 0; i < source.length; i++) {
+        if (source[i] == evt.target) {
+          index = i
+        }
+        if (source[i].checked) {
+          if (start == -1) {
+            start = i
+          }
+          stop = i
+        }
+        if (source[i].checked) {
+          source[i].checked = false
+        }
+      }
+    }
+    if (index == -1) {
+      return
+    }
+    // 設置選項
+    if ((evt.event.shiftKey || this.shift) && start != -1) {
+      if (index <= start) {
+        for (let i = index; i <= stop; i++) {
+          source[i].checked = true
+        }
+      } else if (index >= stop) {
+        for (let i = start; i <= index; i++) {
+          source[i].checked = true
+        }
+      } else {
+        for (let i = start; i <= stop; i++) {
+          source[i].checked = true
+        }
+      }
+      return
+    }
+    source[index].checked = true
   }
   toggleDisplay() {
     this.all = !this.all
