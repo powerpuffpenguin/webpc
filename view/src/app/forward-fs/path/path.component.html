@@ -1,0 +1,25 @@
+<div>
+    <ng-container *ngIf="edit;then editView;else readView"></ng-container>
+    <ng-template #editView>
+        <button [disabled]="disabled" mat-icon-button i18n-matTooltip
+            matTooltip="Switch between button and text-based position bar" (click)="edit=false">
+            <mat-icon fontSet="fontawesome-fas" fontIcon="fa-edit"></mat-icon>
+        </button>
+        <mat-form-field>
+            <mat-label i18n>Position</mat-label>
+            <input [disabled]="disabled" type="text" matInput [(ngModel)]="val">
+            <button [disabled]="disabled" mat-icon-button matSuffix (click)="onClickDone()">
+                <mat-icon>done</mat-icon>
+            </button>
+        </mat-form-field>
+    </ng-template>
+    <ng-template #readView>
+        <button [disabled]="disabled" mat-icon-button i18n-matTooltip
+            matTooltip="Switch between button and text-based position bar" (click)="edit=true">
+            <mat-icon fontSet="fontawesome-far" fontIcon="fa-edit"></mat-icon>
+        </button>
+        <button [disabled]="disabled" mat-button *ngFor="let node of dirs" (click)="onClickDir(node)">
+            {{node.name}}
+        </button>
+    </ng-template>
+</div>

@@ -1,1 +1,18 @@
-<p>list works!</p>
+<div class="view">
+    <ng-container *ngIf="state.ready;then readyView;else loadView"></ng-container>
+</div>
+<ng-template #loadView>
+    <shared-load-view [hasErr]="state.hasErr" [errs]="state.errs" (valChange)="onClickRefresh()"></shared-load-view>
+</ng-template>
+
+<ng-template #readyView>
+    <mat-card>
+        <mat-card-content>
+            <a mat-button [routerLink]="['../list']" [queryParams]="{id:state.target,root:state.dir.root}">
+                <mat-icon>folder_special</mat-icon>
+                <span class="left8">{{state.dir.root}}</span>
+            </a>
+            <fs-manager [folder]="state.dir" [source]="state.source" (sourceChange)="state.source=$event"></fs-manager>
+        </mat-card-content>
+    </mat-card>
+</ng-template>

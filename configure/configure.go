@@ -46,6 +46,7 @@ func (c *Configure) Load(filename string) (e error) {
 	}
 	var formats = []format{
 		&c.DB, &c.Session,
+		&c.System,
 	}
 	for _, format := range formats {
 		e = format.format()

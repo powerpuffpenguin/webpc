@@ -136,8 +136,7 @@ func (f *Forward) Forward(id int64, c *gin.Context) {
 		}
 	}
 	// token
-	c.Request.Header.Set(`Authorization`, base64.RawURLEncoding.EncodeToString(b))
-
+	c.Request.Header.Set(`Authorization`, `Bearer `+base64.RawURLEncoding.EncodeToString(b))
 	// ServeHTTP
 	ele.gateway.ServeHTTP(c.Writer, c.Request)
 }

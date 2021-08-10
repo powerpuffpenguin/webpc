@@ -29,6 +29,12 @@ export class Session {
     get root(): boolean {
         return this.anyAuth(Authorization.Root)
     }
+    get write(): boolean {
+        return this.anyAuth(Authorization.Write)
+    }
+    get read(): boolean {
+        return this.anyAuth(Authorization.Read)
+    }
     get authorization(): Array<number> {
         if (!this.userdata || !this.userdata.authorization || !Array.isArray(this.userdata.authorization)) {
             return []

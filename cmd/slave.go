@@ -9,6 +9,7 @@ import (
 	"github.com/powerpuffpenguin/webpc/configure"
 	"github.com/powerpuffpenguin/webpc/db/manipulator"
 	"github.com/powerpuffpenguin/webpc/logger"
+	"github.com/powerpuffpenguin/webpc/single/mount"
 	"github.com/powerpuffpenguin/webpc/utils"
 
 	"github.com/spf13/cobra"
@@ -51,7 +52,9 @@ func init() {
 
 			// init db
 			manipulator.Init(&cnf.DB)
-
+			if cnf.System.Enable {
+				mount.Init(cnf.System.Mount)
+			}
 			slave.Run(&cnf.Connect, &cnf.System, debug)
 		},
 	}

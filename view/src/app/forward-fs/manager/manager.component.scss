@@ -1,0 +1,30 @@
+.rectangle{
+    background: yellowgreen;
+    opacity: 0.5;
+    position: fixed;
+}
+
+.footer{
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,.3);
+    z-index: 10;
+}
+
+
+.actionMenu{
+    position: fixed;
+}
+
+.mat-icon{
+    font-size: 24px;
+}
+
+.view{
+    min-height: calc(100vh - 270px);
+}
+.menu{
+    margin-right: 14px;
+}

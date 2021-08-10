@@ -43,8 +43,10 @@ func (c *Slave) Load(filename string) (e error) {
 	if e != nil {
 		return
 	}
+	c.System.Enable = true
 	var formats = []format{
 		&c.DB,
+		&c.System,
 	}
 	for _, format := range formats {
 		e = format.format()

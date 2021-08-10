@@ -10,6 +10,7 @@ import (
 	"github.com/powerpuffpenguin/webpc/db/manipulator"
 	"github.com/powerpuffpenguin/webpc/logger"
 	"github.com/powerpuffpenguin/webpc/sessions"
+	"github.com/powerpuffpenguin/webpc/single/mount"
 	"github.com/powerpuffpenguin/webpc/utils"
 
 	"github.com/spf13/cobra"
@@ -49,7 +50,11 @@ func init() {
 
 			// init db
 			manipulator.Init(&cnf.DB)
+
 			sessions.Init(&cnf.Session)
+			if cnf.System.Enable {
+				mount.Init(cnf.System.Mount)
+			}
 
 			master.Run(&cnf.HTTP, &cnf.System, debug)
 		},

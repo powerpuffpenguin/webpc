@@ -1,5 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 import { SharedModule } from "../shared/shared.module";
 
@@ -10,21 +12,37 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatRippleModule } from '@angular/material/core';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 import { RootComponent } from './root/root.component';
 import { ListComponent } from './list/list.component';
+import { ManagerComponent } from './manager/manager.component';
+import { PathComponent } from './path/path.component';
+import { FileComponent } from './file/file.component';
 
 
 @NgModule({
   declarations: [
     RootComponent,
-    ListComponent
+    ListComponent,
+    ManagerComponent,
+    PathComponent,
+    FileComponent
   ],
   imports: [
     CommonModule,
+    RouterModule, FormsModule,
     SharedModule,
     MatProgressBarModule, MatButtonModule, MatCardModule,
-    MatIconModule, MatListModule,
+    MatIconModule, MatListModule, MatTooltipModule,
+    MatFormFieldModule, MatInputModule, MatRippleModule,
+    MatMenuModule, MatToolbarModule,
     ForwardFsRoutingModule
   ]
 })

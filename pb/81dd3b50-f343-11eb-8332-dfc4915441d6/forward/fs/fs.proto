@@ -12,9 +12,36 @@ service FS {
             get: "/api/forward/v1/fs/mount"
         };
     }
+    // list file info
+    rpc List (ListRequest) returns (ListResponse){
+        option (google.api.http) = {
+            get: "/api/forward/v1/fs/list"
+        };
+    }
 }
 message MountRequest{
 }
 message MountResponse{
     repeated string name = 1;
+}
+message Dir{
+    string root = 1;
+    bool read = 2;
+    bool write = 3;
+    bool shared = 4;
+    string dir = 5;
+}
+message FileInfo{
+    string name = 1;
+    uint32 mode = 2;
+    int64 size = 3;
+    bool isDir = 4;
+}
+message ListRequest{
+    string root = 1;
+    string path = 2;
+}
+message ListResponse{
+    Dir dir = 1;
+    repeated FileInfo items = 2;
 }

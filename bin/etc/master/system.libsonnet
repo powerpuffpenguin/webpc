@@ -11,7 +11,7 @@
             // web display name
             Name: "movie",
             // local filesystem path
-            Root: "/home/king/movie",
+            Root: "/home/dev/movie",
             // Set the directory to be readable. Users with read/write permissions can read files
             Read: true,
             // Set the directory to be writable. Users with write permission can write files
@@ -23,7 +23,7 @@
         },
         {
             Name: "home",
-            Root: "/home/king",
+            Root: "/home/dev",
             Write: true,
             Read: true,
             Shared: false,
@@ -37,7 +37,7 @@
         },
         {
             Name: "media",
-            Root: "/media/king/",
+            Root: "/media/dev/",
             Write: false,
             Read: true,
             Shared: false,

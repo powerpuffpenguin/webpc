@@ -5,11 +5,11 @@ import { RootComponent } from './root/root.component';
 
 const routes: Routes = [
   {
-    path: ':id',
+    path: '',
     component: RootComponent
   },
   {
-    path: ':id/list',
+    path: 'list',
     component: ListComponent,
   },
 ];

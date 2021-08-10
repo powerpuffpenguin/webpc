@@ -13,7 +13,7 @@
         </mat-card-header>
         <mat-card-content>
             <mat-nav-list>
-                <a [routerLink]="['list']" [queryParams]="{root:node}" mat-list-item *ngFor="let node of names">
+                <a [routerLink]="['list']" [queryParams]="{id:id,root:node}" mat-list-item *ngFor="let node of names">
                     <mat-icon matListIcon>folder_special</mat-icon>
                     <h3 matLine>{{node}}</h3>
                 </a>

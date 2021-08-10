@@ -20,7 +20,7 @@
             </div>
         </mat-card-content>
         <mat-card-actions>
-            <a mat-button routerLink="/forward/fs/{{data.id}}">Filesystem</a>
+            <a mat-button [routerLink]="['/forward/fs']" [queryParams]="{id:data.id}">Filesystem</a>
             <a mat-button routerLink="/forward/shell/{{data.id}}">Shell</a>
             <a mat-button routerLink="/forward/vnc/{{data.id}}">VNC</a>
         </mat-card-actions>

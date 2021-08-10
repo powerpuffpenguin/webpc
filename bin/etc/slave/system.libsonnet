@@ -7,9 +7,9 @@
     Mount: [
         {
             // web display name
-            Name: "movie",
+            Name: "s_movie",
             // local filesystem path
-            Root: "/home/king/movie",
+            Root: "/home/dev/movie",
             // Set the directory to be readable. Users with read/write permissions can read files
             Read: true,
             // Set the directory to be writable. Users with write permission can write files
@@ -20,22 +20,22 @@
             Shared: true,
         },
         {
-            Name: "home",
-            Root: "/home/king",
+            Name: "s_home",
+            Root: "/home/dev",
             Write: true,
             Read: true,
             Shared: false,
         },
         {
-            Name: "root",
+            Name: "s_root",
             Root: "/",
             Write: false,
             Read: true,
             Shared: false,
         },
         {
-            Name: "media",
-            Root: "/media/king/",
+            Name: "s_media",
+            Root: "/media/dev/",
             Write: false,
             Read: true,
             Shared: false,

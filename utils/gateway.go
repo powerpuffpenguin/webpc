@@ -37,6 +37,9 @@ func headerToGRPC(key string) (string, bool) {
 		fallthrough
 	case `Content-Length`:
 		return key, false
+	case `Authorization`:
+		// if return true will set twice for grpc,maybe a bug
+		return key, false
 	default:
 		return key, true
 	}

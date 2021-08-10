@@ -18,7 +18,7 @@ export class RootComponent implements OnInit, OnDestroy {
   ) {
   }
   ngOnInit(): void {
-    this.activatedRoute.params.pipe(
+    this.activatedRoute.queryParams.pipe(
       takeUntil(this.closed_.observable)
     ).subscribe((params) => {
       const id = params['id']
@@ -45,5 +45,8 @@ export class RootComponent implements OnInit, OnDestroy {
   }
   get names() {
     return this.state.mount.name
+  }
+  get id() {
+    return this.state.target
   }
 }

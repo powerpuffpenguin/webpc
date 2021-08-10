@@ -2,8 +2,11 @@ package helper
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"strings"
+
 	"github.com/powerpuffpenguin/webpc/sessions"
 
 	"github.com/powerpuffpenguin/sessionid"
@@ -32,7 +35,9 @@ func (h Helper) GetToken(ctx context.Context) (token string) {
 }
 func (h Helper) accessSession(ctx context.Context) (session *sessionid.Session, e error) {
 	access := h.GetToken(ctx)
-	if access != `` {
+	if access == `` {
+		e = h.Error(codes.PermissionDenied, `not found token`)
+	} else {
 		session, e = sessions.DefaultManager().Get(ctx, access)
 		if e != nil {
 			e = h.ToTokenError(e)
@@ -85,4 +90,45 @@ func (h Helper) ToTokenError(e error) error {
 		e = h.Error(codes.PermissionDenied, `token not exists`)
 	}
 	return e
+}
+
+type userdataKey struct{}
+type userdataValue struct {
+	userdata sessions.Userdata
+	e        error
+}
+
+func (h Helper) userdata(ctx context.Context) (userdata sessions.Userdata, e error) {
+	access := h.GetToken(ctx)
+	if access == `` {
+		e = h.Error(codes.PermissionDenied, `not found token`)
+	} else {
+		var b []byte
+		b, e = base64.RawURLEncoding.DecodeString(access)
+		if e != nil {
+			e = h.Error(codes.PermissionDenied, e.Error())
+			return
+		}
+		e = json.Unmarshal(b, &userdata)
+		if e != nil {
+			e = h.Error(codes.PermissionDenied, e.Error())
+			return
+		}
+	}
+	return
+}
+func (h Helper) JSONUserdata(ctx context.Context) (newctx context.Context, userdata sessions.Userdata, e error) {
+	newctx = ctx
+
+	cache, ok := ctx.Value(userdataKey{}).(userdataValue)
+	if ok {
+		userdata = cache.userdata
+		return
+	}
+	userdata, e = h.userdata(ctx)
+	newctx = context.WithValue(ctx, userdataKey{}, userdataValue{
+		userdata: userdata,
+		e:        e,
+	})
+	return
 }

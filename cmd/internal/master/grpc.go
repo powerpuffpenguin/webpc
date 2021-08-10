@@ -34,7 +34,6 @@ func newGRPC(cnf *configure.ServerOption, gateway *runtime.ServeMux, cc *grpc.Cl
 	if cnf.MaxSendMsgSize > 0 {
 		opts = append(opts, grpc.MaxSendMsgSize(cnf.MaxSendMsgSize))
 	}
-
 	if debug {
 		opts = append(opts,
 			grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(
