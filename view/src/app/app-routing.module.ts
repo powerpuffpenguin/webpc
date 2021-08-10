@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { HomeComponent } from './app/home/home.component';
-import { AccessGuard } from './core/guard/access.guard';
 import { RootGuard } from './core/guard/root.guard';
 
 const routes: Routes = [
@@ -35,7 +34,6 @@ const routes: Routes = [
   {
     path: 'forward',
     loadChildren: () => import('./forward/forward.module').then(m => m.ForwardModule),
-    canActivate: [AccessGuard],
   },
 ];
 
