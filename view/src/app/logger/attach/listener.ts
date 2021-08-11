@@ -26,8 +26,8 @@ function sendRequest(ws: WebSocket, evt: EventCode) {
 }
 
 interface Writer {
-    writeln(text: string): void
-    write(text: string): void
+    writeln(text: string, log?: boolean): void
+    write(text: string, log?: boolean): void
 }
 class Access {
     session: Session | undefined
@@ -92,10 +92,14 @@ export class Listener extends Client implements ClientOption {
     }
     optOnNew(ws: WebSocket): void {
         ws.binaryType = 'arraybuffer'
-        this.writer.writeln(`attach logger console`)
     }
     optOnOpenError(_: WebSocket): void {
-        this._onclose()
+        const delay = this._onclose()
+        if (delay <= 0) {
+            this.writer.writeln(`connect err, retrying in 0s`, true)
+        } else {
+            this.writer.writeln(`connect err, retrying in ${delay}s`, true)
+        }
     }
     optOnClose(ws: WebSocket): void {
         this._onclose()
@@ -132,7 +136,7 @@ export class Listener extends Client implements ClientOption {
             this._connect()
         }
     }
-    private _onclose() {
+    private _onclose(): number {
         this.first_ = true
 
         let delay = this.delay_
@@ -147,11 +151,7 @@ export class Listener extends Client implements ClientOption {
             }
         }
         this.delay_ = delay
-        if (delay <= 0) {
-            console.warn(`websocket err, retrying in 0s`)
-        } else {
-            console.warn(`websocket err, retrying in ${delay}s`)
-        }
+        return delay
     }
     private timer_: any
     private _checkFirst(ws: WebSocket, code?: Codes, message?: string): boolean {
@@ -160,6 +160,7 @@ export class Listener extends Client implements ClientOption {
         }
         this.first_ = false
         if (code === undefined || code === Codes.OK) {
+            this.writer.writeln(`attach logger console`, true)
             this.delay_ = 0
             if (!this.timer_ && HeartInterval > 1000) {
                 this.timer_ = interval(HeartInterval).pipe(

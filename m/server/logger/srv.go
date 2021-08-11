@@ -95,6 +95,11 @@ func (s server) SetLevel(ctx context.Context, req *grpc_logger.SetLevelRequest) 
 func (s server) Attach(req *grpc_logger.AttachRequest, stream grpc_logger.Logger_AttachServer) (e error) {
 	// TAG := `logger Atach`
 	ctx := stream.Context()
+	var respose grpc_logger.AttachResponse
+	e = stream.Send(&respose)
+	if e != nil {
+		return
+	}
 
 	done := ctx.Done()
 	listener := logger.NewSnapshotListener(done)
@@ -103,7 +108,6 @@ func (s server) Attach(req *grpc_logger.AttachRequest, stream grpc_logger.Logger
 		working = true
 		ch      = listener.Channel()
 		data    []byte
-		respose grpc_logger.AttachResponse
 	)
 	for working {
 		select {

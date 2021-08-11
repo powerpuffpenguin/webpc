@@ -1,16 +1,11 @@
 package v1
 
 import (
-	"errors"
-	"net/http"
-
-	"github.com/powerpuffpenguin/webpc/db"
 	"github.com/powerpuffpenguin/webpc/m/web"
 	grpc_logger "github.com/powerpuffpenguin/webpc/protocol/logger"
 	grpc_slave "github.com/powerpuffpenguin/webpc/protocol/slave"
 
 	"github.com/gin-gonic/gin"
-	"github.com/powerpuffpenguin/sessionid"
 	"google.golang.org/grpc"
 )
 
@@ -24,26 +19,7 @@ func (h *Logger) Register(cc *grpc.ClientConn, router *gin.RouterGroup) {
 	r := router.Group(`logger`)
 	r.GET(`attach`, h.attach)
 }
-func (h *Logger) checkRoot(c *gin.Context) (code int, msg string) {
-	userdata, e := h.ShouldBindUserdata(c)
-	if e != nil {
-		if sessionid.IsTokenExpired(e) {
-			code = http.StatusUnauthorized
-		} else if errors.Is(e, sessionid.ErrTokenNotExists) {
-			code = http.StatusForbidden
-		} else {
-			code = http.StatusInternalServerError
-		}
-		msg = e.Error()
-		return
-	}
-	if !userdata.AuthAny(db.Root) {
-		code = http.StatusForbidden
-		msg = `permission denied`
-		return
-	}
-	return
-}
+
 func (h *Logger) attach(c *gin.Context) {
 	ws, e := h.Websocket(c, nil)
 	if e != nil {
@@ -59,6 +35,7 @@ func (h *Logger) attach(c *gin.Context) {
 		ws.Error(e)
 		return
 	}
+	first := true
 	f := web.NewForward(func(messageType int, p []byte) error {
 		var req grpc_slave.SubscribeRequest
 		e = web.Unmarshal(p, &req)
@@ -70,6 +47,12 @@ func (h *Logger) attach(c *gin.Context) {
 		resp, e := stream.Recv()
 		if e != nil {
 			return
+		}
+		if first {
+			first = false
+			if len(resp.Data) == 0 {
+				return ws.Success()
+			}
 		}
 		return ws.SendBinary(resp.Data)
 	}, func() error {

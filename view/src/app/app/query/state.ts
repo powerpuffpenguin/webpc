@@ -87,6 +87,7 @@ export class StateManager {
                 ws.binaryType = 'arraybuffer'
             },
             onMessage(ws: WebSocket, data) {
+                console.log(data)
                 if (typeof data === "string") {
                     const resp: Response = JSON.parse(data)
                     if (resp.code === undefined) {

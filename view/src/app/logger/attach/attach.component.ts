@@ -102,13 +102,13 @@ export class AttachComponent implements OnInit, OnDestroy, AfterViewInit {
   onClickClear() {
     this.xterm_?.clear()
   }
-  writeln(text: string) {
-    if (this.checked) {
+  writeln(text: string, log?: boolean) {
+    if (log || this.checked) {
       this.xterm_?.writeln(text)
     }
   }
-  write(text: string) {
-    if (this.checked) {
+  write(text: string, log?: boolean) {
+    if (log || this.checked) {
       this.xterm_?.write(text)
     }
   }
