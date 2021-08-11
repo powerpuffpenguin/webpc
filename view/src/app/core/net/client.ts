@@ -11,6 +11,7 @@ export interface ClientOption {
     delay?: number
     onNew?: (ws: WebSocket) => void
     onOpen?: (ws: WebSocket) => void
+    onOpenErr?: (ws: WebSocket) => void
     onClose?: (ws: WebSocket) => void
     onMessage?: (ws: WebSocket, data: any) => void
 }
@@ -50,6 +51,9 @@ export class Client {
 
     write(data: string | ArrayBufferLike | Blob | ArrayBufferView): Promise<void> {
         return this.promise().then((ws) => ws.send(data))
+    }
+    ws(): WebSocket | undefined {
+        return this.ws_
     }
     async promise(): Promise<WebSocket> {
         if (this.completer_) {
@@ -145,6 +149,9 @@ export class Client {
                     if (State.Connect == state) {
                         state = State.Closed
                         reject(new Error('websocket error'))
+                        if (opts.onOpenErr) {
+                            opts.onOpenErr(ws)
+                        }
                     } else if (State.Opened == state) {
                         state = State.Closed
                         if (this.completer_ == completer) {

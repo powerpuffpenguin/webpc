@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
-	"net/http"
 	"strconv"
 	"strings"
 	"sync"
@@ -18,6 +17,7 @@ import (
 	signal_slave "github.com/powerpuffpenguin/webpc/signal/slave"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 var defaultForward = newForward()
@@ -91,7 +91,7 @@ func (f *Forward) Forward(id int64, c *gin.Context) {
 	ele, exists := f.keys[id]
 	f.rw.RUnlock()
 	if !exists {
-		f.web.Error(c, http.StatusNotFound, codes.NotFound, `slave id not found: `+strconv.FormatInt(id, 10))
+		f.web.Error(c, status.Error(codes.NotFound, `slave id not found: `+strconv.FormatInt(id, 10)))
 		return
 	}
 
@@ -105,60 +105,48 @@ func (f *Forward) Forward(id int64, c *gin.Context) {
 	userdata, e := f.web.ShouldBindUserdata(c)
 	if e != nil {
 		if !shared {
-			f.web.NegotiateTokenError(c, e)
+			f.web.Error(c, e)
 			return
 		}
 	}
 
 	// check group
-	result := f.checkGroup(c, id, &userdata)
-	if result.Code != codes.OK {
-		if !shared {
-			f.web.Error(c, result.Status, result.Code, result.Message)
-			return
-		}
-	} else {
+	e = f.checkGroup(c, id, &userdata)
+	if e == nil {
 		// token
 		b, e := json.Marshal(userdata)
 		if e != nil {
-			f.web.Error(c, http.StatusInternalServerError, codes.Unknown, e.Error())
+			f.web.Error(c, e)
 			return
 		}
 		c.Request.Header.Set(`Authorization`, `Bearer `+base64.RawURLEncoding.EncodeToString(b))
+	} else {
+		if !shared {
+			f.web.Error(c, e)
+			return
+		}
 	}
 
 	// ServeHTTP
 	ele.gateway.ServeHTTP(c.Writer, c.Request)
 }
 
-type checkResult struct {
-	Status  int        // http
-	Code    codes.Code // grpc
-	Message string
-}
-
-func (f *Forward) checkGroup(c *gin.Context, id int64, userdata *sessions.Userdata) (result checkResult) {
+func (f *Forward) checkGroup(c *gin.Context, id int64, userdata *sessions.Userdata) (e error) {
 	if id == 0 {
 		if !userdata.AuthAny(db.Root, db.Server) {
-			result.Status = http.StatusForbidden
-			result.Code = codes.PermissionDenied
-			result.Message = `permission denied`
+			e = status.Error(codes.PermissionDenied, `permission denied`)
 			return
 		}
 	} else {
 		if !userdata.AuthAny(db.Root) && userdata.Parent != 1 {
-			parents, e := signal_group.IDS(c.Request.Context(), userdata.Parent, false)
-			if e != nil {
-				result.Status = http.StatusInternalServerError
-				result.Code = codes.Unknown
-				result.Message = e.Error()
+			parents, err := signal_group.IDS(c.Request.Context(), userdata.Parent, false)
+			if err != nil {
+				e = err
 				return
 			}
-			bean, e := signal_slave.Get(c.Request.Context(), id)
-			if e != nil {
-				result.Status = http.StatusInternalServerError
-				result.Code = codes.Unknown
-				result.Message = e.Error()
+			bean, err := signal_slave.Get(c.Request.Context(), id)
+			if err != nil {
+				e = err
 				return
 			}
 			found := false
@@ -169,9 +157,7 @@ func (f *Forward) checkGroup(c *gin.Context, id int64, userdata *sessions.Userda
 				}
 			}
 			if !found {
-				result.Status = http.StatusForbidden
-				result.Code = codes.PermissionDenied
-				result.Message = `permission denied`
+				e = status.Error(codes.PermissionDenied, `permission denied`)
 				return
 			}
 		}

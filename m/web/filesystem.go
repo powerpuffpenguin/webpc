@@ -3,7 +3,6 @@ package web
 import (
 	"bytes"
 	"encoding/json"
-	"encoding/xml"
 	"io"
 	"net/http"
 	"os"
@@ -11,25 +10,24 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
 	"google.golang.org/grpc/codes"
-	"gopkg.in/yaml.v2"
+	"google.golang.org/grpc/status"
 )
 
 func (h Helper) ToHTTPError(c *gin.Context, name string, e error) {
 	if os.IsNotExist(e) {
-		h.Error(c, http.StatusNotFound, codes.NotFound, `not exists : `+name)
+		h.Error(c, status.Error(codes.NotFound, `not exists : `+name))
 		return
 	}
 	if os.IsExist(e) {
-		h.Error(c, http.StatusForbidden, codes.PermissionDenied, `already exists : `+name)
+		h.Error(c, status.Error(codes.PermissionDenied, `already exists : `+name))
 		return
 	}
 	if os.IsPermission(e) {
-		h.Error(c, http.StatusForbidden, codes.PermissionDenied, `forbidden : `+name)
+		h.Error(c, status.Error(codes.PermissionDenied, `forbidden : `+name))
 		return
 	}
-	h.Error(c, http.StatusInternalServerError, codes.Unknown, e.Error())
+	h.Error(c, e)
 }
 
 func (h Helper) NegotiateFilesystem(c *gin.Context, fs http.FileSystem, path string, index bool) {
@@ -59,7 +57,7 @@ func (h Helper) NegotiateFilesystem(c *gin.Context, fs http.FileSystem, path str
 	}
 	if stat.IsDir() {
 		f.Close()
-		h.Error(c, http.StatusForbidden, codes.PermissionDenied, `not a file`)
+		h.Error(c, status.Error(codes.PermissionDenied, `not a file`))
 		return
 	}
 
@@ -72,18 +70,10 @@ func (h Helper) NegotiateObject(c *gin.Context, modtime time.Time, name string, 
 	reader := &objectReader{
 		obj: obj,
 	}
-	switch c.NegotiateFormat(Offered...) {
-	case binding.MIMEXML:
-		c.Writer.Header().Set(`Content-Type`, `application/xml; charset=utf-8`)
-		reader.marshal = xml.Marshal
-	case binding.MIMEYAML:
-		c.Writer.Header().Set(`Content-Type`, `application/x-yaml; charset=utf-8`)
-		reader.marshal = yaml.Marshal
-	default:
-		// default use json
-		reader.marshal = json.Marshal
-		c.Writer.Header().Set(`Content-Type`, `application/json; charset=utf-8`)
-	}
+
+	reader.marshal = json.Marshal
+	c.Writer.Header().Set(`Content-Type`, `application/json; charset=utf-8`)
+
 	http.ServeContent(c.Writer, c.Request, name, modtime, reader)
 }
 

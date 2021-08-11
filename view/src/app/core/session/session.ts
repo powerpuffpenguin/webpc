@@ -7,6 +7,7 @@ import { getItem, setItem } from "../utils/aes-local-storage";
 import { getUnix } from '../utils/utils';
 import { md5String } from '../utils/md5';
 import { aesDecrypt, aesEncrypt } from '../utils/aes';
+import { Codes, NetError } from '../core/restful';
 const Key = 'session'
 const Platform = 'web'
 export interface Userdata {
@@ -134,7 +135,7 @@ export class Manager {
     get observable(): Observable<Session | undefined> {
         return this.subject_
     }
-    private async _load(): Promise<Session | undefined> {
+    private _load(): Session | undefined {
         const str = getItem(Key)
         if (typeof str !== "string") {
             return
@@ -157,9 +158,8 @@ export class Manager {
         }
         return
     }
-    async load(): Promise<void> {
-        this.subject_.next(await this._load())
-        return
+    load() {
+        this.subject_.next(this._load())
     }
     private _save(session: Session) {
         try {
@@ -260,7 +260,7 @@ export class Manager {
             })
         }
     }
-    async refresh(httpClient: HttpClient, session: Session, code?: number, msg?: string): Promise<Session | undefined> {
+    async refresh(httpClient: HttpClient, session: Session, err: NetError): Promise<Session | undefined> {
         if (this.refresh_) { // refreshing
             return this.refresh_.promise
         }
@@ -271,11 +271,8 @@ export class Manager {
         } else if (session != current) { // already refresh
             return current
         }
-        if (code == 403) {
-            if (msg == `token not exists`) {
-                this.clear(session)
-            }
-            throw new Error(`permission denied`)
+        if (err.grpc != Codes.Unauthenticated) {
+            throw err
         }
 
         // refresh
@@ -309,11 +306,10 @@ export class Manager {
         if (session == this.subject_.value) {
             this.subject_.next(undefined)
             if (this.remember_) {
-                this._load().then((current) => {
-                    if (current && current.access == session.access) {
-                        removeItem(Key)
-                    }
-                })
+                const current = this._load()
+                if (current && current.access == session.access) {
+                    removeItem(Key)
+                }
             }
         }
     }

@@ -2,10 +2,11 @@ package logger
 
 import (
 	"context"
+	"os"
+
 	"github.com/powerpuffpenguin/webpc/logger"
 	"github.com/powerpuffpenguin/webpc/m/helper"
 	"github.com/powerpuffpenguin/webpc/m/server/logger/internal/db"
-	"os"
 
 	grpc_logger "github.com/powerpuffpenguin/webpc/protocol/logger"
 
@@ -91,7 +92,7 @@ func (s server) SetLevel(ctx context.Context, req *grpc_logger.SetLevelRequest) 
 	}
 	return
 }
-func (s server) Atach(req *grpc_logger.AttachRequest, stream grpc_logger.Logger_AtachServer) (e error) {
+func (s server) Attach(req *grpc_logger.AttachRequest, stream grpc_logger.Logger_AttachServer) (e error) {
 	// TAG := `logger Atach`
 	ctx := stream.Context()
 

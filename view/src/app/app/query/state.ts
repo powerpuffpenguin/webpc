@@ -110,7 +110,7 @@ export class StateManager {
                         } else {
                             console.warn('connect err: ', resp)
                             if (resp.code == 16 && readySession) {
-                                Manager.instance.refresh(httpClient, readySession)
+                                // Manager.instance.refresh(httpClient, readySession)
                             }
                             ws.close()
                             return

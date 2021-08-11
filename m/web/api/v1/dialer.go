@@ -1,14 +1,13 @@
 package v1
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 	"github.com/powerpuffpenguin/webpc/m/web"
 	"github.com/powerpuffpenguin/webpc/m/web/api/v1/internal/dialer"
 	signal_slave "github.com/powerpuffpenguin/webpc/signal/slave"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type Dialer struct {
@@ -30,14 +29,14 @@ func (h Dialer) dialer(c *gin.Context) {
 	ctx := c.Request.Context()
 	resp, e := signal_slave.Code(ctx, obj.Code)
 	if e != nil {
-		h.Error(c, http.StatusInternalServerError, codes.Unknown, e.Error())
+		h.Error(c, e)
 		return
 	} else if resp.ID == 0 {
-		h.Error(c, http.StatusNotFound, codes.NotFound, `code not exists: `+obj.Code)
+		h.Error(c, status.Error(codes.NotFound, `code not exists: `+obj.Code))
 		return
 	}
 
-	ws, e := h.Upgrade(c.Writer, c.Request, nil)
+	ws, e := h.Websocket(c, nil)
 	if e != nil {
 		return
 	}

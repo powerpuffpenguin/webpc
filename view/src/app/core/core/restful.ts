@@ -1,13 +1,70 @@
 import { HttpHeaders, HttpParams, HttpClient, HttpUrlEncodingCodec } from '@angular/common/http';
 import { Observable } from 'rxjs';
+export enum Codes {
+    OK = 0,
+    Canceled = 1,
+    Unknown = 2,
+    InvalidArgument = 3,
+    DeadlineExceeded = 4,
+    NotFound = 5,
+    AlreadyExists = 6,
+    PermissionDenied = 7,
+    ResourceExhausted = 8,
+    FailedPrecondition = 9,
+    Aborted = 10,
+    OutOfRange = 11,
+    Unimplemented = 12,
+    Internal = 13,
+    Unavailable = 14,
+    DataLoss = 15,
+    Unauthenticated = 16,
+    _maxCode = 17
+}
+export function codesString(code: Codes): string {
+    switch (code) {
+        case Codes.OK:
+            return 'Ok'
+        case Codes.Canceled:
+            return 'Canceled'
+        case Codes.Unknown:
+            return 'Unknown'
+        case Codes.InvalidArgument:
+            return 'InvalidArgument'
+        case Codes.DeadlineExceeded:
+            return 'DeadlineExceeded'
+        case Codes.NotFound:
+            return 'NotFound'
+        case Codes.AlreadyExists:
+            return 'AlreadyExists'
+        case Codes.PermissionDenied:
+            return 'PermissionDenied'
+        case Codes.ResourceExhausted:
+            return 'ResourceExhausted'
+        case Codes.FailedPrecondition:
+            return 'FailedPrecondition'
+        case Codes.Aborted:
+            return 'Aborted'
+        case Codes.OutOfRange:
+            return 'OutOfRange'
+        case Codes.Unimplemented:
+            return 'Unimplemented'
+        case Codes.Internal:
+            return 'Internal'
+        case Codes.Unavailable:
+            return 'Unavailable'
+        case Codes.DataLoss:
+            return 'DataLoss'
+        case Codes.Unauthenticated:
+            return 'Unauthenticated'
+    }
+    return `Unknown`
+}
 export class NetError {
     constructor(
         public readonly status: number, // http status code
-        public readonly grpc: number,// grpc code
+        public readonly grpc: Codes,// grpc code
         public readonly message: string, // string message
     ) {
-
-
     }
     private str_: string | undefined
     toString(): string {
@@ -34,7 +91,7 @@ interface Err {
     statusText: string
     message?: string
     error?: string | {
-        code?: number
+        code?: Codes
         message?: string
         description?: string
         error?: {
@@ -45,25 +102,27 @@ interface Err {
 export function resolveError(e: any): NetError {
     console.warn(e)
     if (!e) {
-        return new NetError(200, 0, 'success')
+        return new NetError(200, Codes.OK, 'success')
     }
     if (typeof e === "string") {
-        return new NetError(500, 2, e)
+        return new NetError(500, Codes.Unknown, e)
     }
     if (e !== null && typeof e === 'object' && typeof e.status === "number") {
         return resolveHttpError(e)
     }
-    return new NetError(500, 2, e.toString())
+    return new NetError(500, Codes.Unknown, e.toString())
 }
 export function resolveHttpError(e: Err): NetError {
     let error = e.error
     const status = e.status
-    let grpc = 2
+    let grpc = Codes.Unknown
     if (typeof error === "string") {
         return new NetError(status, grpc, error)
     }
     if (error) {
-        if (typeof error.message === "string") {
+        if (typeof error.code === "number") {
+            return new NetError(status, error.code, error.message ?? `rpc error: code = ${codesString(error.code)}`)
+        } else if (typeof error.message === "string") {
             if (typeof error.code === "number") {
                 grpc = error.code
             }

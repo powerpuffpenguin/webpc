@@ -21,8 +21,8 @@ service Logger {
         };
     }
     // Attach console logger stdout
-    // websocket /api/v1/logger/atach
-    rpc Atach (AttachRequest) returns (stream AttachResponse);
+    // websocket /api/v1/logger/attach
+    rpc Attach (AttachRequest) returns (stream AttachResponse);
     // List return log files name
     rpc List (ListRequest) returns (ListResponse){
         option (google.api.http) = {

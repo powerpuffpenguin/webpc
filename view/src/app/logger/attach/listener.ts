@@ -1,144 +1,181 @@
 import { Manager, Session } from "src/app/core/session/session"
-import { filter, takeUntil } from "rxjs/operators"
+import { filter, first, takeUntil } from "rxjs/operators"
 import { SessionService } from "src/app/core/session/session.service"
 import { Closed } from "src/app/core/utils/closed"
 import { HttpClient, HttpParams } from "@angular/common/http"
 import { ServerAPI } from "src/app/core/core/api"
+import { Client, ClientOption } from "src/app/core/net/client_w"
+import { environment } from "src/environments/environment"
+import { interval } from "rxjs"
+import { Codes } from "src/app/core/core/restful"
+interface Response {
+    code: Codes
+    message: string
+}
+const HeartInterval = 40 * 1000
+enum EventCode {
+    Heart = 1,
+}
+function sendRequest(ws: WebSocket, evt: EventCode) {
+    const msg = JSON.stringify({
+        event: evt,
+    })
+    if (!environment.production) {
+        console.log(`ws send: ${msg}`)
+    }
+    ws.send(msg)
+}
+
 
 interface Writer {
     writeln(text: string): void
     write(text: string): void
 }
-export class Listener {
+export class Listener extends Client implements ClientOption {
+    baseURL = ServerAPI.v1.logger.websocketURL('attach')
     private session_: Session | undefined
-    private connectSession_: Session | undefined
-    constructor(
-        private readonly httpClient: HttpClient,
-        public readonly writer: Writer,
+    constructor(private readonly httpClient: HttpClient,
+        private readonly writer: Writer,
         private readonly sessionService: SessionService,
     ) {
-        this.sessionService.observable.pipe(
-            takeUntil(this.closed_.observable),
-            filter((session) => session?.access && session?.userdata.id ? true : false)
-        ).subscribe((session) => {
-            this.session_ = session
-            if (!this.websocket_) {
-                this._postConnect()
-            }
-        })
+        super()
+        this._connect()
     }
-    pause = false
-    close() {
-        if (this.closed_.isClosed) {
-            return
-        }
-        this.closed_.close()
-        if (this.websocket_) {
-            this.websocket_.close()
-            this.websocket_ = undefined
-        }
-        if (this.timeout_) {
-            clearTimeout(this.timeout_)
-            this.timeout_ = null
-        }
-        if (this.interval_) {
-            clearInterval(this.interval_)
-            this.interval_ = null
-        }
+    private first_ = true
+    private delay_ = -1
+    optDelay(): number {
+        return this.delay_ * 1000
     }
-    private websocket_: WebSocket | undefined
-    private closed_ = new Closed()
-    private delay_ = 0
-    private timeout_: any
-    private interval_: any
-    private _postConnect() {
-        if (!this.pause && this.delay_) {
-            this.writer.writeln(`reconnect on ${this.delay_} second after`)
-        }
-        this.timeout_ = setTimeout(() => {
-            this.timeout_ = null
-            const session = this.session_
-            if (session?.access && session?.userdata?.id) {
-                const query = new HttpParams({
-                    fromObject: {
-                        access_token: session.access,
-                    }
-                })
-                this.connectSession_ = this.session_
-                const url = ServerAPI.v1.logger.websocketURL('attach') + '?' + query.toString()
-                this._connect(url)
-            }
-        }, this.delay_ * 1000)
-        if (!this.delay_) {
-            this.delay_ = 1
-        } else if (this.delay_ < 16) {
-            this.delay_ *= 2
-        }
-    }
-    private _connect(url: string) {
-        if (this.closed_.isClosed) {
-            return
-        }
-        const ws = new WebSocket(url)
-        ws.binaryType = "arraybuffer"
-        this.websocket_ = ws
-        ws.onopen = () => {
-            this._onopen(ws)
-        }
-        ws.onerror = (evt) => {
-            ws.close()
-        }
-        ws.onclose = (evt) => {
-            this._onclose(ws, evt)
-        }
-    }
-    private _onopen(ws: WebSocket) {
-        if (ws != this.websocket_ || this.closed_.isClosed) {
-            ws.close()
-            return
-        }
-        if (!this.interval_) {
-            this.interval_ = setInterval(() => {
-                try {
-                    if (this.websocket_) {
-                        this.websocket_.send(`{}`)
-                    }
-                } catch (e) {
+    async optURL(): Promise<string> {
+        const session = await this.sessionService.observable.pipe(
+            filter((data) => {
+                if (data && data.userdata && data.userdata.id && data.access) {
+                    return true
                 }
-            }, 1000 * 40)
+                return false
+            }),
+            first(),
+            takeUntil(this.observable),
+        ).toPromise()
+        const access = session?.access ?? ''
+        const baseURL = this.baseURL
+        const url = baseURL + '?' + new HttpParams({
+            fromObject: {
+                access_token: access,
+            }
+        }).toString()
+        this.session_ = session
+        if (environment.production) {
+            console.log(`connect ${baseURL}`)
+        } else {
+            console.log(`connect ${url}`)
         }
+        return url
+    }
+    optOnNew(ws: WebSocket): void {
+        ws.binaryType = 'arraybuffer'
         this.writer.writeln(`attach logger console`)
-        ws.onmessage = (evt) => {
-            if (ws != this.websocket_) {
-                ws.close()
+    }
+    optOnOpenError(_: WebSocket): void {
+        this._onclose()
+    }
+    optOnClose(ws: WebSocket): void {
+        this._onclose()
+        this._connect()
+    }
+    optOnMessage(ws: WebSocket, evt: MessageEvent): void {
+        const data = evt.data
+        if (typeof data === "string") {
+            const resp: Response = JSON.parse(data)
+            if (resp.code === undefined) {
+                resp.code == Codes.OK
+            }
+            if (this._checkFirst(ws, resp.code, resp.message)) {
+                this._onMessage(resp)
+            }
+        } else if (data instanceof ArrayBuffer) {
+            if (this._checkFirst(ws)) {
+                this._onArrayBuffer(data)
+            }
+        } else {
+            ws.close()
+        }
+    }
+    private async _connect() {
+        if (this.isClosed) {
+            return
+        }
+        try {
+            await this.promise()
+        } catch (e) {
+            if (this.isClosed) {
                 return
             }
-            this.delay_ = 1
-            this._onmessage(ws, evt)
+            this._connect()
         }
     }
-    private async _onclose(ws: WebSocket, evt: CloseEvent) {
-        if (this.websocket_ != ws) {
-            return
-        }
-        console.log(`ws closed code=${evt.code} reason=${evt.reason} `)
-        this.websocket_ = undefined
-        if (evt.code == 401 && this.connectSession_) {
-            try {
-                await Manager.instance.refresh(this.httpClient, this.connectSession_, evt.code, evt.reason)
-            } catch (e) {
-                console.warn(`refresh token error`, e)
+    private _onclose() {
+        this.session_ = undefined
+        this.first_ = true
+
+        let delay = this.delay_
+        if (delay == 0) {
+            delay = -1
+        } else if (delay < 0) {
+            delay = 2
+        } else {
+            delay *= 2
+            if (delay > 16) {
+                delay = 16
             }
         }
-        this._postConnect()
-    }
-    private _onmessage(ws: WebSocket, evt: MessageEvent) {
-        if (typeof evt.data === "string") {
-            const str = evt.data.replace(/\n/g, "\r\n")
-            this.writer.write(str)
+        this.delay_ = delay
+        if (delay <= 0) {
+            console.warn(`websocket err, retrying in 0s`)
         } else {
-            this.writer.writeln(`not supported data type : ${typeof evt.data}`)
-            console.log(`not supported data type : ${typeof evt.data}`, evt.data)
+            console.warn(`websocket err, retrying in ${delay}s`)
         }
+    }
+    private timer_: any
+    private _checkFirst(ws: WebSocket, code?: Codes, message?: string): boolean {
+        if (!this.first_) {
+            return true
+        }
+        this.first_ = false
+        if (code === undefined || code === Codes.OK) {
+            this.delay_ = 0
+            if (!this.timer_ && HeartInterval > 1000) {
+                this.timer_ = interval(HeartInterval).pipe(
+                    takeUntil(this.observable)
+                ).subscribe(() => {
+                    const ws = this.ws()
+                    if (ws) {
+                        console.log('send heart')
+                        sendRequest(ws, EventCode.Heart)
+                    }
+                })
+            }
+            return true
+        } else {
+            console.warn(`connect err: ${code} ${message}`)
+            if (code == Codes.Unauthenticated && this.session_) {
+                // Manager.instance.refresh(httpClient, readySession)
+            }
+            ws.close()
+            return false
+        }
+    }
+    private _onMessage(resp: Response) {
+        if (resp.code == Codes.OK) {
+            console.log('ws recv: ', resp)
+        } else {
+            console.warn('ws recv: ', resp)
+        }
+    }
+    private _onArrayBuffer(data: ArrayBuffer) {
+        const enc = new TextDecoder("utf-8")
+        let str = enc.decode(data)
+        str = str.replace(/\n/g, "\r\n")
+        this.writer.write(str)
     }
 }

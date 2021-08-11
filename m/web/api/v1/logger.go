@@ -5,25 +5,26 @@ import (
 	"net/http"
 
 	"github.com/powerpuffpenguin/webpc/db"
-	"github.com/powerpuffpenguin/webpc/logger"
 	"github.com/powerpuffpenguin/webpc/m/web"
+	grpc_logger "github.com/powerpuffpenguin/webpc/protocol/logger"
+	grpc_slave "github.com/powerpuffpenguin/webpc/protocol/slave"
 
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/websocket"
 	"github.com/powerpuffpenguin/sessionid"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
 )
 
 type Logger struct {
 	web.Helper
+	cc *grpc.ClientConn
 }
 
-func (h Logger) Register(cc *grpc.ClientConn, router *gin.RouterGroup) {
+func (h *Logger) Register(cc *grpc.ClientConn, router *gin.RouterGroup) {
+	h.cc = cc
 	r := router.Group(`logger`)
 	r.GET(`attach`, h.attach)
 }
-func (h Logger) checkRoot(c *gin.Context) (code int, msg string) {
+func (h *Logger) checkRoot(c *gin.Context) (code int, msg string) {
 	userdata, e := h.ShouldBindUserdata(c)
 	if e != nil {
 		if sessionid.IsTokenExpired(e) {
@@ -43,50 +44,40 @@ func (h Logger) checkRoot(c *gin.Context) (code int, msg string) {
 	}
 	return
 }
-func (h Logger) attach(c *gin.Context) {
-	ws, e := h.Upgrade(c.Writer, c.Request, nil)
+func (h *Logger) attach(c *gin.Context) {
+	ws, e := h.Websocket(c, nil)
 	if e != nil {
-		h.Error(c, http.StatusBadRequest, codes.InvalidArgument, e.Error())
 		return
 	}
 	defer ws.Close()
-	code, msg := h.checkRoot(c)
-	if code != 0 {
-		h.WSWriteClose(ws, uint16(code), msg)
+	ctx := h.NewContext(c)
+	// fmt.Println(`--------------- new attach`)
+	// defer fmt.Println(`--------------- exit attach`)
+	client := grpc_logger.NewLoggerClient(h.cc)
+	stream, e := client.Attach(ctx, &grpc_logger.AttachRequest{})
+	if e != nil {
+		ws.Error(e)
 		return
 	}
-
-	done := make(chan struct{})
-	listener := logger.NewSnapshotListener(done)
-	logger.AddListener(listener)
-	go h.readWS(ws, done)
-	var (
-		ch      = listener.Channel()
-		working = true
-		data    []byte
-	)
-	for working {
-		select {
-		case <-done:
-			working = false
-		case data = <-ch:
-			if len(data) > 0 {
-				e = ws.WriteMessage(websocket.TextMessage, data)
-				if e != nil {
-					working = false
-				}
-			}
-		}
+	e = ws.Success()
+	if e != nil {
+		return
 	}
-	logger.RemoveListener(listener)
-}
-func (h Logger) readWS(ws *websocket.Conn, done chan<- struct{}) {
-	var e error
-	for {
-		_, _, e = ws.ReadMessage()
+	f := web.NewForward(func(messageType int, p []byte) error {
+		var req grpc_slave.SubscribeRequest
+		e = web.Unmarshal(p, &req)
 		if e != nil {
-			break
+			return e
 		}
-	}
-	close(done)
+		return nil
+	}, func() (e error) {
+		resp, e := stream.Recv()
+		if e != nil {
+			return
+		}
+		return ws.SendBinary(resp.Data)
+	}, func() error {
+		return stream.CloseSend()
+	})
+	ws.Forward(f)
 }

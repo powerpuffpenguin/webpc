@@ -1,15 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpErrorResponse, HttpHeaders, HttpClient } from '@angular/common/http'
 import { from, Observable } from 'rxjs';
-import { catchError, concatAll, map, mapTo } from 'rxjs/operators';
+import { catchError, concatAll, map } from 'rxjs/operators';
 import { Manager, Session } from '../session/session';
-import { NetError, resolveError, resolveHttpError } from '../core/restful';
-import { Completer } from '../utils/completer';
+import { Codes, NetError, resolveError } from '../core/restful';
 
 @Injectable()
 export class HeaderInterceptor implements HttpInterceptor {
   constructor(private readonly httpClient: HttpClient) { }
-  private completer_: Completer<Session | undefined> | undefined
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     let headers = req.headers
 
@@ -40,10 +38,9 @@ export class HeaderInterceptor implements HttpInterceptor {
           // only refresh once
           first = false
           if (session && err instanceof HttpErrorResponse) {
-            if (err.status === 401 || err.status === 403) {
-              return this._refreshRetry(req, next, session, err.status)
-            } else if (err.status === 403) {
-              return this._refreshRetry(req, next, session, err.status, resolveError(err).message)
+            const e = resolveError(err)
+            if (e.grpc == Codes.Unauthenticated) {
+              return this._refreshRetry(req, next, session, e)
             }
           }
         }
@@ -51,9 +48,9 @@ export class HeaderInterceptor implements HttpInterceptor {
       }),
     )
   }
-  private _refreshRetry(req: HttpRequest<any>, next: HttpHandler, session: Session, code?: number, msg?: string): Observable<HttpEvent<any>> {
+  private _refreshRetry(req: HttpRequest<any>, next: HttpHandler, session: Session, err: NetError): Observable<HttpEvent<any>> {
     return from(new Promise<Session>((resolve, reject) => {
-      Manager.instance.refresh(this.httpClient, session, code, msg).then((session) => {
+      Manager.instance.refresh(this.httpClient, session, err).then((session) => {
         if (session) {
           resolve(session)
         } else {
