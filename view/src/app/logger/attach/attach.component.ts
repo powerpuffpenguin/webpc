@@ -87,8 +87,8 @@ export class AttachComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     this.listener = new Listener(
       this.httpClient,
-      this,
       this.sessionService,
+      this,
     )
   }
   onClickDetach() {
