@@ -141,7 +141,5 @@ message SubscribeData{
     bool ready = 2;
 }
 message SubscribeResponse{
-    uint32 code = 1;
-    string emsg = 2;
-    repeated SubscribeData items =3;
+    repeated SubscribeData items = 1;
 }

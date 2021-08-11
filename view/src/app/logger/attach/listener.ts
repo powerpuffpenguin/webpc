@@ -1,9 +1,9 @@
-import { Manager, Session } from "src/app/core/session/session"
 import { filter, first, takeUntil } from "rxjs/operators"
 import { SessionService } from "src/app/core/session/session.service"
 import { HttpClient, HttpParams } from "@angular/common/http"
 import { ServerAPI } from "src/app/core/core/api"
 import { Client, ClientOption } from "src/app/core/net/client"
+import { Access } from "src/app/core/net/access"
 import { environment } from "src/environments/environment"
 import { interval } from "rxjs"
 import { Codes } from "src/app/core/core/restful"
@@ -29,18 +29,7 @@ interface Writer {
     writeln(text: string, log?: boolean): void
     write(text: string, log?: boolean): void
 }
-class Access {
-    session: Session | undefined
-    refresh = false
-    setSession(session?: Session) {
-        this.session = session
-        this.refresh = false
-    }
-    close() {
-        this.session = undefined
-        this.refresh = false
-    }
-}
+
 export class Listener extends Client implements ClientOption {
     baseURL = ServerAPI.v1.logger.websocketURL('attach')
     private access_ = new Access()
@@ -52,8 +41,10 @@ export class Listener extends Client implements ClientOption {
         this._connect()
     }
     close() {
-        this.access_.close()
-        super.close()
+        if (this.isNotClosed) {
+            this.access_.close()
+            super.close()
+        }
     }
     private delay_ = -1
     optDelay(): number {
@@ -61,9 +52,11 @@ export class Listener extends Client implements ClientOption {
     }
     async optURL(): Promise<string> {
         const access = this.access_
-        if (access.refresh && access.session) {
-            await Manager.instance.refresh(this.httpClient, access.session)
+        const refresh = access.refresh(this.httpClient)
+        if (refresh) {
+            await refresh
         }
+
         const session = await this.sessionService.observable.pipe(
             filter((data) => {
                 if (data && data.userdata && data.userdata.id && data.access) {
@@ -172,8 +165,8 @@ export class Listener extends Client implements ClientOption {
             return true
         } else {
             console.warn(`connect err: ${code} ${message}`)
-            if (code == Codes.Unauthenticated && this.access_.session) {
-                this.access_.refresh = true
+            if (code == Codes.Unauthenticated) {
+                this.access_.setRefresh()
             }
             ws.close()
             return false
