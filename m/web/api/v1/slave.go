@@ -34,7 +34,7 @@ func (h *Slave) subscribe(c *gin.Context) {
 		ws.Error(e)
 		return
 	}
-	f := web.NewForward(func(messageType int, p []byte) error {
+	f := web.NewForward(func(counted uint64, messageType int, p []byte) error {
 		var req grpc_slave.SubscribeRequest
 		e = web.Unmarshal(p, &req)
 		if e != nil {

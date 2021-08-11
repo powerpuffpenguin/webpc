@@ -114,16 +114,18 @@ func (wf *websocketForward) Serve() {
 	wf.f.CloseSend()
 }
 func (wf *websocketForward) request() {
+	var counted uint64
 	for {
 		t, p, e := wf.w.ReadMessage()
 		if e != nil {
 			break
 		}
-		e = wf.f.Request(t, p)
+		e = wf.f.Request(counted, t, p)
 		if e != nil {
 			wf.w.Error(e)
 			break
 		}
+		counted++
 	}
 
 	if wf.closed == 0 &&
