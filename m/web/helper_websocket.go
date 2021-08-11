@@ -132,12 +132,14 @@ func (wf *websocketForward) request() {
 	}
 }
 func (wf *websocketForward) response() {
+	var counted uint64
 	for {
-		e := wf.f.Response()
+		e := wf.f.Response(counted)
 		if e != nil {
 			wf.w.Error(e)
 			break
 		}
+		counted++
 	}
 	if wf.closed == 0 &&
 		atomic.SwapInt32(&wf.closed, 1) == 0 {

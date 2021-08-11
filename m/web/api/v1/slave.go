@@ -41,7 +41,7 @@ func (h *Slave) subscribe(c *gin.Context) {
 			return e
 		}
 		return stream.Send(&req)
-	}, func() (e error) {
+	}, func(counted uint64) (e error) {
 		resp, e := stream.Recv()
 		if e != nil {
 			return

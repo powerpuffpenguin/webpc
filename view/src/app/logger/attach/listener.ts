@@ -55,7 +55,6 @@ export class Listener extends Client implements ClientOption {
         this.access_.close()
         super.close()
     }
-    private first_ = true
     private delay_ = -1
     optDelay(): number {
         return this.delay_ * 1000
@@ -105,18 +104,18 @@ export class Listener extends Client implements ClientOption {
         this._onclose()
         this._connect()
     }
-    optOnMessage(ws: WebSocket, evt: MessageEvent): void {
+    optOnMessage(ws: WebSocket, counted: number, evt: MessageEvent): void {
         const data = evt.data
         if (typeof data === "string") {
             const resp: Response = JSON.parse(data)
             if (resp.code === undefined) {
                 resp.code == Codes.OK
             }
-            if (this._checkFirst(ws, resp.code, resp.message)) {
+            if (this._checkFirst(ws, counted, resp.code, resp.message)) {
                 this._onMessage(resp)
             }
         } else if (data instanceof ArrayBuffer) {
-            if (this._checkFirst(ws)) {
+            if (this._checkFirst(ws, counted)) {
                 this._onArrayBuffer(data)
             }
         } else {
@@ -137,8 +136,6 @@ export class Listener extends Client implements ClientOption {
         }
     }
     private _onclose(): number {
-        this.first_ = true
-
         let delay = this.delay_
         if (delay == 0) {
             delay = -1
@@ -154,11 +151,10 @@ export class Listener extends Client implements ClientOption {
         return delay
     }
     private timer_: any
-    private _checkFirst(ws: WebSocket, code?: Codes, message?: string): boolean {
-        if (!this.first_) {
+    private _checkFirst(ws: WebSocket, counted: number, code?: Codes, message?: string): boolean {
+        if (counted) {
             return true
         }
-        this.first_ = false
         if (code === undefined || code === Codes.OK) {
             this.writer.writeln(`attach logger console`, true)
             this.delay_ = 0

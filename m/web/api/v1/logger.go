@@ -35,7 +35,7 @@ func (h *Logger) attach(c *gin.Context) {
 		ws.Error(e)
 		return
 	}
-	first := true
+
 	f := web.NewForward(func(messageType int, p []byte) error {
 		var req grpc_slave.SubscribeRequest
 		e = web.Unmarshal(p, &req)
@@ -43,16 +43,13 @@ func (h *Logger) attach(c *gin.Context) {
 			return e
 		}
 		return nil
-	}, func() (e error) {
+	}, func(counted uint64) (e error) {
 		resp, e := stream.Recv()
 		if e != nil {
 			return
 		}
-		if first {
-			first = false
-			if len(resp.Data) == 0 {
-				return ws.Success()
-			}
+		if counted == 0 && len(resp.Data) == 0 {
+			return ws.Success()
 		}
 		return ws.SendBinary(resp.Data)
 	}, func() error {

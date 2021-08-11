@@ -46,8 +46,10 @@ export interface ClientOption {
     /**
      * 當一個 WebSocket 的 onopen 回調後 被調用
      * @param ws 
+     * @param counted 已經爲這個 WebSocket 執行了多少次回調
+     * @param evt 
      */
-    optOnMessage(ws: WebSocket, evt: MessageEvent): void
+    optOnMessage(ws: WebSocket, counted: number, evt: MessageEvent): void
 }
 
 class ClientImplement {
@@ -160,9 +162,11 @@ class ClientImplement {
                     resolve(ws)
                 }
                 opts.optOnOpen(ws, evt)
+                let counted = 0
                 ws.onmessage = (evt) => {
                     if (State.Opened == state) {
-                        opts.optOnMessage(ws, evt)
+                        opts.optOnMessage(ws, counted, evt)
+                        counted++
                     }
                 }
             }
@@ -215,7 +219,7 @@ export class Client implements ClientOption {
     optOnOpenError(ws: WebSocket): void { }
     optOnOpen(ws: WebSocket, evt: Event): void { }
     optOnClose(ws: WebSocket): void { }
-    optOnMessage(ws: WebSocket, evt: MessageEvent): void { }
+    optOnMessage(ws: WebSocket, counted: number, evt: MessageEvent): void { }
 
     constructor() { }
     private _clientImplement = new ClientImplement()

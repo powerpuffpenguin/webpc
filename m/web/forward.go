@@ -9,17 +9,17 @@ import (
 
 type Forward interface {
 	Request(messageType int, p []byte) error
-	Response() (e error)
+	Response(counted uint64) (e error)
 	CloseSend() error
 }
 type forward struct {
 	req       func(messageType int, p []byte) error
-	resp      func() (e error)
+	resp      func(counted uint64) (e error)
 	closeSend func() error
 }
 
 func NewForward(req func(messageType int, p []byte) error,
-	resp func() (e error),
+	resp func(counted uint64) (e error),
 	closeSend func() error,
 ) Forward {
 	return &forward{
@@ -31,8 +31,8 @@ func NewForward(req func(messageType int, p []byte) error,
 func (f *forward) Request(messageType int, p []byte) error {
 	return f.req(messageType, p)
 }
-func (f *forward) Response() (e error) {
-	return f.resp()
+func (f *forward) Response(counted uint64) (e error) {
+	return f.resp(counted)
 }
 func (f *forward) CloseSend() error {
 	return f.closeSend()
