@@ -260,7 +260,7 @@ export class Manager {
             })
         }
     }
-    async refresh(httpClient: HttpClient, session: Session, err: NetError): Promise<Session | undefined> {
+    async refresh(httpClient: HttpClient, session: Session, err?: NetError): Promise<Session | undefined> {
         if (this.refresh_) { // refreshing
             return this.refresh_.promise
         }
@@ -271,7 +271,7 @@ export class Manager {
         } else if (session != current) { // already refresh
             return current
         }
-        if (err.grpc != Codes.Unauthenticated) {
+        if (err && err.grpc != Codes.Unauthenticated) {
             throw err
         }
 

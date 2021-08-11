@@ -59,10 +59,6 @@ func (h *Logger) attach(c *gin.Context) {
 		ws.Error(e)
 		return
 	}
-	e = ws.Success()
-	if e != nil {
-		return
-	}
 	f := web.NewForward(func(messageType int, p []byte) error {
 		var req grpc_slave.SubscribeRequest
 		e = web.Unmarshal(p, &req)
