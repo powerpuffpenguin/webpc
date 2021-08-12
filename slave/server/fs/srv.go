@@ -192,8 +192,8 @@ func (s server) Download(req *grpc_fs.DownloadRequest, server grpc_fs.FS_Downloa
 		`Content-Disposition`,
 		fmt.Sprintf("attachment; filename=\"%s\"", filepath.Base(req.Path)),
 	))
-	e = s.ServeContent(server,
-		`application/octet-stream`,
+	e = s.ServeName(server,
+		req.Path,
 		stat.ModTime(),
 		f,
 	)

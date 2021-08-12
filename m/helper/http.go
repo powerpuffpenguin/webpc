@@ -33,8 +33,8 @@ func (Helper) SetHTTPCacheMaxAge(ctx context.Context, maxAge int) error {
 	return grpc.SetHeader(ctx, metadata.Pairs(`Cache-Control`, `max-age=`+strconv.Itoa(maxAge)))
 }
 
-func (Helper) SetHTTPCode(ctx context.Context, code int) {
-	grpc.SetHeader(ctx, metadata.Pairs(`x-http-code`, strconv.Itoa(code)))
+func (Helper) SetHTTPCode(ctx context.Context, code int) error {
+	return grpc.SetHeader(ctx, metadata.Pairs(`x-http-code`, strconv.Itoa(code)))
 }
 func (h Helper) ToHTTPError(ctx context.Context, id string, e error) error {
 	if os.IsNotExist(e) {

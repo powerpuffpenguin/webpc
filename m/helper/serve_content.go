@@ -5,9 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"mime"
 	"mime/multipart"
 	"net/http"
 	"net/textproto"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -16,6 +18,17 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
+
+func (h Helper) ServeName(stream grpc.ServerStream, name string,
+	modtime time.Time,
+	content io.ReadSeeker,
+) error {
+	ctype := mime.TypeByExtension(filepath.Ext(name))
+	if ctype == `` {
+		ctype = `application/octet-stream`
+	}
+	return h.ServeContent(stream, ctype, modtime, content)
+}
 
 // ServeContent make stream google.api.HttpBody compatible http download, copy from http.ServeContent.
 func (Helper) ServeContent(stream grpc.ServerStream, contentType string,
