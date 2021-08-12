@@ -1,6 +1,8 @@
 package web
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"net/http"
 	"sync/atomic"
 
@@ -25,6 +27,19 @@ func (h Helper) NewContext(c *gin.Context) context.Context {
 		ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs(
 			`Authorization`, token,
 		))
+	}
+	return ctx
+}
+func (h Helper) NewForwardContext(c *gin.Context) context.Context {
+	ctx := c.Request.Context()
+	userdata, e := h.ShouldBindUserdata(c)
+	if e == nil {
+		b, e := json.Marshal(userdata)
+		if e == nil {
+			return metadata.NewOutgoingContext(ctx, metadata.Pairs(
+				`Authorization`, `Bearer `+base64.RawURLEncoding.EncodeToString(b),
+			))
+		}
 	}
 	return ctx
 }

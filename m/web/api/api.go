@@ -7,6 +7,8 @@ import (
 	"github.com/powerpuffpenguin/webpc/configure"
 	"github.com/powerpuffpenguin/webpc/m/web"
 	v1 "github.com/powerpuffpenguin/webpc/m/web/api/v1"
+
+	forward "github.com/powerpuffpenguin/webpc/m/web/api/forward"
 	"google.golang.org/grpc"
 )
 
@@ -27,6 +29,7 @@ func (h Helper) Register(cc *grpc.ClientConn, router *gin.RouterGroup) {
 
 	ms := []web.IHelper{
 		v1.Helper{},
+		forward.Helper{},
 	}
 	for _, m := range ms {
 		m.Register(cc, r)

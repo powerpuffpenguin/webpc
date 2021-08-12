@@ -18,7 +18,7 @@ import (
 )
 
 // ServeContent make stream google.api.HttpBody compatible http download, copy from http.ServeContent.
-func (Helper) ServeContent(stream grpc.Stream, contentType string,
+func (Helper) ServeContent(stream grpc.ServerStream, contentType string,
 	modtime time.Time,
 	content io.ReadSeeker,
 ) error {
@@ -52,7 +52,7 @@ type serveContent struct {
 	mdOK    bool
 }
 
-func (s *serveContent) Serve(stream grpc.Stream, contentType string,
+func (s *serveContent) Serve(stream grpc.ServerStream, contentType string,
 	sizeFunc func() (int64, error), content io.ReadSeeker,
 ) (e error) {
 	s.ctx = stream.Context()
@@ -62,6 +62,7 @@ func (s *serveContent) Serve(stream grpc.Stream, contentType string,
 	s.header.Set(`Accept-Ranges`, `bytes`)
 	done, rangeReq := s.checkPreconditions(method)
 	if done {
+		e = grpc.SetHeader(s.ctx, s.header)
 		return
 	}
 	size, e := sizeFunc()
@@ -78,6 +79,7 @@ func (s *serveContent) Serve(stream grpc.Stream, contentType string,
 				s.header.Set("Content-Range", fmt.Sprintf("bytes */%d", size))
 			}
 			s.WriteHeader(http.StatusRequestedRangeNotSatisfiable)
+			e = grpc.SetHeader(s.ctx, s.header)
 			return
 		}
 		if sumRangesSize(ranges) > size {
@@ -103,6 +105,7 @@ func (s *serveContent) Serve(stream grpc.Stream, contentType string,
 			ra := ranges[0]
 			if _, err := content.Seek(ra.start, io.SeekStart); err != nil {
 				s.WriteHeader(http.StatusRequestedRangeNotSatisfiable)
+				e = grpc.SetHeader(s.ctx, s.header)
 				return
 			}
 			s.WriteHeader(http.StatusPartialContent)

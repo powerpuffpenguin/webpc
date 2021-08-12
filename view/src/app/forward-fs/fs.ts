@@ -235,3 +235,26 @@ export class FileInfo {
         return sizeString(this.size)
     }
 }
+export interface DirName {
+    name: string
+    dir: string
+}
+export function split(name: string): DirName {
+    if (typeof name !== "string") {
+        return {
+            name: '',
+            dir: '',
+        }
+    }
+    const index = name.lastIndexOf('/')
+    if (index != -1) {
+        return {
+            name: name.substring(index + 1),
+            dir: name.substring(0, index),
+        }
+    }
+    return {
+        name: name,
+        dir: '',
+    }
+}

@@ -1,0 +1,9 @@
+<a mat-button [routerLink]="['/forward/fs']" [queryParams]="{id:target}">
+    <mat-icon>folder_special</mat-icon>
+    <span class="left8" i18n>Filesystem management</span>
+</a>
+
+<a mat-button [routerLink]="['/forward/fs/list']" [queryParams]="{id:target,root:root}">
+    <mat-icon>folder_special</mat-icon>
+    <span class="left8">{{root}}</span>
+</a>

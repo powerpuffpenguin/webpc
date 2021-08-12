@@ -77,11 +77,13 @@ func (f *Forward) Put(id int64, cc *grpc.ClientConn, gateway *runtime.ServeMux) 
 		gateway: gateway,
 	}
 }
-func (f *Forward) Client(id int64) (cc *grpc.ClientConn) {
+func (f *Forward) Get(id int64) (cc *grpc.ClientConn, e error) {
 	f.rw.RLock()
 	ele, exists := f.keys[id]
 	if exists {
 		cc = ele.cc
+	} else {
+		e = status.Error(codes.NotFound, `slave id not found: `+strconv.FormatInt(id, 10))
 	}
 	f.rw.RUnlock()
 	return
@@ -115,13 +117,18 @@ func (f *Forward) Forward(id int64, c *gin.Context) {
 	if e == nil {
 		// token
 		b, e := json.Marshal(userdata)
-		if e != nil {
+		if e == nil {
+			c.Request.Header.Set(`Authorization`, `Bearer `+base64.RawURLEncoding.EncodeToString(b))
+		} else if shared {
+			c.Request.Header.Del(`Authorization`)
+		} else {
 			f.web.Error(c, e)
 			return
 		}
-		c.Request.Header.Set(`Authorization`, `Bearer `+base64.RawURLEncoding.EncodeToString(b))
 	} else {
-		if !shared {
+		if shared {
+			c.Request.Header.Del(`Authorization`)
+		} else {
 			f.web.Error(c, e)
 			return
 		}

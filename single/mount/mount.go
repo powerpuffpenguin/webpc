@@ -53,7 +53,7 @@ func (m *Mount) toError(name string, e error) error {
 	return e
 }
 func (m *Mount) LS(path string) (dir string, modtime time.Time, results []FileInfo, e error) {
-	dst, e := m.Filename(path)
+	dst, e := m.filename(path)
 	if e != nil {
 		return
 	}
@@ -101,7 +101,7 @@ func (m *Mount) LS(path string) (dir string, modtime time.Time, results []FileIn
 	return
 }
 
-func (m *Mount) Filename(path string) (filename string, e error) {
+func (m *Mount) filename(path string) (filename string, e error) {
 	filename = filepath.Clean(m.root + path)
 	if m.root != filename {
 		root := m.root
@@ -112,6 +112,28 @@ func (m *Mount) Filename(path string) (filename string, e error) {
 			e = status.Error(codes.PermissionDenied, `Illegal path`)
 			return
 		}
+	}
+	return
+}
+func (m *Mount) Open(name string) (f *os.File, e error) {
+	path, e := m.filename(name)
+	if e != nil {
+		return
+	}
+	f, e = os.Open(path)
+	if e != nil {
+		e = m.toError(name, e)
+	}
+	return
+}
+func (m *Mount) OpenFile(name string, flag int, perm os.FileMode) (f *os.File, e error) {
+	path, e := m.filename(name)
+	if e != nil {
+		return
+	}
+	f, e = os.OpenFile(path, flag, perm)
+	if e != nil {
+		e = m.toError(name, e)
 	}
 	return
 }

@@ -1,1 +1,23 @@
-<p>text works!</p>
+<div class="viewcard">
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title i18n>Text View</mat-card-title>
+            <mat-card-subtitle>{{filepath}}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+            <fs-navigation [target]="id" [root]="root"></fs-navigation>
+            <fs-path [path]="dir" (pathChange)="onPathChange($event)"></fs-path>
+            <mat-form-field appearance="fill">
+                <mat-label>{{name}}</mat-label>
+                <textarea matInput [(ngModel)]="val" [disabled]="disabled||isNotCanWrite" rows="15" spellcheck="false"
+                    autocapitalize="off" autocomplete="off" autocorrect="off"></textarea>
+            </mat-form-field>
+        </mat-card-content>
+        <mat-card-actions>
+            <button mat-stroked-button color="primary" [disabled]="disabled" i18n (click)="onClickLoad()">Load</button>
+            <button mat-stroked-button color="primary" [disabled]="disabled||isNotCanWrite||isNotChanged" i18n
+                (click)="onCLickSave()">Save</button>
+            <mat-spinner *ngIf="disabled" color="accent" diameter='24'></mat-spinner>
+        </mat-card-actions>
+    </mat-card>
+</div>

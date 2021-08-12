@@ -24,11 +24,11 @@ func (Helper) ServeMessage(ctx context.Context, modtime time.Time,
 
 	if md, ok := metadata.FromIncomingContext(ctx); ok {
 		strs := md.Get(`Method`)
-		if strs != nil && len(strs) != 0 {
+		if len(strs) != 0 {
 			method = strs[0]
 		}
 		strs = md.Get(`If-Modified-Since`)
-		if strs != nil && len(strs) != 0 {
+		if  len(strs) != 0 {
 			ims = strs[0]
 		}
 	}

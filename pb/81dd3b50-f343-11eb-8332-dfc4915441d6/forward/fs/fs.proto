@@ -25,6 +25,9 @@ service FS {
             get: "/api/forward/v1/fs/download"
         };
     }
+    // Update file data
+    // put /api/forward/v1/fs
+    rpc Put (stream PutRequest) returns (PutResponse){}
 }
 message MountRequest{
 }
@@ -55,4 +58,11 @@ message ListResponse{
 message DownloadRequest{
     string root = 1;
     string path =2;
+}
+message PutRequest{
+    string root = 1;
+    string path =2;
+    bytes data = 3;
+}
+message PutResponse{
 }

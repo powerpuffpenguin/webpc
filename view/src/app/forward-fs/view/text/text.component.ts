@@ -5,18 +5,32 @@ import { ServerAPI } from 'src/app/core/core/api';
 import { ToasterService } from 'angular2-toaster';
 import { I18nService } from 'src/app/core/i18n/i18n.service';
 import { HttpClient } from '@angular/common/http';
-import { Subscription } from 'rxjs';
-
+import { Closed } from 'src/app/core/utils/closed';
+import { finalize, takeUntil } from 'rxjs/operators';
+import { split } from '../../fs'
+import { Session } from 'src/app/core/session/session';
 @Component({
   selector: 'app-text',
   templateUrl: './text.component.html',
   styleUrls: ['./text.component.scss']
 })
-export class TextComponent implements OnInit {
-
-
+export class TextComponent implements OnInit, OnDestroy {
+  private closed_ = new Closed()
+  id = ''
+  root = ''
+  filepath = ''
+  dir = ''
+  name = ''
+  get disabled(): boolean {
+    return this.loading_ || this.saving_
+  }
+  val = ''
+  private val_ = ''
+  private session_: Session | undefined
+  private loading_ = false
+  private saving_ = false
   constructor(private router: Router,
-    private route: ActivatedRoute,
+    private activatedRoute: ActivatedRoute,
     private sessionService: SessionService,
     private toasterService: ToasterService,
     private i18nService: I18nService,
@@ -24,104 +38,102 @@ export class TextComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    //  this.sessionService.observable.subscribe((session) => {
-    //       if (this._closed) {
-    //         return
-    //       }
-    //       this._session = session
-    //     })
-    //     this.sessionService.ready.then(() => {
-    //       if (this._closed) {
-    //         return
-    //       }
-    //       const param = this.route.snapshot.queryParamMap
-    //       const root = param.get(`root`)
-    //       const path = param.get(`path`)
-    //       this.root = root
-    //       this.filepath = path
-    //       this.name = path
-    //       const index = path.lastIndexOf('/')
-    //       if (index != -1) {
-    //         this.dir = path.substring(0, index)
-    //         this.name = path.substring(index + 1)
-    //       }
-    //       this.ready = true
-    //       this.onClickLoad()
-    //     })
+    this.sessionService.observable.pipe(
+      takeUntil(this.closed_.observable)
+    ).subscribe((session) => {
+      this.session_ = session
+    })
+    this.activatedRoute.queryParams.pipe(
+      takeUntil(this.closed_.observable)
+    ).subscribe((params) => {
+      if (this.disabled) {
+        return
+      }
+      this.id = params['id']
+      this.root = params['root']
+      this.filepath = params['path']
+      const tmp = split(this.filepath)
+      this.name = tmp.name
+      this.dir = tmp.dir
+
+      this.onClickLoad()
+    })
   }
   ngOnDestroy() {
-    // this._closed = true
-    // if (this._subscription) {
-    //   this._subscription.unsubscribe()
-    // }
+    this.closed_.close()
   }
   onPathChange(path: string) {
-    // if (typeof path !== "string") {
-    //   path = '/'
-    // }
-    // if (!path.startsWith('/')) {
-    //   path = '/' + path
-    // }
+    if (typeof path !== "string") {
+      path = '/'
+    }
+    if (!path.startsWith('/')) {
+      path = '/' + path
+    }
 
-    // this.router.navigate(['fs', 'list'], {
-    //   queryParams: {
-    //     root: this.root,
-    //     path: path,
-    //   }
-    // })
+    this.router.navigate(['/forward/fs/list'], {
+      queryParams: {
+        id: this.id,
+        root: this.root,
+        path: path,
+      }
+    })
   }
   canDeactivate(): boolean {
-    // if (this.saving) {
-    //   this.toasterService.pop('warning',
-    //     undefined,
-    //     this.i18nService.get('Wait for data to be saved'),
-    //   )
-    //   return false
-    // }
+    if (this.saving_) {
+      this.toasterService.pop('warning',
+        undefined,
+        this.i18nService.get('Wait for data to be saved'),
+      )
+      return false
+    }
     return true
   }
   onClickLoad() {
-    // this.loading = true
-    // ServerAPI.v1.fs.getOne(this.httpClient,
-    //   [this.root, this.filepath],
-    //   {
-    //     responseType: 'text',
-    //   },
-    // ).then((data) => {
-    //   this.val = data
-    //   this._val = data
-    // }, (e) => {
-    //   this.toasterService.pop('error', undefined, e)
-    // }).finally(() => {
-    //   this.loading = false
-    // })
+    this.loading_ = true
+    ServerAPI.forward.v1.fs.child('download').get(this.httpClient, {
+      responseType: 'text',
+      params: {
+        slave_id: this.id,
+        root: this.root,
+        path: this.filepath,
+      }
+    }).pipe(
+      finalize(() => {
+        this.loading_ = false
+      }),
+      takeUntil(this.closed_.observable)
+    ).subscribe((data) => {
+      this.val = data
+      this.val_ = data
+    }, (e) => {
+      this.toasterService.pop('error', undefined, e)
+    })
   }
-  // get isNotChanged(): boolean {
-  //   return this.val == this._val
-  // }
-  // get isNotCanWrite(): boolean {
-  //   if (this._session) {
-  //     if (this._session.write || this._session.root) {
-  //       return false
-  //     }
-  //   }
-  //   return true
-  // }
+  get isNotChanged(): boolean {
+    return this.val == this.val_
+  }
+  get isNotCanWrite(): boolean {
+    if (this.session_) {
+      if (this.session_.write || this.session_.root) {
+        return false
+      }
+    }
+    return true
+  }
   onCLickSave() {
-    // this.saving = true
-    // ServerAPI.v1.fs.putOne(this.httpClient,
-    //   [
-    //     this.root,
-    //     this.filepath,
-    //   ],
-    //   this.val,
-    // ).then(() => {
-    //   this.toasterService.pop('success', undefined, this.i18nService.get('Data saved'))
-    //   this._val = this.val
-    // }, (e) => {
-    //   this.toasterService.pop('error', undefined, e)
-    // }).finally(() => {
-    //   this.saving = false
-    // })
+    this.saving_ = true
+    ServerAPI.forward.v1.fs.child(this.id, this.root, this.filepath).put(this.httpClient,
+      this.val
+    ).pipe(
+      finalize(() => {
+        this.saving_ = false
+      }),
+      takeUntil(this.closed_.observable)
+    ).subscribe(() => {
+      this.toasterService.pop('success', undefined, this.i18nService.get('Data saved'))
+      this.val_ = this.val
+    }, (e) => {
+      this.toasterService.pop('error', undefined, e)
+    })
   }
 }

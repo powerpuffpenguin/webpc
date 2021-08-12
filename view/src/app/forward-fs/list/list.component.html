@@ -8,10 +8,7 @@
 <ng-template #readyView>
     <mat-card>
         <mat-card-content>
-            <a mat-button [routerLink]="['../list']" [queryParams]="{id:state.target,root:state.dir.root}">
-                <mat-icon>folder_special</mat-icon>
-                <span class="left8">{{state.dir.root}}</span>
-            </a>
+            <fs-navigation [target]="state.target" [root]="state.dir.root"></fs-navigation>
             <fs-manager [folder]="state.dir" [source]="state.source" (sourceChange)="state.source=$event"></fs-manager>
         </mat-card-content>
     </mat-card>

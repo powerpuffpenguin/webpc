@@ -16,9 +16,7 @@ func (h Helper) Register(cc *grpc.ClientConn, router *gin.RouterGroup) {
 	r := router.Group(BaseURL)
 
 	ms := []web.IHelper{
-		&Logger{},
-		Dialer{},
-		&Slave{},
+		Filesystem{},
 	}
 	for _, m := range ms {
 		m.Register(cc, r)

@@ -2,7 +2,7 @@ import { HttpClient } from "@angular/common/http"
 import { Closed } from "src/app/core/utils/closed"
 import { Loader } from "src/app/core/utils/loader"
 import { FileInfo, Dir } from "../fs";
-import { ListState, ListResponse } from './load_state';
+import { ListState } from './load_state';
 export interface Error {
     id: string
     err: any
