@@ -28,7 +28,7 @@ export class Access {
         }
     }
 }
-interface Response {
+export interface Response {
     code: Codes
     message: string
 }
@@ -115,14 +115,14 @@ export class SessionClient extends Client {
         if (typeof data === "string") {
             const resp: Response = JSON.parse(data)
             if (resp.code === undefined) {
-                resp.code == Codes.OK
+                resp.code = Codes.OK
             }
             if (this._checkFirst(ws, counted, resp.code, resp.message)) {
-                this._onMessage(resp)
+                this._onMessage(ws, resp)
             }
         } else if (data instanceof ArrayBuffer) {
             if (this._checkFirst(ws, counted)) {
-                this._onArrayBuffer(data)
+                this._onArrayBuffer(ws, data)
             }
         } else {
             ws.close()
@@ -192,6 +192,6 @@ export class SessionClient extends Client {
     _onConnectError(code?: Codes, message?: string) {
         console.warn(`connect err: ${code} ${message}`)
     }
-    _onMessage(resp: Response) { }
-    _onArrayBuffer(data: ArrayBuffer) { }
+    _onMessage(ws: WebSocket, resp: Response) { }
+    _onArrayBuffer(ws: WebSocket, data: ArrayBuffer) { }
 }

@@ -1,36 +1,17 @@
 import { SessionService } from "src/app/core/session/session.service"
 import { HttpClient } from "@angular/common/http"
 import { ServerAPI } from "src/app/core/core/api"
-import { ClientOption } from "src/app/core/net/client"
-import { Access } from "src/app/core/net/access"
-import { environment } from "src/environments/environment"
-import { interval } from "rxjs"
 import { Codes } from "src/app/core/core/restful"
-import { SessionClient } from "src/app/core/session/session_client"
-interface Response {
-    code: Codes
-    message: string
-}
+import { SessionClient, Response } from "src/app/core/session/session_client"
+
 const HeartInterval = 40 * 1000
-enum EventCode {
-    Heart = 1,
-}
-function sendRequest(ws: WebSocket, evt: EventCode) {
-    const msg = JSON.stringify({
-        event: evt,
-    })
-    if (!environment.production) {
-        console.log(`ws send: ${msg}`)
-    }
-    ws.send(msg)
-}
 
 interface Writer {
     writeln(text: string, log?: boolean): void
     write(text: string, log?: boolean): void
 }
 
-export class Listener extends SessionClient implements ClientOption {
+export class Listener extends SessionClient {
     constructor(httpClient: HttpClient,
         sessionService: SessionService,
         private readonly writer: Writer,
@@ -55,14 +36,14 @@ export class Listener extends SessionClient implements ClientOption {
     _onConnectError(code?: Codes, message?: string) {
         this.writer.writeln(`connect err: ${code} ${message}`, true)
     }
-    _onMessage(resp: Response) {
+    _onMessage(ws: WebSocket, resp: Response) {
         if (resp.code == Codes.OK) {
             console.log('ws recv: ', resp)
         } else {
             console.warn('ws recv: ', resp)
         }
     }
-    _onArrayBuffer(data: ArrayBuffer) {
+    _onArrayBuffer(ws: WebSocket, data: ArrayBuffer) {
         const enc = new TextDecoder("utf-8")
         let str = enc.decode(data)
         str = str.replace(/\n/g, "\r\n")
