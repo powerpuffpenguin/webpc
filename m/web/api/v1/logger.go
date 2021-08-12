@@ -3,7 +3,6 @@ package v1
 import (
 	"github.com/powerpuffpenguin/webpc/m/web"
 	grpc_logger "github.com/powerpuffpenguin/webpc/protocol/logger"
-	grpc_slave "github.com/powerpuffpenguin/webpc/protocol/slave"
 
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
@@ -37,11 +36,6 @@ func (h *Logger) attach(c *gin.Context) {
 	}
 
 	f := web.NewForward(func(counted uint64, messageType int, p []byte) error {
-		var req grpc_slave.SubscribeRequest
-		e = web.Unmarshal(p, &req)
-		if e != nil {
-			return e
-		}
 		return nil
 	}, func(counted uint64) (e error) {
 		resp, e := stream.Recv()

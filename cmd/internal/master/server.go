@@ -44,7 +44,7 @@ func newServer(system *configure.System, l net.Listener, swagger, debug bool, cn
 
 	gateway := utils.NewGateway()
 	mux := gin.Default()
-
+	mux.RedirectTrailingSlash = false
 	register.HTTP(clientConn, mux, gateway, swagger)
 
 	gpipe := newGRPC(cnf, gateway, clientConn, debug)
