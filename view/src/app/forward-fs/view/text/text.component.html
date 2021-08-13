@@ -7,16 +7,27 @@
         <mat-card-content>
             <fs-navigation [target]="id" [root]="root"></fs-navigation>
             <fs-path [path]="dir" (pathChange)="onPathChange($event)"></fs-path>
-            <mat-form-field appearance="fill">
-                <mat-label>{{name}}</mat-label>
-                <textarea matInput [(ngModel)]="val" [disabled]="disabled||isNotCanWrite" rows="15" spellcheck="false"
-                    autocapitalize="off" autocomplete="off" autocorrect="off"></textarea>
-            </mat-form-field>
+            <mat-button-toggle-group name="rw" [(ngModel)]="rw">
+                <mat-button-toggle value="read" i18n>read</mat-button-toggle>
+                <mat-button-toggle value="write" i18n>write</mat-button-toggle>
+            </mat-button-toggle-group>
+
+            <ng-container *ngIf="edit;then editView;else readView"></ng-container>
+            <ng-template #readView>
+                <pre>{{val}}</pre>
+            </ng-template>
+            <ng-template #editView>
+                <mat-form-field appearance="fill">
+                    <mat-label>{{name}}</mat-label>
+                    <textarea matInput [(ngModel)]="val" [disabled]="disabled||isNotCanWrite" rows="15"
+                        spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off"></textarea>
+                </mat-form-field>
+            </ng-template>
         </mat-card-content>
         <mat-card-actions>
             <button mat-stroked-button color="primary" [disabled]="disabled" i18n (click)="onClickLoad()">Load</button>
-            <button mat-stroked-button color="primary" [disabled]="disabled||isNotCanWrite||isNotChanged" i18n
-                (click)="onCLickSave()">Save</button>
+            <button *ngIf="edit" mat-stroked-button color="primary" [disabled]="disabled||isNotCanWrite||isNotChanged"
+                i18n (click)="onCLickSave()">Save</button>
             <mat-spinner *ngIf="disabled" color="accent" diameter='24'></mat-spinner>
         </mat-card-actions>
     </mat-card>

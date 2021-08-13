@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 	"time"
@@ -57,29 +58,7 @@ func (s server) checkRead(ctx context.Context, m *mount.Mount) (e error) {
 	}
 	return
 }
-func (s server) checkWrite(ctx context.Context, m *mount.Mount) (e error) {
-	// can read
-	if !m.Write() {
-		e = s.Error(codes.PermissionDenied, `filesystem is not writable`)
-		return
-	}
 
-	// root
-	_, userdata, e := s.JSONUserdata(ctx)
-	if e != nil {
-		return
-	}
-	if userdata.AuthTest(db.Root) {
-		return
-	}
-
-	// read auth
-	if !userdata.AuthTest(db.Write) {
-		e = s.Error(codes.PermissionDenied, `no read permission`)
-		return
-	}
-	return
-}
 func (s server) checkUserdataWrite(userdata *sessions.Userdata, m *mount.Mount) (e error) {
 	// can read
 	if !m.Write() {
@@ -306,6 +285,63 @@ func (s server) Put(server grpc_fs.FS_PutServer) (e error) {
 				zap.Uint64(`writed`, writed),
 			)
 		}
+	}
+	return
+}
+func (s server) Create(ctx context.Context, req *grpc_fs.CreateRequest) (resp *grpc_fs.FileInfo, e error) {
+	TAG := `forward.fs Create`
+	_, userdata, e := s.JSONUserdata(ctx)
+	if e != nil {
+		return
+	}
+	fs := mount.Default()
+	m := fs.Root(req.Root)
+	if m == nil {
+		e = s.Error(codes.NotFound, `root not found: `+req.Root)
+		return
+	}
+	e = s.checkUserdataWrite(&userdata, m)
+	if e != nil {
+		return
+	}
+	name := filepath.Base(req.Name)
+	var (
+		stat  os.FileInfo
+		isdir bool
+	)
+	if req.File {
+		stat, e = m.Create(req.File, req.Dir, name, 0666)
+	} else {
+		isdir = true
+		stat, e = m.Create(req.File, req.Dir, name, 0775)
+	}
+	if e != nil {
+		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
+			ce.Write(
+				zap.Error(e),
+				zap.String(`root`, req.Root),
+				zap.String(`name`, req.Name),
+				zap.String(`dir`, req.Dir),
+				zap.Bool(`file`, req.File),
+			)
+		}
+		return
+	}
+
+	if ce := logger.Logger.Check(zap.InfoLevel, TAG); ce != nil {
+		ce.Write(
+			zap.String(`root`, req.Root),
+			zap.String(`name`, req.Name),
+			zap.String(`dir`, req.Dir),
+			zap.Bool(`file`, req.File),
+		)
+	}
+	s.SetHTTPCode(ctx, http.StatusCreated)
+	resp = &grpc_fs.FileInfo{
+		Name:  name,
+		IsDir: isdir,
+		Size:  stat.Size(),
+		Mode:  uint32(stat.Mode()),
 	}
 	return
 }

@@ -26,7 +26,10 @@ export const KB = 1024
 export const MB = 1024 * KB
 export const GB = 1024 * MB
 export const TB = 1024 * GB
-export function sizeString(val: number): string {
+export function sizeString(val: number | string): string {
+    if (typeof val === "string") {
+        val = parseInt(val)
+    }
     if (typeof val !== "number" || isNaN(val)) {
         return '0b'
     }

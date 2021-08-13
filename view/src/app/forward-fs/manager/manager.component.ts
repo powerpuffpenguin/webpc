@@ -8,6 +8,8 @@ import { first, takeUntil } from 'rxjs/operators';
 import { Session } from 'src/app/core/session/session';
 import { SessionService } from 'src/app/core/session/session.service';
 import { Closed } from 'src/app/core/utils/closed';
+import { NewFileComponent } from '../dialog/new-file/new-file.component';
+import { PropertyComponent } from '../dialog/property/property.component';
 import { CheckEvent } from '../file/file.component';
 import { FileInfo, Dir } from '../fs';
 import { Box, Point } from './box';
@@ -22,6 +24,12 @@ const DefaultValue: any = {}
 })
 export class ManagerComponent implements OnInit, OnDestroy {
   private closed_ = new Closed()
+  get isClosed(): boolean {
+    return this.closed_.isClosed
+  }
+  get isNotClosed(): boolean {
+    return this.closed_.isNotClosed
+  }
   private session_: Session | undefined
   private subscription_: Subscription | undefined
   constructor(private router: Router,
@@ -341,17 +349,18 @@ export class ManagerComponent implements OnInit, OnDestroy {
     //   }
   }
   onClickNewFile() {
-    //   if (!this.folder || this._closed) {
-    //     return
-    //   }
-    //   this.matDialog.open(NewFileComponent, {
-    //     data: this.folder,
-    //     disableClose: true,
-    //   }).afterClosed().toPromise().then((fileinfo: FileInfo) => {
-    //     if (fileinfo && fileinfo instanceof FileInfo) {
-    //       this._pushNode(fileinfo)
-    //     }
-    //   })
+    const folder = this.folder
+    if (!folder || this.isClosed) {
+      return
+    }
+    this.matDialog.open(NewFileComponent, {
+      data: folder,
+      disableClose: true,
+    }).afterClosed().toPromise().then((fileinfo: FileInfo) => {
+      if (fileinfo && fileinfo instanceof FileInfo) {
+        this._pushNode(fileinfo)
+      }
+    })
   }
   onClickNewFolder() {
     //   if (!this.folder || this._closed) {
@@ -366,29 +375,29 @@ export class ManagerComponent implements OnInit, OnDestroy {
     //     }
     //   })
   }
-  // private _pushNode(fileinfo: FileInfo) {
-  //   if (!this._source) {
-  //     this._source = new Array<FileInfo>()
-  //     this.sourceChange.emit(this._source)
-  //   }
-  //   this._source.push(fileinfo)
-  //   this._source.sort(FileInfo.compare)
-  //   if (typeof fileinfo.name === "string" && fileinfo.name.startsWith('.')) {
-  //     return
-  //   }
-  //   if (!this._hide) {
-  //     this._hide = new Array<FileInfo>()
-  //   }
-  //   this._hide.push(fileinfo)
-  //   this._hide.sort(FileInfo.compare)
-  // }
+  private _pushNode(fileinfo: FileInfo) {
+    if (!this.source_) {
+      this.source_ = new Array<FileInfo>()
+      this.sourceChange.emit(this.source_)
+    }
+    this.source_.push(fileinfo)
+    this.source_.sort(FileInfo.compare)
+    if (typeof fileinfo.name === "string" && fileinfo.name.startsWith('.')) {
+      return
+    }
+    if (!this.hide_) {
+      this.hide_ = new Array<FileInfo>()
+    }
+    this.hide_.push(fileinfo)
+    this.hide_.sort(FileInfo.compare)
+  }
   onClickProperty() {
-    //   if (!this.target || this.target.length == 0) {
-    //     return
-    //   }
-    //   this.matDialog.open(PropertyComponent, {
-    //     data: this.target,
-    //   })
+    if (!this.target || this.target.length == 0) {
+      return
+    }
+    this.matDialog.open(PropertyComponent, {
+      data: this.target,
+    })
   }
   onClickRemove() {
     //   const target = this.target
@@ -483,17 +492,18 @@ export class ManagerComponent implements OnInit, OnDestroy {
   //   }
   // }
   onClickRefresh() {
-    //   const folder = this.folder
-    //   if (!folder) {
-    //     return
-    //   }
-    //   this.router.navigate(['fs', 'list'], {
-    //     queryParams: {
-    //       root: folder.root,
-    //       path: folder.dir,
-    //       tick: new Date().getTime(),
-    //     }
-    //   })
+    const folder = this.folder
+    if (!folder) {
+      return
+    }
+    this.router.navigate(['/forward/fs/list'], {
+      queryParams: {
+        id: folder.id,
+        root: folder.root,
+        path: folder.dir,
+        tick: new Date().getTime(),
+      }
+    })
   }
   onClickUncompress() {
     //   const target = this.target

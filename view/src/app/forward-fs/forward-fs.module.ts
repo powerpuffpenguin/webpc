@@ -20,6 +20,9 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatDialogModule } from '@angular/material/dialog';
 
 import { RootComponent } from './root/root.component';
 import { ListComponent } from './list/list.component';
@@ -31,6 +34,8 @@ import { NavigationComponent } from './navigation/navigation.component';
 import { AudioComponent } from './view/audio/audio.component';
 import { VideoComponent } from './view/video/video.component';
 import { ImageComponent } from './view/image/image.component';
+import { PropertyComponent } from './dialog/property/property.component';
+import { NewFileComponent } from './dialog/new-file/new-file.component';
 
 
 @NgModule({
@@ -44,7 +49,9 @@ import { ImageComponent } from './view/image/image.component';
     NavigationComponent,
     AudioComponent,
     VideoComponent,
-    ImageComponent
+    ImageComponent,
+    PropertyComponent,
+    NewFileComponent
   ],
   imports: [
     CommonModule,
@@ -54,7 +61,8 @@ import { ImageComponent } from './view/image/image.component';
     MatIconModule, MatListModule, MatTooltipModule,
     MatFormFieldModule, MatInputModule, MatRippleModule,
     MatMenuModule, MatToolbarModule, MatProgressSpinnerModule,
-    MatCheckboxModule,
+    MatCheckboxModule, MatButtonToggleModule, MatDividerModule,
+    MatDialogModule,
     ForwardFsRoutingModule
   ]
 })

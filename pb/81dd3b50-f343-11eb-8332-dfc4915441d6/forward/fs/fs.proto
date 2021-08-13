@@ -28,6 +28,14 @@ service FS {
     // Update file data
     // put /api/forward/v1/fs
     rpc Put (stream PutRequest) returns (PutResponse){}
+
+    // Create a new folder or file
+    rpc Create (CreateRequest) returns (FileInfo){
+        option (google.api.http) = {
+            post: "/api/forward/v1/fs"
+            body: "*"
+        };
+    }
 }
 message MountRequest{
 }
@@ -65,4 +73,11 @@ message PutRequest{
     bytes data = 3;
 }
 message PutResponse{
+}
+message CreateRequest{
+    string root = 1;
+    string dir =2;
+    string name =3;
+    // if true create a new file, else create a new folder
+    bool file = 4;
 }

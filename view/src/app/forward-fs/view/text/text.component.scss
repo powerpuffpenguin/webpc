@@ -1,7 +1,13 @@
 .mat-form-field{
     width: 100%;
+    margin-top: 12px;
 }
 .mat-spinner{
     display: inline-block;
     margin-left: 8px;
+}
+pre{
+    border-radius: 8px;
+    padding: 6px 8px 6px 8px;
+    background: var(--theme-background);
 }

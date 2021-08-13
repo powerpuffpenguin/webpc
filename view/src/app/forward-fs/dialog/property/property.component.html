@@ -1,0 +1,12 @@
+<h1 mat-dialog-title>
+    <ng-container i18n>Property</ng-container>
+</h1>
+<div mat-dialog-content>
+    <mat-list>
+        <mat-list-item *ngFor="let node of source">
+            <mat-icon matListAvatar>{{node.icon}}</mat-icon>
+            <div matLine>{{node.name}}</div>
+            <div matLine>{{node.modeString}} {{node.sizeString}} </div>
+        </mat-list-item>
+    </mat-list>
+</div>

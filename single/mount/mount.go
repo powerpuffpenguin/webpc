@@ -137,3 +137,46 @@ func (m *Mount) OpenFile(name string, flag int, perm os.FileMode) (f *os.File, e
 	}
 	return
 }
+func (m *Mount) formatCreate(dir, name string) (string, error) {
+	if name == `` {
+		return ``, status.Error(codes.InvalidArgument, `name not supported empty`)
+	}
+	dir, e := m.filename(dir)
+	if e != nil {
+		return ``, e
+	}
+
+	return filepath.Join(dir, name), nil
+}
+func (m *Mount) Create(file bool, dir, name string, perm os.FileMode) (info os.FileInfo, e error) {
+	path, e := m.formatCreate(dir, name)
+	if e != nil {
+		return
+	}
+	if file {
+		var f *os.File
+		f, e = os.OpenFile(path, os.O_CREATE|os.O_EXCL, perm)
+		if e != nil {
+			e = m.toError(filepath.Join(dir, name), e)
+			return
+		}
+		info, e = f.Stat()
+		f.Close()
+		if e != nil {
+			e = m.toError(filepath.Join(dir, name), e)
+			return
+		}
+	} else {
+		e = os.Mkdir(path, perm)
+		if e != nil {
+			e = m.toError(filepath.Join(dir, name), e)
+			return
+		}
+		info, e = os.Stat(path)
+		if e != nil {
+			e = m.toError(filepath.Join(dir, name), e)
+			return
+		}
+	}
+	return
+}

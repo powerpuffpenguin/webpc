@@ -16,6 +16,10 @@ import { Session } from 'src/app/core/session/session';
 })
 export class TextComponent implements OnInit, OnDestroy {
   private closed_ = new Closed()
+  get edit(): boolean {
+    return !this.isNotCanWrite && this.rw == 'write'
+  }
+  rw: 'read' | 'write' = 'read'
   id = ''
   root = ''
   filepath = ''
