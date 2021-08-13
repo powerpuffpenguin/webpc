@@ -1,0 +1,17 @@
+<div class="viewcard">
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title i18n>Video View</mat-card-title>
+            <mat-card-subtitle>{{filepath}}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+            <fs-navigation [target]="id" [root]="root"></fs-navigation>
+            <fs-path [path]="dir" (pathChange)="onPathChange($event)"></fs-path>
+            <p>
+                <mat-checkbox [(ngModel)]="stretch" i18n>Stretch Width</mat-checkbox>
+            </p>
+            <video *ngIf="url" [src]="url" [style.width]="stretch?'100%':''" controls="controls" autoplay loop>Not
+                support video tag,Please use a modern browser.</video>
+        </mat-card-content>
+    </mat-card>
+</div>

@@ -1,0 +1,15 @@
+<div class="viewcard">
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title i18n>Audio View</mat-card-title>
+            <mat-card-subtitle>{{filepath}}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+            <fs-navigation [target]="id" [root]="root"></fs-navigation>
+            <fs-path [path]="dir" (pathChange)="onPathChange($event)"></fs-path>
+
+            <audio *ngIf="url" [src]="url" controls="controls" autoplay loop>Not support audio tag,Please use a modern
+                browser.</audio>
+        </mat-card-content>
+    </mat-card>
+</div>

@@ -36,15 +36,16 @@ func (Helper) SetHTTPCacheMaxAge(ctx context.Context, maxAge int) error {
 func (Helper) SetHTTPCode(ctx context.Context, code int) error {
 	return grpc.SetHeader(ctx, metadata.Pairs(`x-http-code`, strconv.Itoa(code)))
 }
-func (h Helper) ToHTTPError(ctx context.Context, id string, e error) error {
+
+func (h Helper) ToHTTPError(name string, e error) error {
 	if os.IsNotExist(e) {
-		return h.Error(codes.NotFound, `not exists : `+id)
+		return h.Error(codes.NotFound, `not exists : `+name)
 	}
 	if os.IsExist(e) {
-		return h.Error(codes.PermissionDenied, `already exists : `+id)
+		return h.Error(codes.PermissionDenied, `already exists : `+name)
 	}
 	if os.IsPermission(e) {
-		return h.Error(codes.PermissionDenied, `forbidden : `+id)
+		return h.Error(codes.PermissionDenied, `forbidden : `+name)
 	}
 	return h.Error(codes.Unknown, e.Error())
 }

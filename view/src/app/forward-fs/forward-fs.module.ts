@@ -19,6 +19,7 @@ import { MatRippleModule } from '@angular/material/core';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 import { RootComponent } from './root/root.component';
 import { ListComponent } from './list/list.component';
@@ -27,6 +28,9 @@ import { PathComponent } from './path/path.component';
 import { FileComponent } from './file/file.component';
 import { TextComponent } from './view/text/text.component';
 import { NavigationComponent } from './navigation/navigation.component';
+import { AudioComponent } from './view/audio/audio.component';
+import { VideoComponent } from './view/video/video.component';
+import { ImageComponent } from './view/image/image.component';
 
 
 @NgModule({
@@ -37,7 +41,10 @@ import { NavigationComponent } from './navigation/navigation.component';
     PathComponent,
     FileComponent,
     TextComponent,
-    NavigationComponent
+    NavigationComponent,
+    AudioComponent,
+    VideoComponent,
+    ImageComponent
   ],
   imports: [
     CommonModule,
@@ -47,6 +54,7 @@ import { NavigationComponent } from './navigation/navigation.component';
     MatIconModule, MatListModule, MatTooltipModule,
     MatFormFieldModule, MatInputModule, MatRippleModule,
     MatMenuModule, MatToolbarModule, MatProgressSpinnerModule,
+    MatCheckboxModule,
     ForwardFsRoutingModule
   ]
 })

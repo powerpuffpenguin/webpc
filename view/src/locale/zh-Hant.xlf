@@ -106,6 +106,22 @@
           <context context-type="linenumber">44</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="ae0378d2442812ae46ace487bf5139936ae1c2fd" datatype="html">
+        <source>Wait for data to be saved</source>
+        <target>等待數據保存</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.html</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b8b1f4380472ddd45e08ce78580fad15f6957d5c" datatype="html">
+        <source>Data saved</source>
+        <target>數據已保存</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.html</context>
+          <context context-type="linenumber">47</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="8a3e5253b801997bb641fd367390cdae7e987656" datatype="html">
         <source>Add Device</source>
         <target>添加設備</target>
@@ -595,7 +611,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-fs/manager/manager.component.html</context>
-          <context context-type="linenumber">105</context>
+          <context context-type="linenumber">106</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/group/list/node/node.component.html</context>
@@ -747,7 +763,7 @@
         <target>下載</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-fs/manager/manager.component.html</context>
-          <context context-type="linenumber">80</context>
+          <context context-type="linenumber">81</context>
         </context-group>
       </trans-unit>
       <trans-unit id="1979da7460819153e11d2078244645d94291b69c" datatype="html">
@@ -755,7 +771,7 @@
         <target>複製</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-fs/manager/manager.component.html</context>
-          <context context-type="linenumber">86</context>
+          <context context-type="linenumber">87</context>
         </context-group>
       </trans-unit>
       <trans-unit id="393584cc19f5730acb6ca04a01d7b818e5cda8a4" datatype="html">
@@ -763,7 +779,7 @@
         <target>剪下</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-fs/manager/manager.component.html</context>
-          <context context-type="linenumber">90</context>
+          <context context-type="linenumber">91</context>
         </context-group>
       </trans-unit>
       <trans-unit id="f1aea024fc1f74582f6863f215ddc3438ca65956" datatype="html">
@@ -771,7 +787,7 @@
         <target>壓縮</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-fs/manager/manager.component.html</context>
-          <context context-type="linenumber">95</context>
+          <context context-type="linenumber">96</context>
         </context-group>
       </trans-unit>
       <trans-unit id="eee748902e363090150f4fa84687f2ebe353eaac" datatype="html">
@@ -779,7 +795,7 @@
         <target>解壓</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-fs/manager/manager.component.html</context>
-          <context context-type="linenumber">100</context>
+          <context context-type="linenumber">101</context>
         </context-group>
       </trans-unit>
       <trans-unit id="cf17e2f3737e74b8e3b874867ec9cf5fa46f2146" datatype="html">
@@ -787,7 +803,19 @@
         <target>屬性</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-fs/manager/manager.component.html</context>
-          <context context-type="linenumber">110</context>
+          <context context-type="linenumber">111</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8bffe465080d61e1835737553e2bceb00868e939" datatype="html">
+        <source>Filesystem management</source>
+        <target>檔案管理</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/navigation/navigation.component.html</context>
+          <context context-type="linenumber">3</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/root/root.component.html</context>
+          <context context-type="linenumber">12</context>
         </context-group>
       </trans-unit>
       <trans-unit id="272fb7b69aa7689350d5785238419c2102934883" datatype="html">
@@ -810,12 +838,60 @@
           <context context-type="linenumber">9</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="8bffe465080d61e1835737553e2bceb00868e939" datatype="html">
-        <source>Filesystem management</source>
-        <target>檔案管理</target>
+      <trans-unit id="ecb82440ef7e800346069b1932182e1bda643ca0" datatype="html">
+        <source>Audio View</source>
+        <target>音頻視圖</target>
         <context-group purpose="location">
-          <context context-type="sourcefile">src/app/forward-fs/root/root.component.html</context>
-          <context context-type="linenumber">12</context>
+          <context context-type="sourcefile">src/app/forward-fs/view/audio/audio.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="47b42d655f6c69a19a36fe852091dbd87876e750" datatype="html">
+        <source>Image View</source>
+        <target>圖像視圖</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/view/image/image.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="2f94232f5d2ac15b91e51dbcc0047905b94a36e1" datatype="html">
+        <source>Text View</source>
+        <target>文檔視圖</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/view/text/text.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="8d7fb36ea2bff6fd8a53c1676d45e63ab624ad16" datatype="html">
+        <source>Load</source>
+        <target>載入</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/view/text/text.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="52c9a103b812f258bcddc3d90a6e3f46871d25fe" datatype="html">
+        <source>Save</source>
+        <target>存儲</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/view/text/text.component.html</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3c5a92935ba932c46cd84d27a00c336578a2331c" datatype="html">
+        <source>Video View</source>
+        <target>視頻視圖</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/view/video/video.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6e164f0f833878970b4233ce495aed5c5b841cc1" datatype="html">
+        <source>Stretch Width</source>
+        <target>拉伸寬度</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/view/video/video.component.html</context>
+          <context context-type="linenumber">11</context>
         </context-group>
       </trans-unit>
       <trans-unit id="84cd855cdd79e346fb01958d34e4d4504f830034" datatype="html">

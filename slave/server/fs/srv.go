@@ -183,10 +183,10 @@ func (s server) Download(req *grpc_fs.DownloadRequest, server grpc_fs.FS_Downloa
 	defer f.Close()
 	stat, e := f.Stat()
 	if e != nil {
-		e = s.ToHTTPError(ctx, req.Path, e)
+		e = s.ToHTTPError(req.Path, e)
 		return
 	}
-	s.SetHTTPCacheMaxAge(ctx, 5)
+	s.SetHTTPCacheMaxAge(ctx, 0)
 
 	grpc.SetHeader(ctx, metadata.Pairs(
 		`Content-Disposition`,
@@ -243,11 +243,13 @@ func (s server) Put(server grpc_fs.FS_PutServer) (e error) {
 	}
 
 	var (
-		first = true
-		req   grpc_fs.PutRequest
-		f     *os.File
-		root  string
-		path  string
+		first  = true
+		req    grpc_fs.PutRequest
+		f      *os.File
+		root   string
+		path   string
+		writed uint64
+		n      int
 	)
 	for {
 		e = server.RecvMsg(&req)
@@ -268,13 +270,15 @@ func (s server) Put(server grpc_fs.FS_PutServer) (e error) {
 			if ce := logger.Logger.Check(zap.InfoLevel, TAG); ce != nil {
 				ce.Write(
 					zap.String(`event`, `open`),
+					zap.String(`who`, userdata.Who()),
 					zap.String(`root`, req.Root),
 					zap.String(`path`, req.Path),
 				)
 			}
 		}
 		if len(req.Data) != 0 {
-			_, e = f.Write(req.Data)
+			n, e = f.Write(req.Data)
+			writed += uint64(n)
 			if e != nil {
 				break
 			}
@@ -285,8 +289,10 @@ func (s server) Put(server grpc_fs.FS_PutServer) (e error) {
 		if ce := logger.Logger.Check(zap.InfoLevel, TAG); ce != nil {
 			ce.Write(
 				zap.String(`event`, `success`),
+				zap.String(`who`, userdata.Who()),
 				zap.String(`root`, root),
 				zap.String(`path`, path),
+				zap.Uint64(`writed`, writed),
 			)
 		}
 	} else {
@@ -294,8 +300,10 @@ func (s server) Put(server grpc_fs.FS_PutServer) (e error) {
 			ce.Write(
 				zap.Error(e),
 				zap.String(`event`, `error`),
+				zap.String(`who`, userdata.Who()),
 				zap.String(`root`, root),
 				zap.String(`path`, path),
+				zap.Uint64(`writed`, writed),
 			)
 		}
 	}

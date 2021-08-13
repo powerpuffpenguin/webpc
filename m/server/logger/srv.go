@@ -181,13 +181,13 @@ func (s server) Download(req *grpc_logger.DownloadRequest, stream grpc_logger.Lo
 	}
 	f, e := os.Open(filename)
 	if e != nil {
-		e = s.ToHTTPError(ctx, req.Name, e)
+		e = s.ToHTTPError(req.Name, e)
 		return
 	}
 	defer f.Close()
 	stat, e := f.Stat()
 	if e != nil {
-		e = s.ToHTTPError(ctx, req.Name, e)
+		e = s.ToHTTPError(req.Name, e)
 		return
 	}
 	s.SetHTTPCacheMaxAge(ctx, 0)
