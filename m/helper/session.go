@@ -102,6 +102,8 @@ func (h Helper) userdata(ctx context.Context) (userdata sessions.Userdata, e err
 	access := h.GetToken(ctx)
 	if access == `` {
 		e = h.Error(codes.PermissionDenied, `not found token`)
+	} else if access == `Expired` {
+		e = h.Error(codes.Unauthenticated, `token expired `)
 	} else {
 		var b []byte
 		b, e = base64.RawURLEncoding.DecodeString(access)

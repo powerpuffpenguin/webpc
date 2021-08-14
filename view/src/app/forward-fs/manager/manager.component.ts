@@ -16,6 +16,7 @@ import { RenameComponent } from '../dialog/rename/rename.component';
 import { CheckEvent } from '../file/file.component';
 import { FileInfo, Dir } from '../fs';
 import { Box, Point } from './box';
+import { Settings } from './settings';
 function isObject(object: any): boolean {
   return object !== null && typeof object === "object"
 }
@@ -101,9 +102,24 @@ export class ManagerComponent implements OnInit, OnDestroy {
     return this.trigger_
   }
 
-  ctrl = false
-  shift = false
-  all = false
+  get ctrl(): boolean {
+    return Settings.instance.ctrl
+  }
+  get shift(): boolean {
+    return Settings.instance.shift
+  }
+  get all(): boolean {
+    return Settings.instance.all
+  }
+  set ctrl(ok: boolean) {
+    Settings.instance.ctrl = ok ? true : false
+  }
+  set shift(ok: boolean) {
+    Settings.instance.shift = ok ? true : false
+  }
+  set all(ok: boolean) {
+    Settings.instance.all = ok ? true : false
+  }
   onPathChange(path: string) {
     const folder = this.folder
     if (!folder) {

@@ -88,6 +88,14 @@ func (f *Forward) Get(id int64) (cc *grpc.ClientConn, e error) {
 	f.rw.RUnlock()
 	return
 }
+func (f *Forward) forwardShared(gateway *runtime.ServeMux, c *gin.Context, expired bool) {
+	if expired {
+		c.Request.Header.Set(`Authorization`, `Bearer Expired`)
+	} else {
+		c.Request.Header.Del(`Authorization`)
+	}
+	gateway.ServeHTTP(c.Writer, c.Request)
+}
 func (f *Forward) Forward(id int64, c *gin.Context) {
 	f.rw.RLock()
 	ele, exists := f.keys[id]
@@ -96,20 +104,21 @@ func (f *Forward) Forward(id int64, c *gin.Context) {
 		f.web.Error(c, status.Error(codes.NotFound, `slave id not found: `+strconv.FormatInt(id, 10)))
 		return
 	}
-
 	// public api
 	shared := false
-	if strings.HasPrefix(c.Request.URL.Path, `/api/forward/v1/fs/`) {
+	if c.Request.URL.Path == `/api/forward/v1/fs/` || strings.HasPrefix(c.Request.URL.Path, `/api/forward/v1/fs/`) {
 		shared = true
 	}
 
 	// userdata
 	userdata, e := f.web.ShouldBindUserdata(c)
 	if e != nil {
-		if !shared {
+		if shared {
+			f.forwardShared(ele.gateway, c, status.Code(e) == codes.Unauthenticated)
+		} else {
 			f.web.Error(c, e)
-			return
 		}
+		return
 	}
 
 	// check group
@@ -120,18 +129,19 @@ func (f *Forward) Forward(id int64, c *gin.Context) {
 		if e == nil {
 			c.Request.Header.Set(`Authorization`, `Bearer `+base64.RawURLEncoding.EncodeToString(b))
 		} else if shared {
-			c.Request.Header.Del(`Authorization`)
+			f.forwardShared(ele.gateway, c, true)
+			return
 		} else {
 			f.web.Error(c, e)
 			return
 		}
 	} else {
 		if shared {
-			c.Request.Header.Del(`Authorization`)
+			f.forwardShared(ele.gateway, c, status.Code(e) == codes.Unavailable)
 		} else {
 			f.web.Error(c, e)
-			return
 		}
+		return
 	}
 
 	// ServeHTTP
