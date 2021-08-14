@@ -48,6 +48,7 @@ service FS {
             body: "*"
         };
     }
+    rpc Compress (stream CompressRequest) returns (stream CompressResponse){}
 }
 message MountRequest{
 }
@@ -107,4 +108,36 @@ message RenameRequest{
     string current = 4;
 }
 message RenameResponse{
+}
+enum Event {
+    EventUniversal = 0;
+    Heart = 1;
+    Init = 2;
+    Exists = 3;
+    Progress = 4;
+    Success = 5;
+};
+enum Algorithm {
+    AlgorithmUniversal = 0;
+    Tar = 1;
+    Zip = 2;
+    TarGZ = 3;
+};
+message CompressRequest{
+    Event event = 1;
+
+    // init
+    string root = 2;
+    string dir = 3;
+    string dst = 4;
+    repeated string source = 5;
+    // .tar
+    // .zip
+    // .tar.gz
+    Algorithm algorithm = 6;
+}
+message CompressResponse{
+    Event event = 1;
+    string value = 2;
+    FileInfo info = 3;
 }

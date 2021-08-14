@@ -15,6 +15,7 @@ import (
 	grpc_fs "github.com/powerpuffpenguin/webpc/protocol/forward/fs"
 	"github.com/powerpuffpenguin/webpc/sessions"
 	"github.com/powerpuffpenguin/webpc/single/mount"
+	"github.com/powerpuffpenguin/webpc/slave/server/fs/internal/compress"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -429,5 +430,42 @@ func (s server) Rename(ctx context.Context, req *grpc_fs.RenameRequest) (resp *g
 		)
 	}
 	resp = &emptyRenameResponse
+	return
+}
+
+func (s server) Compress(server grpc_fs.FS_CompressServer) (e error) {
+	TAG := `forward.fs Compress`
+	// check write permission
+	_, userdata, e := s.JSONUserdata(server.Context())
+	if e != nil {
+		return
+	}
+	if !userdata.AuthAny(db.Root, db.Write) {
+		e = s.Error(codes.PermissionDenied, `no write permission`)
+		return
+	}
+	w := compress.New(server)
+	e = w.Serve()
+	if e == nil {
+		if ce := logger.Logger.Check(zap.InfoLevel, TAG); ce != nil {
+			ce.Write(
+				zap.String(`who`, userdata.Who()),
+				zap.String(`root`, w.Root),
+				zap.String(`dir`, w.Dir),
+				zap.String(`dst`, w.Dst),
+				zap.Strings(`source`, w.Source),
+			)
+		}
+	} else {
+		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
+			ce.Write(
+				zap.String(`who`, userdata.Who()),
+				zap.String(`root`, w.Root),
+				zap.String(`dir`, w.Dir),
+				zap.String(`dst`, w.Dst),
+				zap.Strings(`source`, w.Source),
+			)
+		}
+	}
 	return
 }

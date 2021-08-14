@@ -1,6 +1,7 @@
 package mount
 
 import (
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -53,7 +54,7 @@ func (m *Mount) toError(name string, e error) error {
 	return e
 }
 func (m *Mount) LS(path string) (dir string, modtime time.Time, results []FileInfo, e error) {
-	dst, e := m.filename(path)
+	dst, e := m.Filename(path)
 	if e != nil {
 		return
 	}
@@ -101,7 +102,7 @@ func (m *Mount) LS(path string) (dir string, modtime time.Time, results []FileIn
 	return
 }
 
-func (m *Mount) filename(path string) (filename string, e error) {
+func (m *Mount) Filename(path string) (filename string, e error) {
 	filename = filepath.Clean(m.root + path)
 	if m.root != filename {
 		root := m.root
@@ -119,7 +120,7 @@ func (m *Mount) Open(name string) (*os.File, error) {
 	return m.OpenFile(name, os.O_RDONLY, 0)
 }
 func (m *Mount) OpenFile(name string, flag int, perm os.FileMode) (f *os.File, e error) {
-	path, e := m.filename(name)
+	path, e := m.Filename(name)
 	if e != nil {
 		return
 	}
@@ -130,7 +131,7 @@ func (m *Mount) OpenFile(name string, flag int, perm os.FileMode) (f *os.File, e
 	}
 	return
 }
-func (m *Mount) checkName(name string) error {
+func (m *Mount) CheckName(name string) error {
 	val := filepath.Base(name)
 	if name != val {
 		return status.Error(codes.InvalidArgument, `invalid name: `+name)
@@ -140,11 +141,11 @@ func (m *Mount) checkName(name string) error {
 	return nil
 }
 func (m *Mount) formatCreate(dir, name string) (string, error) {
-	e := m.checkName(name)
+	e := m.CheckName(name)
 	if e != nil {
 		return ``, e
 	}
-	dir, e = m.filename(dir)
+	dir, e = m.Filename(dir)
 	if e != nil {
 		return ``, e
 	}
@@ -186,12 +187,12 @@ func (m *Mount) RemoveAll(dir string, names []string) (e error) {
 	if len(names) == 0 {
 		return
 	}
-	dir, e = m.filename(dir)
+	dir, e = m.Filename(dir)
 	if e != nil {
 		return
 	}
 	for _, name := range names {
-		e = m.checkName(name)
+		e = m.CheckName(name)
 		if e != nil {
 			return
 		}
@@ -207,15 +208,15 @@ func (m *Mount) RemoveAll(dir string, names []string) (e error) {
 	return
 }
 func (m *Mount) Rename(dir, old, current string) (e error) {
-	dir, e = m.filename(dir)
+	dir, e = m.Filename(dir)
 	if e != nil {
 		return
 	}
-	e = m.checkName(old)
+	e = m.CheckName(old)
 	if e != nil {
 		return
 	}
-	e = m.checkName(current)
+	e = m.CheckName(current)
 	if e != nil {
 		return
 	}
@@ -234,4 +235,25 @@ func (m *Mount) Rename(dir, old, current string) (e error) {
 		return
 	}
 	return
+}
+func (m *Mount) Walk(root string, fn filepath.WalkFunc) error {
+	root, e := m.Filename(root)
+	if e != nil {
+		return e
+	}
+
+	prefix := m.root
+	count := len(prefix)
+	if strings.HasSuffix(prefix, Separator) {
+		count -= len(Separator)
+	}
+	return filepath.Walk(root, func(path string, info fs.FileInfo, err error) error {
+		if len(path) >= count {
+			path = path[count:]
+		}
+		if err != nil {
+			return fn(path, info, err)
+		}
+		return fn(path, info, err)
+	})
 }
