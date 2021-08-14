@@ -115,16 +115,8 @@ func (m *Mount) filename(path string) (filename string, e error) {
 	}
 	return
 }
-func (m *Mount) Open(name string) (f *os.File, e error) {
-	path, e := m.filename(name)
-	if e != nil {
-		return
-	}
-	f, e = os.Open(path)
-	if e != nil {
-		e = m.toError(name, e)
-	}
-	return
+func (m *Mount) Open(name string) (*os.File, error) {
+	return m.OpenFile(name, os.O_RDONLY, 0)
 }
 func (m *Mount) OpenFile(name string, flag int, perm os.FileMode) (f *os.File, e error) {
 	path, e := m.filename(name)
@@ -134,18 +126,28 @@ func (m *Mount) OpenFile(name string, flag int, perm os.FileMode) (f *os.File, e
 	f, e = os.OpenFile(path, flag, perm)
 	if e != nil {
 		e = m.toError(name, e)
+		return
 	}
 	return
 }
-func (m *Mount) formatCreate(dir, name string) (string, error) {
-	if name == `` {
-		return ``, status.Error(codes.InvalidArgument, `name not supported empty`)
+func (m *Mount) checkName(name string) error {
+	val := filepath.Base(name)
+	if name != val {
+		return status.Error(codes.InvalidArgument, `invalid name: `+name)
+	} else if name == `` {
+		return status.Error(codes.InvalidArgument, `name not supported empty`)
 	}
-	dir, e := m.filename(dir)
+	return nil
+}
+func (m *Mount) formatCreate(dir, name string) (string, error) {
+	e := m.checkName(name)
 	if e != nil {
 		return ``, e
 	}
-
+	dir, e = m.filename(dir)
+	if e != nil {
+		return ``, e
+	}
 	return filepath.Join(dir, name), nil
 }
 func (m *Mount) Create(file bool, dir, name string, perm os.FileMode) (info os.FileInfo, e error) {
@@ -177,6 +179,59 @@ func (m *Mount) Create(file bool, dir, name string, perm os.FileMode) (info os.F
 			e = m.toError(filepath.Join(dir, name), e)
 			return
 		}
+	}
+	return
+}
+func (m *Mount) RemoveAll(dir string, names []string) (e error) {
+	if len(names) == 0 {
+		return
+	}
+	dir, e = m.filename(dir)
+	if e != nil {
+		return
+	}
+	for _, name := range names {
+		e = m.checkName(name)
+		if e != nil {
+			return
+		}
+	}
+	for _, name := range names {
+		dst := filepath.Join(dir, name)
+		e = os.RemoveAll(dst)
+		if e != nil {
+			e = m.toError(dst, e)
+			return
+		}
+	}
+	return
+}
+func (m *Mount) Rename(dir, old, current string) (e error) {
+	dir, e = m.filename(dir)
+	if e != nil {
+		return
+	}
+	e = m.checkName(old)
+	if e != nil {
+		return
+	}
+	e = m.checkName(current)
+	if e != nil {
+		return
+	}
+
+	old = filepath.Join(dir, old)
+	current = filepath.Join(dir, current)
+	e = os.Rename(old, current)
+	if e != nil {
+		if os.IsNotExist(e) {
+			e = status.Error(codes.NotFound, `not exists: `+old)
+		} else if os.IsExist(e) {
+			e = status.Error(codes.AlreadyExists, `already exists: `+current)
+		} else if os.IsPermission(e) {
+			e = status.Error(codes.PermissionDenied, `forbidden: `+current)
+		}
+		return
 	}
 	return
 }

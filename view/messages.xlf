@@ -107,6 +107,71 @@
           <context context-type="linenumber">47</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="1c902affd9a2c65640090dd7dab3b52ffa3cdf73" datatype="html">
+        <source>Unsupported file type</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.html</context>
+          <context context-type="linenumber">48</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="79e4486927009b188bba3b697eb91c475495e639" datatype="html">
+        <source>New File</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.html</context>
+          <context context-type="linenumber">49</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/new-file/new-file.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/manager/manager.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c293be6125764337b3e53e59163ddf618519d22e" datatype="html">
+        <source>New File Success</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.html</context>
+          <context context-type="linenumber">50</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6b74467987623883f8365d202c2173d9e0271458" datatype="html">
+        <source>New Folder</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.html</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/new-folder/new-folder.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/manager/manager.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="959a91792868c9cac12f6c5ea6bae695cc20d2b1" datatype="html">
+        <source>New Folder Success</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.html</context>
+          <context context-type="linenumber">52</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d8bcc9c4ee939429759fcf9c9633703096ad4d4a" datatype="html">
+        <source>File deleted</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.html</context>
+          <context context-type="linenumber">53</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="17eef374333ad654acdd38dd3b96e7d97c7e4c7b" datatype="html">
+        <source>Rename Success</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.html</context>
+          <context context-type="linenumber">54</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="8a3e5253b801997bb641fd367390cdae7e987656" datatype="html">
         <source>Add Device</source>
         <context-group purpose="location">
@@ -175,6 +240,18 @@
           <context context-type="linenumber">44</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/new-file/new-file.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/new-folder/new-folder.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/rename/rename.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/group/dialog/add/add.component.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
@@ -208,6 +285,18 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/dialog/edit/edit.component.html</context>
           <context context-type="linenumber">8</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/new-file/new-file.component.html</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/new-folder/new-folder.component.html</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/rename/rename.component.html</context>
+          <context context-type="linenumber">18</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/group/dialog/add/add.component.html</context>
@@ -270,6 +359,18 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/dialog/group/group.component.html</context>
           <context context-type="linenumber">17</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/new-file/new-file.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/new-folder/new-folder.component.html</context>
+          <context context-type="linenumber">20</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/rename/rename.component.html</context>
+          <context context-type="linenumber">24</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/group/dialog/add/add.component.html</context>
@@ -341,6 +442,22 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/dialog/group/group.component.html</context>
           <context context-type="linenumber">18</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/new-file/new-file.component.html</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/new-folder/new-folder.component.html</context>
+          <context context-type="linenumber">21</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/remove/remove.component.html</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/rename/rename.component.html</context>
+          <context context-type="linenumber">25</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/group/dialog/add/add.component.html</context>
@@ -571,6 +688,10 @@
           <context context-type="linenumber">79</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/remove/remove.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-fs/manager/manager.component.html</context>
           <context context-type="linenumber">106</context>
         </context-group>
@@ -604,18 +725,33 @@
           <context context-type="linenumber">14</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="79e4486927009b188bba3b697eb91c475495e639" datatype="html">
-        <source>New File</source>
+      <trans-unit id="cf17e2f3737e74b8e3b874867ec9cf5fa46f2146" datatype="html">
+        <source>Property</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/property/property.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-fs/manager/manager.component.html</context>
-          <context context-type="linenumber">16</context>
+          <context context-type="linenumber">111</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="6b74467987623883f8365d202c2173d9e0271458" datatype="html">
-        <source>New Folder</source>
+      <trans-unit id="f0dc0497ad16adbd386a3b2f2c55d81c51a1f029" datatype="html">
+        <source>Sure</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/remove/remove.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="e26f9cf3666aace4e524b1505c9795d76d87738d" datatype="html">
+        <source>Rename</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/rename/rename.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-fs/manager/manager.component.html</context>
-          <context context-type="linenumber">20</context>
+          <context context-type="linenumber">76</context>
         </context-group>
       </trans-unit>
       <trans-unit id="170919b6c28b7eb90fead8af3d10ce8f10dc041e" datatype="html">
@@ -697,13 +833,6 @@
           <context context-type="linenumber">71</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="e26f9cf3666aace4e524b1505c9795d76d87738d" datatype="html">
-        <source>Rename</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/forward-fs/manager/manager.component.html</context>
-          <context context-type="linenumber">76</context>
-        </context-group>
-      </trans-unit>
       <trans-unit id="dc75033a5238fdc4f462212c847a45ba8018a3fd" datatype="html">
         <source>Download</source>
         <context-group purpose="location">
@@ -737,13 +866,6 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-fs/manager/manager.component.html</context>
           <context context-type="linenumber">101</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="cf17e2f3737e74b8e3b874867ec9cf5fa46f2146" datatype="html">
-        <source>Property</source>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/forward-fs/manager/manager.component.html</context>
-          <context context-type="linenumber">111</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8bffe465080d61e1835737553e2bceb00868e939" datatype="html">
@@ -796,18 +918,32 @@
           <context context-type="linenumber">4</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="a5bf7d7cbcca9fb5f1ca873a5057e099508d2dcf" datatype="html">
+        <source>read</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/view/text/text.component.html</context>
+          <context context-type="linenumber">11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1496dcf6338d0031c7f0833b8abee8a8491d9b7c" datatype="html">
+        <source>write</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/view/text/text.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="8d7fb36ea2bff6fd8a53c1676d45e63ab624ad16" datatype="html">
         <source>Load</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-fs/view/text/text.component.html</context>
-          <context context-type="linenumber">17</context>
+          <context context-type="linenumber">28</context>
         </context-group>
       </trans-unit>
       <trans-unit id="52c9a103b812f258bcddc3d90a6e3f46871d25fe" datatype="html">
         <source>Save</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-fs/view/text/text.component.html</context>
-          <context context-type="linenumber">19</context>
+          <context context-type="linenumber">30</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3c5a92935ba932c46cd84d27a00c336578a2331c" datatype="html">

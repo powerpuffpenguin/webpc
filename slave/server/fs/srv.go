@@ -28,9 +28,50 @@ type server struct {
 	helper.Helper
 }
 
-var emptyMountResponse grpc_fs.MountResponse
+func (s server) mountUserdataWrite(ctx context.Context, name string) (userdata sessions.Userdata, m *mount.Mount, e error) {
+	m, e = s.mount(name)
+	if e != nil {
+		return
+	}
 
-func (s server) checkRead(ctx context.Context, m *mount.Mount) (e error) {
+	// can read
+	if !m.Write() {
+		e = s.Error(codes.PermissionDenied, `filesystem is not writable`)
+		return
+	}
+
+	_, userdata, e = s.JSONUserdata(ctx)
+	if e != nil {
+		return
+	}
+
+	if userdata.AuthAny(db.Root, db.Write) {
+		return
+	}
+
+	e = s.Error(codes.PermissionDenied, `no write permission`)
+	return
+}
+func (s server) checkUserdataWrite(userdata *sessions.Userdata, m *mount.Mount) (e error) {
+	// can read
+	if !m.Write() {
+		e = s.Error(codes.PermissionDenied, `filesystem is not writable`)
+		return
+	}
+
+	if userdata.AuthAny(db.Root, db.Write) {
+		return
+	}
+
+	e = s.Error(codes.PermissionDenied, `no write permission`)
+	return
+}
+func (s server) mountRead(ctx context.Context, name string) (m *mount.Mount, e error) {
+	m, e = s.mount(name)
+	if e != nil {
+		return
+	}
+
 	// shared
 	if m.Shared() {
 		return
@@ -39,44 +80,37 @@ func (s server) checkRead(ctx context.Context, m *mount.Mount) (e error) {
 	// can read
 	if !m.Read() {
 		e = s.Error(codes.PermissionDenied, `filesystem is not readable`)
+		m = nil
 		return
 	}
 
 	// root
 	_, userdata, e := s.JSONUserdata(ctx)
 	if e != nil {
+		m = nil
 		return
 	}
-	if userdata.AuthTest(db.Root) {
+	if userdata.AuthAny(db.Root, db.Read) {
 		return
 	}
 
-	// read auth
-	if !userdata.AuthTest(db.Read) {
-		e = s.Error(codes.PermissionDenied, `no read permission`)
+	e = s.Error(codes.PermissionDenied, `no read permission`)
+	m = nil
+	return
+}
+
+func (s server) mount(name string) (m *mount.Mount, e error) {
+	fs := mount.Default()
+	m = fs.Root(name)
+	if m == nil {
+		e = s.Error(codes.NotFound, `root not found: `+name)
 		return
 	}
 	return
 }
 
-func (s server) checkUserdataWrite(userdata *sessions.Userdata, m *mount.Mount) (e error) {
-	// can read
-	if !m.Write() {
-		e = s.Error(codes.PermissionDenied, `filesystem is not writable`)
-		return
-	}
+var emptyMountResponse grpc_fs.MountResponse
 
-	if userdata.AuthTest(db.Root) {
-		return
-	}
-
-	// read auth
-	if !userdata.AuthTest(db.Write) {
-		e = s.Error(codes.PermissionDenied, `no read permission`)
-		return
-	}
-	return
-}
 func (s server) Mount(ctx context.Context, req *grpc_fs.MountRequest) (resp *grpc_fs.MountResponse, e error) {
 	fs := mount.Default()
 
@@ -97,13 +131,7 @@ func (s server) Mount(ctx context.Context, req *grpc_fs.MountRequest) (resp *grp
 var emptyListResponse grpc_fs.ListResponse
 
 func (s server) List(ctx context.Context, req *grpc_fs.ListRequest) (resp *grpc_fs.ListResponse, e error) {
-	fs := mount.Default()
-	m := fs.Root(req.Root)
-	if m == nil {
-		e = s.Error(codes.NotFound, `root not found: `+req.Root)
-		return
-	}
-	e = s.checkRead(ctx, m)
+	m, e := s.mountRead(ctx, req.Root)
 	if e != nil {
 		return
 	}
@@ -112,7 +140,7 @@ func (s server) List(ctx context.Context, req *grpc_fs.ListRequest) (resp *grpc_
 	if e != nil {
 		return
 	}
-	s.SetHTTPCacheMaxAge(ctx, 5)
+	s.SetHTTPCacheMaxAge(ctx, 0)
 	e = s.ServeMessage(ctx, modtime, func(nobody bool) error {
 		if nobody {
 			resp = &emptyListResponse
@@ -144,14 +172,8 @@ func (s server) List(ctx context.Context, req *grpc_fs.ListRequest) (resp *grpc_
 }
 
 func (s server) Download(req *grpc_fs.DownloadRequest, server grpc_fs.FS_DownloadServer) (e error) {
-	fs := mount.Default()
-	m := fs.Root(req.Root)
-	if m == nil {
-		e = s.Error(codes.NotFound, `root not found: `+req.Root)
-		return
-	}
 	ctx := server.Context()
-	e = s.checkRead(ctx, m)
+	m, e := s.mountRead(ctx, req.Root)
 	if e != nil {
 		return
 	}
@@ -290,35 +312,26 @@ func (s server) Put(server grpc_fs.FS_PutServer) (e error) {
 }
 func (s server) Create(ctx context.Context, req *grpc_fs.CreateRequest) (resp *grpc_fs.FileInfo, e error) {
 	TAG := `forward.fs Create`
-	_, userdata, e := s.JSONUserdata(ctx)
+	userdata, m, e := s.mountUserdataWrite(ctx, req.Root)
 	if e != nil {
 		return
 	}
-	fs := mount.Default()
-	m := fs.Root(req.Root)
-	if m == nil {
-		e = s.Error(codes.NotFound, `root not found: `+req.Root)
-		return
-	}
-	e = s.checkUserdataWrite(&userdata, m)
-	if e != nil {
-		return
-	}
-	name := filepath.Base(req.Name)
+
 	var (
 		stat  os.FileInfo
 		isdir bool
 	)
 	if req.File {
-		stat, e = m.Create(req.File, req.Dir, name, 0666)
+		stat, e = m.Create(req.File, req.Dir, req.Name, 0666)
 	} else {
 		isdir = true
-		stat, e = m.Create(req.File, req.Dir, name, 0775)
+		stat, e = m.Create(req.File, req.Dir, req.Name, 0775)
 	}
 	if e != nil {
 		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
 			ce.Write(
 				zap.Error(e),
+				zap.String(`who`, userdata.Who()),
 				zap.String(`root`, req.Root),
 				zap.String(`name`, req.Name),
 				zap.String(`dir`, req.Dir),
@@ -330,6 +343,7 @@ func (s server) Create(ctx context.Context, req *grpc_fs.CreateRequest) (resp *g
 
 	if ce := logger.Logger.Check(zap.InfoLevel, TAG); ce != nil {
 		ce.Write(
+			zap.String(`who`, userdata.Who()),
 			zap.String(`root`, req.Root),
 			zap.String(`name`, req.Name),
 			zap.String(`dir`, req.Dir),
@@ -338,10 +352,82 @@ func (s server) Create(ctx context.Context, req *grpc_fs.CreateRequest) (resp *g
 	}
 	s.SetHTTPCode(ctx, http.StatusCreated)
 	resp = &grpc_fs.FileInfo{
-		Name:  name,
+		Name:  req.Name,
 		IsDir: isdir,
 		Size:  stat.Size(),
 		Mode:  uint32(stat.Mode()),
 	}
+	return
+}
+
+var emptyRemoveResponse grpc_fs.RemoveResponse
+
+func (s server) Remove(ctx context.Context, req *grpc_fs.RemoveRequest) (resp *grpc_fs.RemoveResponse, e error) {
+	TAG := `forward.fs Remove`
+	userdata, m, e := s.mountUserdataWrite(ctx, req.Root)
+	if e != nil {
+		return
+	}
+
+	e = m.RemoveAll(req.Dir, req.Names)
+	if e != nil {
+		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
+			ce.Write(
+				zap.Error(e),
+				zap.String(`who`, userdata.Who()),
+				zap.String(`root`, req.Root),
+				zap.String(`dir`, req.Dir),
+				zap.Strings(`names`, req.Names),
+			)
+		}
+		return
+	}
+
+	if ce := logger.Logger.Check(zap.InfoLevel, TAG); ce != nil {
+		ce.Write(
+			zap.String(`who`, userdata.Who()),
+			zap.String(`root`, req.Root),
+			zap.String(`dir`, req.Dir),
+			zap.Strings(`names`, req.Names),
+		)
+	}
+	resp = &emptyRemoveResponse
+	return
+}
+
+var emptyRenameResponse grpc_fs.RenameResponse
+
+func (s server) Rename(ctx context.Context, req *grpc_fs.RenameRequest) (resp *grpc_fs.RenameResponse, e error) {
+	TAG := `forward.fs Rename`
+	userdata, m, e := s.mountUserdataWrite(ctx, req.Root)
+	if e != nil {
+		return
+	}
+
+	e = m.Rename(req.Dir, req.Old, req.Current)
+	if e != nil {
+		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
+			ce.Write(
+				zap.Error(e),
+				zap.String(`who`, userdata.Who()),
+				zap.String(`root`, req.Root),
+				zap.String(`dir`, req.Dir),
+				zap.String(`old`, req.Old),
+				zap.String(`current`, req.Current),
+			)
+		}
+		return
+	}
+
+	if ce := logger.Logger.Check(zap.InfoLevel, TAG); ce != nil {
+		ce.Write(
+			zap.String(`who`, userdata.Who()),
+			zap.String(`root`, req.Root),
+			zap.String(`dir`, req.Dir),
+			zap.String(`old`, req.Old),
+			zap.String(`current`, req.Current),
+		)
+	}
+	resp = &emptyRenameResponse
 	return
 }

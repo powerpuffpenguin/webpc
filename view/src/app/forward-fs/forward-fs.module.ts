@@ -36,6 +36,9 @@ import { VideoComponent } from './view/video/video.component';
 import { ImageComponent } from './view/image/image.component';
 import { PropertyComponent } from './dialog/property/property.component';
 import { NewFileComponent } from './dialog/new-file/new-file.component';
+import { NewFolderComponent } from './dialog/new-folder/new-folder.component';
+import { RemoveComponent } from './dialog/remove/remove.component';
+import { RenameComponent } from './dialog/rename/rename.component';
 
 
 @NgModule({
@@ -51,7 +54,10 @@ import { NewFileComponent } from './dialog/new-file/new-file.component';
     VideoComponent,
     ImageComponent,
     PropertyComponent,
-    NewFileComponent
+    NewFileComponent,
+    NewFolderComponent,
+    RemoveComponent,
+    RenameComponent
   ],
   imports: [
     CommonModule,

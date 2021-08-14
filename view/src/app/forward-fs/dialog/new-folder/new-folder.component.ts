@@ -6,24 +6,23 @@ import { I18nService } from 'src/app/core/i18n/i18n.service';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FileInfo, Dir } from '../../fs';
 import { finalize } from 'rxjs/operators';
-
 @Component({
-  selector: 'app-new-file',
-  templateUrl: './new-file.component.html',
-  styleUrls: ['./new-file.component.scss']
+  selector: 'app-new-folder',
+  templateUrl: './new-folder.component.html',
+  styleUrls: ['./new-folder.component.scss']
 })
-export class NewFileComponent implements OnInit {
+export class NewFolderComponent implements OnInit {
   constructor(private httpClient: HttpClient,
     private toasterService: ToasterService,
     private i18nService: I18nService,
-    private matDialogRef: MatDialogRef<NewFileComponent>,
+    private matDialogRef: MatDialogRef<NewFolderComponent>,
     @Inject(MAT_DIALOG_DATA) public data: Dir,
   ) {
   }
   disabled = false
 
   ngOnInit(): void {
-    this.name = this.i18nService.get('New File')
+    this.name = this.i18nService.get('New Folder')
   }
   name = ''
   onSubmit() {
@@ -34,13 +33,13 @@ export class NewFileComponent implements OnInit {
       root: data.root,
       dir: data.dir,
       name: this.name,
-      file: true,
+      file: false,
     }).pipe(
       finalize(() => {
         this.disabled = false
       })
     ).subscribe((data) => {
-      this.toasterService.pop('success', undefined, this.i18nService.get(`New File Success`))
+      this.toasterService.pop('success', undefined, this.i18nService.get(`New Folder Success`))
       const node = new FileInfo(this.data.root, this.data.dir, data)
       this.matDialogRef.close(node)
     }, (e) => {

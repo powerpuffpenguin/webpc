@@ -9,7 +9,10 @@ import { Session } from 'src/app/core/session/session';
 import { SessionService } from 'src/app/core/session/session.service';
 import { Closed } from 'src/app/core/utils/closed';
 import { NewFileComponent } from '../dialog/new-file/new-file.component';
+import { NewFolderComponent } from '../dialog/new-folder/new-folder.component';
 import { PropertyComponent } from '../dialog/property/property.component';
+import { RemoveComponent } from '../dialog/remove/remove.component';
+import { RenameComponent } from '../dialog/rename/rename.component';
 import { CheckEvent } from '../file/file.component';
 import { FileInfo, Dir } from '../fs';
 import { Box, Point } from './box';
@@ -316,37 +319,40 @@ export class ManagerComponent implements OnInit, OnDestroy {
     return true
   }
   onClickRename() {
-    //   if (this.target && this.target.length == 1) {
-    //     const node = this.target[0]
-    //     const name = node.name
-    //     this.matDialog.open(RenameComponent, {
-    //       data: node,
-    //       disableClose: true,
-    //     }).afterClosed().toPromise().then(() => {
-    //       const current = node.name;
-    //       if (name == current) {
-    //         return
-    //       }
-    //       if (name.startsWith(`.`)) {
-    //         if (!current.startsWith(`.`)) {
-    //           if (!this._hide) {
-    //             this._hide = new Array<FileInfo>()
-    //           }
-    //           this._hide.push(node)
-    //           this._hide.sort(FileInfo.compare)
-    //         }
-    //       } else {
-    //         if (current.startsWith(`.`)) {
-    //           if (this._hide) {
-    //             const index = this._hide.indexOf(node)
-    //             if (index != -1) {
-    //               this._hide.splice(index, 1)
-    //             }
-    //           }
-    //         }
-    //       }
-    //     })
-    //   }
+    if (this.target && this.target.length == 1) {
+      const node = this.target[0]
+      const name = node.name
+      this.matDialog.open(RenameComponent, {
+        data: {
+          dir: this.folder,
+          target: node,
+        },
+        disableClose: true,
+      }).afterClosed().toPromise().then(() => {
+        const current = node.name
+        if (name == current) {
+          return
+        }
+        if (name.startsWith(`.`)) {
+          if (!current.startsWith(`.`)) {
+            if (!this.hide_) {
+              this.hide_ = new Array<FileInfo>()
+            }
+            this.hide_.push(node)
+            this.hide_.sort(FileInfo.compare)
+          }
+        } else {
+          if (current.startsWith(`.`)) {
+            if (this.hide_) {
+              const index = this.hide_.indexOf(node)
+              if (index != -1) {
+                this.hide_.splice(index, 1)
+              }
+            }
+          }
+        }
+      })
+    }
   }
   onClickNewFile() {
     const folder = this.folder
@@ -363,17 +369,18 @@ export class ManagerComponent implements OnInit, OnDestroy {
     })
   }
   onClickNewFolder() {
-    //   if (!this.folder || this._closed) {
-    //     return
-    //   }
-    //   this.matDialog.open(NewFolderComponent, {
-    //     data: this.folder,
-    //     disableClose: true,
-    //   }).afterClosed().toPromise().then((fileinfo: FileInfo) => {
-    //     if (fileinfo && fileinfo instanceof FileInfo) {
-    //       this._pushNode(fileinfo)
-    //     }
-    //   })
+    const folder = this.folder
+    if (!folder || this.isClosed) {
+      return
+    }
+    this.matDialog.open(NewFolderComponent, {
+      data: folder,
+      disableClose: true,
+    }).afterClosed().toPromise().then((fileinfo: FileInfo) => {
+      if (fileinfo && fileinfo instanceof FileInfo) {
+        this._pushNode(fileinfo)
+      }
+    })
   }
   private _pushNode(fileinfo: FileInfo) {
     if (!this.source_) {
@@ -400,36 +407,22 @@ export class ManagerComponent implements OnInit, OnDestroy {
     })
   }
   onClickRemove() {
-    //   const target = this.target
-    //   if (!target || target.length == 0) {
-    //     return
-    //   }
-    //   const dir = this.folder
-    //   this.matDialog.open(RemoveComponent, {
-    //     data: {
-    //       dir: dir,
-    //       source: target,
-    //     },
-    //     disableClose: true,
-    //   }).afterClosed().toPromise().then((ok) => {
-    //     if (ok) {
-    //       for (let i = 0; i < target.length; i++) {
-    //         const element = target[i]
-    //         if (this._source) {
-    //           const index = this._source.indexOf(element)
-    //           if (index != -1) {
-    //             this._source.splice(index, 1)
-    //           }
-    //         }
-    //         if (this._hide) {
-    //           const index = this._hide.indexOf(element)
-    //           if (index != -1) {
-    //             this._hide.splice(index, 1)
-    //           }
-    //         }
-    //       }
-    //     }
-    //   })
+    const target = this.target
+    if (!target || target.length == 0) {
+      return
+    }
+    const dir = this.folder
+    this.matDialog.open(RemoveComponent, {
+      data: {
+        dir: dir,
+        source: target,
+      },
+      disableClose: true,
+    }).afterClosed().toPromise().then((ok) => {
+      if (ok && this.isNotClosed) {
+        this.onClickRefresh()
+      }
+    })
   }
   onClickCompress() {
     //   const target = this.target

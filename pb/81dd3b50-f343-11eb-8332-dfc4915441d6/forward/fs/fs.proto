@@ -36,6 +36,18 @@ service FS {
             body: "*"
         };
     }
+    // Remove folder or file
+    rpc Remove (RemoveRequest) returns (RemoveResponse){
+        option (google.api.http) = {
+            delete: "/api/forward/v1/fs"
+        };
+    }
+    rpc Rename (RenameRequest) returns (RenameResponse){
+        option (google.api.http) = {
+            post: "/api/forward/v1/fs/rename"
+            body: "*"
+        };
+    }
 }
 message MountRequest{
 }
@@ -80,4 +92,19 @@ message CreateRequest{
     string name =3;
     // if true create a new file, else create a new folder
     bool file = 4;
+}
+message RemoveRequest{
+    string root = 1;
+    string dir = 2;
+    repeated string names = 3;
+}
+message RemoveResponse{
+}
+message RenameRequest{
+    string root = 1;
+    string dir = 2;
+    string old = 3;
+    string current = 4;
+}
+message RenameResponse{
 }

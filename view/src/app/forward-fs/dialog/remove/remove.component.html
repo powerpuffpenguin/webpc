@@ -1,0 +1,19 @@
+<h1 mat-dialog-title>
+    <ng-container i18n>Delete</ng-container>
+    <mat-icon *ngIf="disabled">
+        <mat-spinner color="accent" diameter='32'></mat-spinner>
+    </mat-icon>
+</h1>
+<div mat-dialog-content>
+    <mat-list>
+        <mat-list-item *ngFor="let node of target.source">
+            <mat-icon matListAvatar>{{node.icon}}</mat-icon>
+            <div matLine>{{node.name}}</div>
+            <div matLine>{{node.modeString}} {{node.size}} </div>
+        </mat-list-item>
+    </mat-list>
+</div>
+<div mat-dialog-actions>
+    <button type="button" mat-stroked-button [disabled]="disabled" (click)="onSubmit()" i18n>Sure</button>
+    <button type="button" mat-stroked-button [disabled]="disabled" (click)="onClose()" i18n>Close</button>
+</div>
