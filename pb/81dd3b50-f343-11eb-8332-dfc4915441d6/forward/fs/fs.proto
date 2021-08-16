@@ -48,6 +48,7 @@ service FS {
             body: "*"
         };
     }
+    // websocket /api/forward/v1/fs/compress
     rpc Compress (stream CompressRequest) returns (stream CompressResponse){}
 }
 message MountRequest{
@@ -112,10 +113,18 @@ message RenameResponse{
 enum Event {
     EventUniversal = 0;
     Heart = 1;
+
     Init = 2;
-    Exists = 3;
-    Progress = 4;
-    Success = 5;
+    Progress = 3;
+    Success = 4;
+    
+    Yes = 5;
+    No = 6;
+
+    Exists = 7;
+    YesAll = 8;
+    Skip = 9;
+    SkipAll = 10;
 };
 enum Algorithm {
     AlgorithmUniversal = 0;

@@ -459,6 +459,7 @@ func (s server) Compress(server grpc_fs.FS_CompressServer) (e error) {
 	} else {
 		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
 			ce.Write(
+				zap.Error(e),
 				zap.String(`who`, userdata.Who()),
 				zap.String(`root`, w.Root),
 				zap.String(`dir`, w.Dir),

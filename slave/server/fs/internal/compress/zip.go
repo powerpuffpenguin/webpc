@@ -30,14 +30,11 @@ func (zw *ZipWriter) Close() error {
 	return zw.w.Close()
 }
 
-func (zw *ZipWriter) Root(vdir string, name string) (e error) {
+func (zw *ZipWriter) Root(dir string, name string) (e error) {
 	m := zw.m
-	dir, e := m.Filename(vdir)
-	if e != nil {
-		return
-	}
 	root := filepath.Join(dir, name)
 	count := len(dir)
+	var f *os.File
 	e = m.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -50,7 +47,12 @@ func (zw *ZipWriter) Root(vdir string, name string) (e error) {
 		if info.IsDir() {
 			err = zw.dir(info, name)
 		} else {
-			err = zw.file(info, path, name)
+			f, err = m.Open(path)
+			if err != nil {
+				return err
+			}
+			err = zw.file(info, f, name)
+			f.Close()
 		}
 		return err
 	})
@@ -66,13 +68,16 @@ func (zw *ZipWriter) dir(info os.FileInfo, name string) (e error) {
 	return e
 }
 
-func (zw *ZipWriter) file(info os.FileInfo, filename, name string) (e error) {
-	m := zw.m
-	f, e := m.Open(filename)
+func (zw *ZipWriter) file(info os.FileInfo, reader io.Reader, name string) (e error) {
+	header, e := zip.FileInfoHeader(info)
 	if e != nil {
 		return
 	}
-	defer f.Close()
-
+	header.Name = name
+	w, e := zw.w.CreateHeader(header)
+	if e != nil {
+		return
+	}
+	_, e = io.Copy(w, reader)
 	return e
 }

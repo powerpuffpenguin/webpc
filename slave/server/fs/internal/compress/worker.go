@@ -122,7 +122,7 @@ func (w *Worker) doInit(req *grpc_fs.CompressRequest) (e error) {
 	if e != nil {
 		return
 	}
-	dir, e := m.Filename(req.Dir)
+	_, e = m.Filename(req.Dir)
 	if e != nil {
 		return
 	}
@@ -161,7 +161,7 @@ func (w *Worker) doInit(req *grpc_fs.CompressRequest) (e error) {
 	}
 
 	w.Root = req.Root
-	w.Dir = dir
+	w.Dir = req.Dir
 	w.Dst = dst
 	w.Source = req.Source
 	go w.serve(m, req.Algorithm)
@@ -174,11 +174,52 @@ func (w *Worker) putError(e error) {
 	case <-w.close:
 	}
 }
-func (w *Worker) serve(m *mount.Mount, algorithm grpc_fs.Algorithm) {
-	f, e := m.OpenFile(filepath.Join(w.Dir, w.Dst), os.O_RDWR|os.O_CREATE|os.O_EXCL, 0666)
-	if e != nil {
-		w.putError(e)
+func (w *Worker) waitRequest(expects ...grpc_fs.Event) (req *grpc_fs.CompressRequest, e error) {
+	select {
+	case req = <-w.req:
+	case <-w.ctx.Done():
+		e = w.ctx.Err()
 		return
+	}
+	e = w.chekEvent(req.Event, expects...)
+	if e != nil {
+		req = nil
+		return
+	}
+	return
+}
+func (w *Worker) askExists(m *mount.Mount, name string) (f *os.File, e error) {
+	e = w.server.Send(&grpc_fs.CompressResponse{
+		Event: grpc_fs.Event_Exists,
+		Value: name,
+	})
+	if e != nil {
+		return
+	}
+	req, e := w.waitRequest(grpc_fs.Event_Yes, grpc_fs.Event_No)
+	if e != nil {
+		return
+	} else if req.Event == grpc_fs.Event_No {
+		e = status.Error(codes.Canceled, name+` already exists, cancel compress`)
+		return
+	}
+	f, e = m.OpenFile(name, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
+	return
+}
+func (w *Worker) serve(m *mount.Mount, algorithm grpc_fs.Algorithm) {
+	name := filepath.Join(w.Dir, w.Dst)
+	f, e := m.OpenFile(name, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0666)
+	if e != nil {
+		if codes.AlreadyExists == status.Code(e) {
+			f, e = w.askExists(m, name)
+			if e != nil {
+				w.putError(e)
+				return
+			}
+		} else {
+			w.putError(e)
+			return
+		}
 	}
 	e = w.doCompress(m, algorithm, f)
 	if e != nil {
@@ -228,9 +269,9 @@ func (w *Worker) doCompress(m *mount.Mount, algorithm grpc_fs.Algorithm, writer 
 	)
 	switch algorithm {
 	case grpc_fs.Algorithm_Tar:
-		return w.archiveTar(m, writer)
+		c = NewTarWriter(h, m, writer, false)
 	case grpc_fs.Algorithm_TarGZ:
-		return w.archiveTarGZ(m, writer)
+		c = NewTarWriter(h, m, writer, true)
 	// case grpc_fs.Algorithm_Zip:
 	default:
 		c = NewZipWriter(h, m, writer)
@@ -243,12 +284,4 @@ func (w *Worker) doCompress(m *mount.Mount, algorithm grpc_fs.Algorithm, writer 
 		}
 	}
 	return c.Close()
-}
-func (w *Worker) archiveTar(m *mount.Mount, writer io.Writer) (e error) {
-
-	return
-}
-func (w *Worker) archiveTarGZ(m *mount.Mount, writer io.Writer) (e error) {
-
-	return
 }

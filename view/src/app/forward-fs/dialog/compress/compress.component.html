@@ -1,0 +1,32 @@
+<h1 mat-dialog-title>
+    <ng-container i18n>Compress</ng-container>
+    <mat-icon *ngIf="disabled">
+        <mat-spinner color="accent" diameter='32'></mat-spinner>
+    </mat-icon>
+</h1>
+
+<form (submit)="onSubmit()" #viewForm="ngForm">
+
+    <div mat-dialog-content class="dialog-form-view">
+        <div>
+            <mat-form-field class="full-width">
+                <mat-label i18n>Name</mat-label>
+                <input matInput [disabled]="disabled" cdkFocusInitial required [(ngModel)]="name" name="name">
+                <span matSuffix>{{getExt(algorithm)}}</span>
+                <mat-error i18n>Name Invalid</mat-error>
+            </mat-form-field>
+        </div>
+        <div>
+            <mat-radio-group [(ngModel)]="algorithm" name="algorithm" [disabled]="disabled">
+                <mat-radio-button *ngFor="let node of algorithms" [value]="node">
+                    {{getExt(node)}}
+                </mat-radio-button>
+            </mat-radio-group>
+        </div>
+        <div *ngIf="progress">{{progress}}</div>
+    </div>
+    <div mat-dialog-actions>
+        <button type="submit" mat-stroked-button i18n [disabled]="disabled || viewForm.invalid ">Submit</button>
+        <button type="button" mat-stroked-button i18n (click)="onClose()">Close</button>
+    </div>
+</form>

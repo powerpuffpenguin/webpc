@@ -23,6 +23,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatRadioModule } from '@angular/material/radio';
 
 import { RootComponent } from './root/root.component';
 import { ListComponent } from './list/list.component';
@@ -39,6 +40,8 @@ import { NewFileComponent } from './dialog/new-file/new-file.component';
 import { NewFolderComponent } from './dialog/new-folder/new-folder.component';
 import { RemoveComponent } from './dialog/remove/remove.component';
 import { RenameComponent } from './dialog/rename/rename.component';
+import { CompressComponent } from './dialog/compress/compress.component';
+import { ExistsComponent } from './dialog/exists/exists.component';
 
 
 @NgModule({
@@ -57,7 +60,9 @@ import { RenameComponent } from './dialog/rename/rename.component';
     NewFileComponent,
     NewFolderComponent,
     RemoveComponent,
-    RenameComponent
+    RenameComponent,
+    CompressComponent,
+    ExistsComponent
   ],
   imports: [
     CommonModule,
@@ -68,7 +73,7 @@ import { RenameComponent } from './dialog/rename/rename.component';
     MatFormFieldModule, MatInputModule, MatRippleModule,
     MatMenuModule, MatToolbarModule, MatProgressSpinnerModule,
     MatCheckboxModule, MatButtonToggleModule, MatDividerModule,
-    MatDialogModule,
+    MatDialogModule, MatRadioModule,
     ForwardFsRoutingModule
   ]
 })

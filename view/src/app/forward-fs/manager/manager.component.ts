@@ -8,6 +8,7 @@ import { first, takeUntil } from 'rxjs/operators';
 import { Session } from 'src/app/core/session/session';
 import { SessionService } from 'src/app/core/session/session.service';
 import { Closed } from 'src/app/core/utils/closed';
+import { CompressComponent } from '../dialog/compress/compress.component';
 import { NewFileComponent } from '../dialog/new-file/new-file.component';
 import { NewFolderComponent } from '../dialog/new-folder/new-folder.component';
 import { PropertyComponent } from '../dialog/property/property.component';
@@ -441,65 +442,23 @@ export class ManagerComponent implements OnInit, OnDestroy {
     })
   }
   onClickCompress() {
-    //   const target = this.target
-    //   if (!target || target.length == 0) {
-    //     return
-    //   }
-    //   const dir = this.folder
-    //   this.matDialog.open(CompressComponent, {
-    //     data: {
-    //       dir: dir,
-    //       source: target,
-    //     },
-    //     disableClose: true,
-    //   }).afterClosed().toPromise().then((fileinfo: FileInfo) => {
-    //     if (fileinfo instanceof FileInfo) {
-    //       this._pushOrUpdate(fileinfo)
-    //     }
-    //   })
+    const target = this.target
+    if (!target || target.length == 0) {
+      return
+    }
+    const dir = this.folder
+    this.matDialog.open(CompressComponent, {
+      data: {
+        dir: dir,
+        source: target,
+      },
+      disableClose: true,
+    }).afterClosed().toPromise().then((ok) => {
+      if (this.closed_.isNotClosed && ok) {
+        this.onClickRefresh()
+      }
+    })
   }
-  // private _pushOrUpdate(fileinfo: FileInfo) {
-  //   if (!this._source) {
-  //     this._source = new Array<FileInfo>()
-  //     this.sourceChange.emit(this._source)
-  //   }
-  //   if (this._source.length == 0) {
-  //     this._source.push(fileinfo)
-  //   } else {
-  //     let ok = false
-  //     for (let i = 0; i < this._source.length; i++) {
-  //       if (this._source[i].name == fileinfo.name) {
-  //         ok = true
-  //         this._source[i] = fileinfo
-  //         break
-  //       }
-  //     }
-  //     if (!ok) {
-  //       this._source.push(fileinfo)
-  //       this._source.sort(FileInfo.compare)
-  //     }
-  //   }
-
-  //   if (!this._hide) {
-  //     this._hide = new Array<FileInfo>()
-  //   }
-  //   if (this._hide.length == 0) {
-  //     this._hide.push(fileinfo)
-  //   } else {
-  //     let ok = false
-  //     for (let i = 0; i < this._hide.length; i++) {
-  //       if (this._hide[i].name == fileinfo.name) {
-  //         ok = true
-  //         this._hide[i] = fileinfo
-  //         break
-  //       }
-  //     }
-  //     if (!ok) {
-  //       this._hide.push(fileinfo)
-  //       this._hide.sort(FileInfo.compare)
-  //     }
-  //   }
-  // }
   onClickRefresh() {
     const folder = this.folder
     if (!folder) {
