@@ -116,6 +116,27 @@ func (m *Mount) Filename(path string) (filename string, e error) {
 	}
 	return
 }
+
+func (m *Mount) MkdirAll(name string, perm os.FileMode) (e error) {
+	path, e := m.Filename(name)
+	if e != nil {
+		return
+	}
+	e = os.MkdirAll(path, perm)
+	if e != nil {
+		e = m.toError(name, e)
+		return
+	}
+
+	stat, err := os.Stat(path)
+	if err != nil {
+		return
+	}
+	if stat.IsDir() && stat.Mode() != perm {
+		os.Chmod(path, perm)
+	}
+	return
+}
 func (m *Mount) Open(name string) (*os.File, error) {
 	return m.OpenFile(name, os.O_RDONLY, 0)
 }

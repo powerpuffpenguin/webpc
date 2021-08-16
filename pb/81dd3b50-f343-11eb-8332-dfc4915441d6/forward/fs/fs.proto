@@ -50,6 +50,8 @@ service FS {
     }
     // websocket /api/forward/v1/fs/compress
     rpc Compress (stream CompressRequest) returns (stream CompressResponse){}
+    // websocket /api/forward/v1/fs/uncompress
+    rpc Uncompress (stream UncompressRequest) returns (stream UncompressResponse){}
 }
 message MountRequest{
 }
@@ -140,13 +142,22 @@ message CompressRequest{
     string dir = 3;
     string dst = 4;
     repeated string source = 5;
-    // .tar
-    // .zip
-    // .tar.gz
     Algorithm algorithm = 6;
 }
 message CompressResponse{
     Event event = 1;
     string value = 2;
     FileInfo info = 3;
+}
+message UncompressRequest{
+    Event event = 1;
+
+    // init
+    string root = 2;
+    string dir = 3;
+    string name = 4;
+}
+message UncompressResponse{
+    Event event = 1;
+    string value = 2;
 }

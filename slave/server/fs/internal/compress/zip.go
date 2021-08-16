@@ -12,7 +12,6 @@ type ZipWriter struct {
 
 func NewZipWriter(w io.Writer) *ZipWriter {
 	return &ZipWriter{
-
 		w: zip.NewWriter(w),
 	}
 }
