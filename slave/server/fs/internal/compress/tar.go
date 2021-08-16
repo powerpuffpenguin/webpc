@@ -5,19 +5,14 @@ import (
 	"compress/gzip"
 	"io"
 	"os"
-	"path/filepath"
-
-	"github.com/powerpuffpenguin/webpc/single/mount"
 )
 
 type TarWriter struct {
-	helper
-	m  *mount.Mount
 	w  *tar.Writer
 	gz *gzip.Writer
 }
 
-func NewTarWriter(helper helper, m *mount.Mount, w io.Writer, gz bool) *TarWriter {
+func NewTarWriter(w io.Writer, gz bool) *TarWriter {
 	var (
 		gwriter *gzip.Writer
 		writer  *tar.Writer
@@ -29,10 +24,8 @@ func NewTarWriter(helper helper, m *mount.Mount, w io.Writer, gz bool) *TarWrite
 		writer = tar.NewWriter(w)
 	}
 	return &TarWriter{
-		helper: helper,
-		m:      m,
-		w:      writer,
-		gz:     gwriter,
+		w:  writer,
+		gz: gwriter,
 	}
 }
 func (tw *TarWriter) Close() (e error) {
@@ -45,34 +38,7 @@ func (tw *TarWriter) Close() (e error) {
 	}
 	return
 }
-func (tw *TarWriter) Root(dir string, name string) (e error) {
-	m := tw.m
-	root := filepath.Join(dir, name)
-	count := len(dir)
-	var f *os.File
-	e = m.Walk(root, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		name := path[count:]
-		err = tw.SendProgress(name)
-		if err != nil {
-			return err
-		}
-		if info.IsDir() {
-			err = tw.dir(info, name)
-		} else {
-			f, err = m.Open(path)
-			if err != nil {
-				return err
-			}
-			err = tw.file(info, f, name)
-			f.Close()
-		}
-		return err
-	})
-	return
-}
+
 func (tw *TarWriter) dir(info os.FileInfo, name string) (e error) {
 	header := &tar.Header{
 		Typeflag: tar.TypeDir,

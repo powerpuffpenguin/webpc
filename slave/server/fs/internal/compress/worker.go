@@ -222,20 +222,21 @@ func (w *Worker) serve(m *mount.Mount, algorithm grpc_fs.Algorithm) (e error) {
 	return
 }
 func (w *Worker) doCompress(m *mount.Mount, algorithm grpc_fs.Algorithm, writer io.Writer) (e error) {
-	var (
-		c Compressor
-		h = helper{
-			server: w.server,
-		}
-	)
+	var c *Compressor
 	switch algorithm {
 	case grpc_fs.Algorithm_Tar:
-		c = NewTarWriter(h, m, writer, false)
+		c = NewCompressor(w.server, m,
+			NewTarWriter(writer, false),
+		)
 	case grpc_fs.Algorithm_TarGZ:
-		c = NewTarWriter(h, m, writer, true)
+		c = NewCompressor(w.server, m,
+			NewTarWriter(writer, true),
+		)
 	// case grpc_fs.Algorithm_Zip:
 	default:
-		c = NewZipWriter(h, m, writer)
+		c = NewCompressor(w.server, m,
+			NewZipWriter(writer),
+		)
 	}
 	for _, name := range w.Source {
 		e = c.Root(w.Dir, name)
