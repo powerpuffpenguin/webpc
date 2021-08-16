@@ -1,7 +1,6 @@
 package compress
 
 import (
-	"context"
 	"io"
 	"os"
 	"path/filepath"
@@ -17,7 +16,6 @@ import (
 
 type Worker struct {
 	server grpc_fs.FS_CompressServer
-	ctx    context.Context
 	req    chan *grpc_fs.CompressRequest
 	err    chan error
 	close  chan struct{}
@@ -29,10 +27,8 @@ type Worker struct {
 }
 
 func New(server grpc_fs.FS_CompressServer) *Worker {
-	ctx := server.Context()
 	return &Worker{
 		server: server,
-		ctx:    ctx,
 		req:    make(chan *grpc_fs.CompressRequest),
 		err:    make(chan error),
 		close:  make(chan struct{}),
@@ -60,12 +56,15 @@ func (w *Worker) chekEvent(evt grpc_fs.Event, expects ...grpc_fs.Event) error {
 	return status.Error(codes.InvalidArgument, `unexpected event: `+evt.String())
 }
 func (w *Worker) runRecv() {
-	done := w.ctx.Done()
+	done := w.close
 	server := w.server
 	for {
 		req, e := server.Recv()
 		if e != nil {
-			w.putError(e)
+			select {
+			case w.err <- e:
+			case <-done:
+			}
 			break
 		} else if req.Event != grpc_fs.Event_Heart {
 			select {
@@ -84,32 +83,19 @@ func (w *Worker) Serve() (e error) {
 	select {
 	case <-t.C:
 		e = status.Error(codes.DeadlineExceeded, `wait init timeout`)
-		return
 	case e = <-w.err:
-		close(w.close)
-
 		if !t.Stop() {
 			<-t.C
 		}
-		return
 	case req := <-w.req:
 		if !t.Stop() {
 			<-t.C
 		}
+		// init
 		e = w.doInit(req)
-		if e != nil {
-			close(w.close)
-			return
-		}
 	}
 
-	select {
-	case <-w.ctx.Done():
-		e = w.ctx.Err()
-		close(w.close)
-	case e = <-w.err:
-		close(w.close)
-	}
+	close(w.close)
 	return
 }
 func (w *Worker) doInit(req *grpc_fs.CompressRequest) (e error) {
@@ -164,21 +150,14 @@ func (w *Worker) doInit(req *grpc_fs.CompressRequest) (e error) {
 	w.Dir = req.Dir
 	w.Dst = dst
 	w.Source = req.Source
-	go w.serve(m, req.Algorithm)
+	e = w.serve(m, req.Algorithm)
 	return
 }
-func (w *Worker) putError(e error) {
-	select {
-	case w.err <- e:
-	case <-w.ctx.Done():
-	case <-w.close:
-	}
-}
+
 func (w *Worker) waitRequest(expects ...grpc_fs.Event) (req *grpc_fs.CompressRequest, e error) {
 	select {
 	case req = <-w.req:
-	case <-w.ctx.Done():
-		e = w.ctx.Err()
+	case e = <-w.err:
 		return
 	}
 	e = w.chekEvent(req.Event, expects...)
@@ -206,47 +185,32 @@ func (w *Worker) askExists(m *mount.Mount, name string) (f *os.File, e error) {
 	f, e = m.OpenFile(name, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
 	return
 }
-func (w *Worker) serve(m *mount.Mount, algorithm grpc_fs.Algorithm) {
+func (w *Worker) serve(m *mount.Mount, algorithm grpc_fs.Algorithm) (e error) {
 	name := filepath.Join(w.Dir, w.Dst)
 	f, e := m.OpenFile(name, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0666)
 	if e != nil {
 		if codes.AlreadyExists == status.Code(e) {
 			f, e = w.askExists(m, name)
 			if e != nil {
-				w.putError(e)
 				return
 			}
 		} else {
-			w.putError(e)
 			return
 		}
 	}
 	e = w.doCompress(m, algorithm, f)
 	if e != nil {
 		f.Close()
-		w.putError(e)
 		return
 	}
+	ret, _ := f.Seek(0, os.SEEK_END)
 	e = f.Sync()
+	f.Close()
 	if e != nil {
-		f.Close()
-		w.putError(e)
 		return
 	}
 
-	ret, e := f.Seek(0, os.SEEK_END)
-	if e != nil {
-		f.Close()
-		w.putError(e)
-		return
-	}
-	e = f.Close()
-	if e != nil {
-		f.Close()
-		w.putError(e)
-		return
-	}
-	e = w.server.Send(&grpc_fs.CompressResponse{
+	w.server.Send(&grpc_fs.CompressResponse{
 		Event: grpc_fs.Event_Success,
 		Info: &grpc_fs.FileInfo{
 			Name:  w.Dir,
@@ -255,10 +219,7 @@ func (w *Worker) serve(m *mount.Mount, algorithm grpc_fs.Algorithm) {
 			Mode:  uint32(0666),
 		},
 	})
-	if e != nil {
-		w.putError(e)
-		return
-	}
+	return
 }
 func (w *Worker) doCompress(m *mount.Mount, algorithm grpc_fs.Algorithm, writer io.Writer) (e error) {
 	var (
