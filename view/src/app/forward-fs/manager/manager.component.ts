@@ -14,6 +14,7 @@ import { NewFolderComponent } from '../dialog/new-folder/new-folder.component';
 import { PropertyComponent } from '../dialog/property/property.component';
 import { RemoveComponent } from '../dialog/remove/remove.component';
 import { RenameComponent } from '../dialog/rename/rename.component';
+import { UncompressComponent } from '../dialog/uncompress/uncompress.component';
 import { CheckEvent } from '../file/file.component';
 import { FileInfo, Dir } from '../fs';
 import { Box, Point } from './box';
@@ -474,22 +475,22 @@ export class ManagerComponent implements OnInit, OnDestroy {
     })
   }
   onClickUncompress() {
-    //   const target = this.target
-    //   if (!target || target.length == 0) {
-    //     return
-    //   }
-    //   const dir = this.folder
-    //   this.matDialog.open(UncompressComponent, {
-    //     data: {
-    //       dir: dir,
-    //       source: target[0],
-    //     },
-    //     disableClose: true,
-    //   }).afterClosed().toPromise().then((ok) => {
-    //     if (ok) {
-    //       this.onClickRefresh()
-    //     }
-    //   })
+    const target = this.target
+    if (!target || target.length == 0) {
+      return
+    }
+    const dir = this.folder
+    this.matDialog.open(UncompressComponent, {
+      data: {
+        dir: dir,
+        source: target[0],
+      },
+      disableClose: true,
+    }).afterClosed().toPromise().then((ok) => {
+      if (this.closed_.isNotClosed && ok) {
+        this.onClickRefresh()
+      }
+    })
   }
 
   // private _copy(iscopy: boolean): boolean {

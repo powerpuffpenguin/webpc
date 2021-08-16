@@ -10,10 +10,10 @@ type TarReader struct {
 	r *tar.Reader
 }
 
-func NewTarReader(r io.Reader) (*TarReader, error) {
+func NewTarReader(r io.Reader) *TarReader {
 	return &TarReader{
 		r: tar.NewReader(r),
-	}, nil
+	}
 }
 func (tr *TarReader) Root(callback func(io.Reader, string, os.FileMode) error) (e error) {
 	var (

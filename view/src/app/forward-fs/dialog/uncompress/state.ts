@@ -13,15 +13,9 @@ interface Message {
     info: FileInfo,
 }
 
-export enum Algorithm {
-    Tar = 1,
-    Zip = 2,
-    TarGZ = 3,
-}
-
 interface callbacks {
     onProgress(name: string): void
-    onExists(name: string): Promise<boolean>
+    onExists(name: string): Promise<EventCode>
 }
 export class Client extends SessionRequest {
     private init_ = '';
@@ -30,18 +24,15 @@ export class Client extends SessionRequest {
         httpClient: HttpClient,
         sessionService: SessionService,
         root: string, dir: string,
-        dst: string, source: Array<string>,
-        algorithm: Algorithm,
+        name: string,
         private readonly callbacks: callbacks,
     ) {
-        super(ServerAPI.forward.v1.fs.websocketURL(id, 'compress'), HeartInterval, httpClient, sessionService)
+        super(ServerAPI.forward.v1.fs.websocketURL(id, 'uncompress'), HeartInterval, httpClient, sessionService)
         this.init_ = JSON.stringify({
             event: EventCode.Init,
             root: root,
             dir: dir,
-            dst: dst,
-            source: source,
-            algorithm: algorithm,
+            name: name,
         })
         this._connect()
     }
@@ -58,12 +49,8 @@ export class Client extends SessionRequest {
         const callbacks = this.callbacks
         switch (fromString(msg.event)) {
             case EventCode.Exists:
-                callbacks.onExists(msg.value).then((ok) => {
-                    if (ok) {
-                        sendRequest(ws, EventCode.Yes)
-                    } else {
-                        sendRequest(ws, EventCode.No)
-                    }
+                callbacks.onExists(msg.value).then((evt) => {
+                    sendRequest(ws, evt)
                 }).catch((e) => {
                     this.reject(e)
                 })

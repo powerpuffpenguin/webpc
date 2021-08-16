@@ -42,6 +42,7 @@ import { RemoveComponent } from './dialog/remove/remove.component';
 import { RenameComponent } from './dialog/rename/rename.component';
 import { CompressComponent } from './dialog/compress/compress.component';
 import { ExistsComponent } from './dialog/exists/exists.component';
+import { UncompressComponent } from './dialog/uncompress/uncompress.component';
 
 
 @NgModule({
@@ -62,7 +63,8 @@ import { ExistsComponent } from './dialog/exists/exists.component';
     RemoveComponent,
     RenameComponent,
     CompressComponent,
-    ExistsComponent
+    ExistsComponent,
+    UncompressComponent
   ],
   imports: [
     CommonModule,

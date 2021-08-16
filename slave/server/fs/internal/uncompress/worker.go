@@ -1,6 +1,8 @@
 package uncompress
 
 import (
+	"compress/bzip2"
+	"compress/gzip"
 	"path/filepath"
 	"strings"
 	"time"
@@ -169,22 +171,38 @@ func (w *Worker) serve(m *mount.Mount, algorithm Algorithm) (dst []string, e err
 	if e != nil {
 		return
 	}
-	var un *Uncompressor
+	var (
+		reader reader
+		un     *Uncompressor
+		gf     *gzip.Reader
+	)
 	switch algorithm {
 	case Tar:
+		reader = NewTarReader(f)
 	case TarGZ:
-	case TarBZ2:
-	case Zip:
-		var r reader
-		r, e = NewZipReader(f)
+		gf, e = gzip.NewReader(f)
 		if e != nil {
 			f.Close()
 			return
 		}
-		un = NewUncompressor(w, m, r)
+		reader = NewTarReader(gf)
+	case TarBZ2:
+		reader = NewTarReader(bzip2.NewReader(f))
+	case Zip:
+		reader, e = NewZipReader(f)
+		if e != nil {
+			f.Close()
+			return
+		}
 	}
-
+	un = NewUncompressor(w, m, reader)
 	dst, e = un.Root(w.Dir)
+	if gf != nil {
+		err := gf.Close()
+		if e == nil {
+			e = err
+		}
+	}
 	f.Close()
 	return
 }
