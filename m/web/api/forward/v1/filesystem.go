@@ -22,6 +22,7 @@ func (h Filesystem) Register(cc *grpc.ClientConn, router *gin.RouterGroup) {
 	r.PUT(`:id/:root/*path`, h.put)
 	r.GET(`:id/compress`, h.compress)
 	r.GET(`:id/uncompress`, h.uncompress)
+	r.GET(`:id/copy`, h.copy)
 }
 
 func (h Filesystem) put(c *gin.Context) {
@@ -177,6 +178,53 @@ func (h Filesystem) uncompress(c *gin.Context) {
 	}
 	f := web.NewForward(func(counted uint64, messageType int, p []byte) error {
 		var req grpc_fs.UncompressRequest
+		e = web.Unmarshal(p, &req)
+		if e != nil {
+			return e
+		}
+		return stream.Send(&req)
+	}, func(counted uint64) (e error) {
+		resp, e := stream.Recv()
+		if e != nil {
+			return
+		}
+		return ws.SendMessage(resp)
+	}, func() error {
+		return stream.CloseSend()
+	})
+	ws.Forward(f)
+}
+func (h Filesystem) copy(c *gin.Context) {
+	ws, e := h.Websocket(c, nil)
+	if e != nil {
+		return
+	}
+	defer ws.Close()
+
+	var obj struct {
+		ID int64 `uri:"id"`
+	}
+	e = c.ShouldBindUri(&obj)
+	if e != nil {
+		ws.Error(status.Error(codes.InvalidArgument, e.Error()))
+		return
+	}
+
+	cc, e := forward.Default().Get(obj.ID)
+	if e != nil {
+		ws.Error(e)
+		return
+	}
+
+	ctx := h.NewForwardContext(c)
+	client := grpc_fs.NewFSClient(cc)
+	stream, e := client.Copy(ctx)
+	if e != nil {
+		ws.Error(e)
+		return
+	}
+	f := web.NewForward(func(counted uint64, messageType int, p []byte) error {
+		var req grpc_fs.CopyRequest
 		e = web.Unmarshal(p, &req)
 		if e != nil {
 			return e

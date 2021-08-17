@@ -1,6 +1,7 @@
-import { getItem, setItem } from "src/app/core/utils/local-storage"
+import { getItem, removeItem, setItem } from "src/app/core/utils/local-storage"
 import { environment } from "src/environments/environment"
 const Key = 'fs.clipboard'
+
 export class Settings {
     private static instance_: Settings | undefined
     static get instance(): Settings {
@@ -29,6 +30,18 @@ export class Settings {
     }
     setClipboard(obj: Clipboard) {
         setItem(Key, obj.toJSON())
+    }
+    removeClipboard(obj: Clipboard) {
+        const jsonStr = getItem(Key)
+        if (typeof jsonStr === "string") {
+            try {
+                const o = Clipboard.fromJSON(jsonStr)
+                if (o.equalValue(obj)) {
+                    removeItem(Key)
+                }
+            } catch (e) {
+            }
+        }
     }
 }
 export class Clipboard {
@@ -72,5 +85,20 @@ export class Clipboard {
             copied: this.copied,
             at: Date.now(),
         })
+    }
+    equalValue(o: Clipboard): boolean {
+        if (this.id != o.id ||
+            this.root != o.root ||
+            this.dir != o.dir ||
+            this.names.length != o.names.length ||
+            this.copied != o.copied) {
+            return false
+        }
+        for (let i = 0; i < this.names.length; i++) {
+            if (this.names[i] != o.names[i]) {
+                return false
+            }
+        }
+        return true
     }
 }

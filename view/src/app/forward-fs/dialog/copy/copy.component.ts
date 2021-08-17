@@ -26,10 +26,10 @@ export class CopyComponent implements OnInit, OnDestroy {
     this.onSubmit()
   }
   get copied(): boolean {
-    return this.data.copied
+    return this.data.src.copied
   }
   onClose() {
-    this.matDialogRef.close()
+    this.matDialogRef.close(false)
   }
   ngOnDestroy() {
     if (this.client_) {
@@ -66,7 +66,7 @@ export class CopyComponent implements OnInit, OnDestroy {
       if (this.client_ == client) {
         this.client_ = undefined
       }
-      this.matDialogRef.close(true)
+      this.matDialogRef.close(false)
     })
   }
 }

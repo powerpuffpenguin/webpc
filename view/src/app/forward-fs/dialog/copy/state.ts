@@ -7,7 +7,6 @@ import { EventCode, fromString, sendRequest } from '../event';
 import { Clipboard } from '../../manager/settings'
 
 export interface Data {
-    copied: boolean
     src: Clipboard,
     dst: {
         root: string

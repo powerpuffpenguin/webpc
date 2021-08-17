@@ -542,7 +542,6 @@ export class ManagerComponent implements OnInit, OnDestroy {
     }
     this.matDialog.open(CopyComponent, {
       data: {
-        copied: clipboard.copied,
         src: clipboard,
         dst: {
           root: folder.root,
@@ -550,7 +549,10 @@ export class ManagerComponent implements OnInit, OnDestroy {
         }
       },
       disableClose: true,
-    }).afterClosed().toPromise().then(() => {
+    }).afterClosed().toPromise().then((ok) => {
+      if (ok && !clipboard.copied) {
+        Settings.instance.removeClipboard(clipboard)
+      }
       if (this.isNotClosed) {
         this.onClickRefresh()
       }

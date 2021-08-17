@@ -244,6 +244,16 @@ func (m *Mount) Rename(dir, old, current string) (e error) {
 
 	old = filepath.Join(dir, old)
 	current = filepath.Join(dir, current)
+	_, err := os.Stat(current)
+	if !os.IsNotExist(err) {
+		if os.IsPermission(err) {
+			e = status.Error(codes.PermissionDenied, `forbidden: `+current)
+		} else {
+			e = status.Error(codes.AlreadyExists, `already exists: `+current)
+		}
+		return
+	}
+
 	e = os.Rename(old, current)
 	if e != nil {
 		if os.IsNotExist(e) {

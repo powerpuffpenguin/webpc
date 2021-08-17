@@ -16,7 +16,9 @@ import (
 	"github.com/powerpuffpenguin/webpc/sessions"
 	"github.com/powerpuffpenguin/webpc/single/mount"
 	"github.com/powerpuffpenguin/webpc/slave/server/fs/internal/compress"
+	"github.com/powerpuffpenguin/webpc/slave/server/fs/internal/copied"
 	"github.com/powerpuffpenguin/webpc/slave/server/fs/internal/uncompress"
+
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -501,6 +503,52 @@ func (s server) Uncompress(server grpc_fs.FS_UncompressServer) (e error) {
 				zap.String(`root`, w.Root),
 				zap.String(`dir`, w.Dir),
 				zap.String(`name`, w.Name),
+			)
+		}
+	}
+	return
+}
+func (s server) Copy(server grpc_fs.FS_CopyServer) (e error) {
+	TAG := `forward.fs Copy`
+	// check write permission
+	_, userdata, e := s.JSONUserdata(server.Context())
+	if e != nil {
+		return
+	}
+	root := userdata.AuthAny(db.Root)
+	readable := true
+	if !root {
+		if !userdata.AuthAny(db.Write) {
+			e = s.Error(codes.PermissionDenied, `no write permission`)
+			return
+		}
+		readable = userdata.AuthAny(db.Read)
+	}
+	w := copied.New(server, readable)
+	e = w.Serve()
+	if e == nil {
+		if ce := logger.Logger.Check(zap.InfoLevel, TAG); ce != nil {
+			ce.Write(
+				zap.String(`who`, userdata.Who()),
+				zap.Bool(`copied`, w.Copied),
+				zap.String(`src root`, w.SrcRoot),
+				zap.String(`src dir`, w.SrcDir),
+				zap.String(`dst root`, w.DstRoot),
+				zap.String(`dst dir`, w.DstDir),
+				zap.Strings(`names`, w.Names),
+			)
+		}
+	} else {
+		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
+			ce.Write(
+				zap.Error(e),
+				zap.String(`who`, userdata.Who()),
+				zap.Bool(`copied`, w.Copied),
+				zap.String(`src root`, w.SrcRoot),
+				zap.String(`src dir`, w.SrcDir),
+				zap.String(`dst root`, w.DstRoot),
+				zap.String(`dst dir`, w.DstDir),
+				zap.Strings(`names`, w.Names),
 			)
 		}
 	}
