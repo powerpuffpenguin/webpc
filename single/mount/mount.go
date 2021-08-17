@@ -101,7 +101,30 @@ func (m *Mount) LS(path string) (dir string, modtime time.Time, results []FileIn
 	}
 	return
 }
-
+func (m *Mount) Stat(name string) (info os.FileInfo, e error) {
+	path, e := m.Filename(name)
+	if e != nil {
+		return
+	}
+	info, e = os.Stat(path)
+	if e != nil {
+		e = m.toError(name, e)
+		return
+	}
+	return
+}
+func (m *Mount) Chmod(name string, perm os.FileMode) (e error) {
+	path, e := m.Filename(name)
+	if e != nil {
+		return
+	}
+	e = os.Chmod(path, perm)
+	if e != nil {
+		e = m.toError(name, e)
+		return
+	}
+	return
+}
 func (m *Mount) Filename(path string) (filename string, e error) {
 	filename = filepath.Clean(m.root + path)
 	if m.root != filename {
@@ -137,6 +160,7 @@ func (m *Mount) MkdirAll(name string, perm os.FileMode) (e error) {
 	}
 	return
 }
+
 func (m *Mount) Open(name string) (*os.File, error) {
 	return m.OpenFile(name, os.O_RDONLY, 0)
 }
