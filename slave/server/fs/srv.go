@@ -18,7 +18,7 @@ import (
 	"github.com/powerpuffpenguin/webpc/slave/server/fs/internal/compress"
 	"github.com/powerpuffpenguin/webpc/slave/server/fs/internal/copied"
 	"github.com/powerpuffpenguin/webpc/slave/server/fs/internal/uncompress"
-
+	"github.com/powerpuffpenguin/webpc/slave/server/fs/internal/upload"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -549,6 +549,88 @@ func (s server) Copy(server grpc_fs.FS_CopyServer) (e error) {
 				zap.String(`dst root`, w.DstRoot),
 				zap.String(`dst dir`, w.DstDir),
 				zap.Strings(`names`, w.Names),
+			)
+		}
+	}
+	return
+}
+
+func (s server) Hash(ctx context.Context, req *grpc_fs.HashRequest) (resp *grpc_fs.HashResponse, e error) {
+	_, m, e := s.mountUserdataWrite(ctx, req.Root)
+	if e != nil {
+		return
+	}
+	resp, e = upload.Hash(m, req)
+	return
+}
+
+func (s server) Chunk(ctx context.Context, req *grpc_fs.ChunkRequest) (resp *grpc_fs.ChunkResponse, e error) {
+	_, m, e := s.mountUserdataWrite(ctx, req.Root)
+	if e != nil {
+		return
+	}
+	resp, e = upload.Chunk(m, req)
+	return
+}
+
+func (s server) Upload(ctx context.Context, req *grpc_fs.UploadRequest) (resp *grpc_fs.UploadResponse, e error) {
+	userdata, m, e := s.mountUserdataWrite(ctx, req.Root)
+	if e != nil {
+		return
+	}
+	resp, e = upload.Upload(m, req)
+	TAG := `forward.fs Upload`
+	if e == nil {
+		if ce := logger.Logger.Check(zap.InfoLevel, TAG); ce != nil {
+			ce.Write(
+				zap.String(`who`, userdata.Who()),
+				zap.String(`root`, req.Root),
+				zap.String(`path`, req.Path),
+				zap.Uint32(`chunk`, req.Chunk),
+				zap.Int(`data legnth`, len(req.Data)),
+			)
+		}
+	} else {
+		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
+			ce.Write(
+				zap.Error(e),
+				zap.String(`who`, userdata.Who()),
+				zap.String(`root`, req.Root),
+				zap.String(`path`, req.Path),
+				zap.Uint32(`chunk`, req.Chunk),
+				zap.Int(`data legnth`, len(req.Data)),
+			)
+		}
+	}
+	return
+}
+
+func (s server) Merge(ctx context.Context, req *grpc_fs.MergeRequest) (resp *grpc_fs.MergeResponse, e error) {
+	userdata, m, e := s.mountUserdataWrite(ctx, req.Root)
+	if e != nil {
+		return
+	}
+	resp, e = upload.Merge(m, req)
+	TAG := `forward.fs Merge`
+	if e == nil {
+		if ce := logger.Logger.Check(zap.InfoLevel, TAG); ce != nil {
+			ce.Write(
+				zap.String(`who`, userdata.Who()),
+				zap.String(`root`, req.Root),
+				zap.String(`path`, req.Path),
+				zap.Uint32(`hash`, req.Hash),
+				zap.Uint32(`count`, req.Count),
+			)
+		}
+	} else {
+		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
+			ce.Write(
+				zap.Error(e),
+				zap.String(`who`, userdata.Who()),
+				zap.String(`root`, req.Root),
+				zap.String(`path`, req.Path),
+				zap.Uint32(`hash`, req.Hash),
+				zap.Uint32(`count`, req.Count),
 			)
 		}
 	}

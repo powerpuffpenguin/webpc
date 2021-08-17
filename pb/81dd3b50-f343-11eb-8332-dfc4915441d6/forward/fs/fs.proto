@@ -26,7 +26,7 @@ service FS {
         };
     }
     // Update file data
-    // websocket /api/forward/v1/fs/:id/:root/*path
+    // put /api/forward/v1/fs/:id/:root/*path
     rpc Put (stream PutRequest) returns (PutResponse){}
 
     // Create a new folder or file
@@ -54,6 +54,24 @@ service FS {
     rpc Uncompress (stream UncompressRequest) returns (stream UncompressResponse){}
     // websocket /api/forward/v1/fs/:id/copy
     rpc Copy (stream CopyRequest) returns (stream CopyResponse){}
+    // Get upload file hash
+    rpc Hash (HashRequest) returns (HashResponse){
+        option (google.api.http) = {
+            get: "/api/forward/v1/fs/hash"
+        };
+    }
+    // Get upload chunk hash
+    rpc Chunk (ChunkRequest) returns (ChunkResponse){
+        option (google.api.http) = {
+            get: "/api/forward/v1/fs/chunk"
+        };
+    }
+    // upload chunk
+    // put /api/forward/v1/fs/:id/:root/*path
+    rpc Upload (UploadRequest) returns (UploadResponse){}
+
+    // merge chunk to file
+    rpc Merge (MergeRequest) returns (MergeResponse);
 }
 message MountRequest{
 }
@@ -177,4 +195,47 @@ message CopyRequest{
 message CopyResponse{
     Event event = 1;
     string value = 2;
+}
+message HashRequest{
+    string root = 1;
+    string path = 2;
+    // file size
+    int64 size = 3;
+    // chunk size
+    uint32 chunk = 4;
+}
+message HashResponse{
+    bool match = 2; // size match
+    // crc32(chunks.map((chunk)=>crc32(chunk)).join())
+    uint32 hash = 1; // if size not match,set hash empty string
+}
+message ChunkRequest{
+    string root = 1;
+    string path = 2;
+    // chunk index
+    repeated uint32 chunk = 3;
+} 
+message ChunkData{
+    bool exists = 1;
+    uint32 hash = 2;
+}
+message ChunkResponse{
+    // crc32(chunk)
+    repeated ChunkData result = 1;
+}
+message UploadRequest{
+    string root = 1;
+    string path =2;
+    uint32 chunk = 3;
+    bytes data = 4;
+}
+message UploadResponse{
+}
+message MergeRequest{
+    string root = 1;
+    string path =2;
+    uint32 hash = 3;
+    uint32 count = 4;
+}
+message MergeResponse{
 }

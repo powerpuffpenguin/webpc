@@ -164,6 +164,7 @@ func (m *Mount) MkdirAll(name string, perm os.FileMode) (e error) {
 func (m *Mount) Open(name string) (*os.File, error) {
 	return m.OpenFile(name, os.O_RDONLY, 0)
 }
+
 func (m *Mount) OpenFile(name string, flag int, perm os.FileMode) (f *os.File, e error) {
 	path, e := m.Filename(name)
 	if e != nil {
