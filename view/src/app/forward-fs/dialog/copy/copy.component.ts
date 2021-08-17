@@ -3,35 +3,33 @@ import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ToasterService } from 'angular2-toaster';
 import { I18nService } from 'src/app/core/i18n/i18n.service';
-import { FileInfo, Dir } from '../../fs';
-import { Client } from './state';
-import { SessionService } from "src/app/core/session/session.service";
-import { ExistsChoiceComponent } from '../exists-choice/exists-choice.component'
-interface Target {
-  dir: Dir
-  source: FileInfo
-}
+import { SessionService } from 'src/app/core/session/session.service';
+import { ExistsChoiceComponent } from '../exists-choice/exists-choice.component';
+import { Client, Data } from './state';
+
 @Component({
-  selector: 'app-uncompress',
-  templateUrl: './uncompress.component.html',
-  styleUrls: ['./uncompress.component.scss']
+  selector: 'app-copy',
+  templateUrl: './copy.component.html',
+  styleUrls: ['./copy.component.scss']
 })
-export class UncompressComponent implements OnInit, OnDestroy {
+export class CopyComponent implements OnInit, OnDestroy {
   constructor(private readonly toasterService: ToasterService,
     private readonly i18nService: I18nService,
     private readonly matDialog: MatDialog,
     private readonly httpClient: HttpClient,
     private readonly sessionService: SessionService,
-    private readonly matDialogRef: MatDialogRef<UncompressComponent>,
-    @Inject(MAT_DIALOG_DATA) public target: Target,) {
-  }
+    private readonly matDialogRef: MatDialogRef<CopyComponent>,
+    @Inject(MAT_DIALOG_DATA) private readonly data: Data,) { }
   private client_: Client | undefined
   progress = ''
   ngOnInit(): void {
     this.onSubmit()
   }
+  get copied(): boolean {
+    return this.data.copied
+  }
   onClose() {
-    this.matDialogRef.close(true)
+    this.matDialogRef.close()
   }
   ngOnDestroy() {
     if (this.client_) {
@@ -40,11 +38,9 @@ export class UncompressComponent implements OnInit, OnDestroy {
     }
   }
   onSubmit() {
-    const target = this.target
-    const dir = target.dir
-    const client = new Client(dir.id, this.httpClient, this.sessionService,
-      dir.root, dir.dir,
-      target.source.name, {
+    const data = this.data
+    const client = new Client(this.httpClient, this.sessionService,
+      data, {
       onProgress: (name: string) => {
         this.progress = name
       },
@@ -58,7 +54,11 @@ export class UncompressComponent implements OnInit, OnDestroy {
     )
     this.client_ = client
     client.result.then(() => {
-      this.toasterService.pop('success', undefined, this.i18nService.get('Uncompress done'))
+      if (this.copied) {
+        this.toasterService.pop('success', undefined, this.i18nService.get('Copy file done'))
+      } else {
+        this.toasterService.pop('success', undefined, this.i18nService.get('Move file done'))
+      }
       this.matDialogRef.close(true)
     }, (e) => {
       this.toasterService.pop('error', undefined, e)

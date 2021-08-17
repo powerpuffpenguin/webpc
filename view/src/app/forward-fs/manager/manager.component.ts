@@ -5,10 +5,12 @@ import { Router } from '@angular/router';
 import { ToasterService } from 'angular2-toaster';
 import { fromEvent, Subscription } from 'rxjs';
 import { first, takeUntil } from 'rxjs/operators';
+import { I18nService } from 'src/app/core/i18n/i18n.service';
 import { Session } from 'src/app/core/session/session';
 import { SessionService } from 'src/app/core/session/session.service';
 import { Closed } from 'src/app/core/utils/closed';
 import { CompressComponent } from '../dialog/compress/compress.component';
+import { CopyComponent } from '../dialog/copy/copy.component';
 import { NewFileComponent } from '../dialog/new-file/new-file.component';
 import { NewFolderComponent } from '../dialog/new-folder/new-folder.component';
 import { PropertyComponent } from '../dialog/property/property.component';
@@ -18,10 +20,7 @@ import { UncompressComponent } from '../dialog/uncompress/uncompress.component';
 import { CheckEvent } from '../file/file.component';
 import { FileInfo, Dir } from '../fs';
 import { Box, Point } from './box';
-import { Settings } from './settings';
-function isObject(object: any): boolean {
-  return object !== null && typeof object === "object"
-}
+import { Clipboard, Settings } from './settings';
 const DefaultValue: any = {}
 @Component({
   selector: 'fs-manager',
@@ -38,10 +37,11 @@ export class ManagerComponent implements OnInit, OnDestroy {
   }
   private session_: Session | undefined
   private subscription_: Subscription | undefined
-  constructor(private router: Router,
-    private matDialog: MatDialog,
-    private sessionService: SessionService,
-    private toasterService: ToasterService,
+  constructor(private readonly router: Router,
+    private readonly matDialog: MatDialog,
+    private readonly sessionService: SessionService,
+    private readonly toasterService: ToasterService,
+    private readonly i18nService: I18nService,
   ) { }
 
   @Input()
@@ -493,84 +493,68 @@ export class ManagerComponent implements OnInit, OnDestroy {
     })
   }
 
-  // private _copy(iscopy: boolean): boolean {
-  //   const target = this.target
-  //   if (!target || target.length == 0) {
-  //     return false
-  //   }
-  //   const folder = this.folder
-  //   if (!folder) {
-  //     return false
-  //   }
-  //   const names = new Array<string>()
-  //   for (let i = 0; i < target.length; i++) {
-  //     names.push(target[i].name)
-  //   }
-  //   this.fileService.files = {
-  //     copy: iscopy,
-  //     root: folder.root,
-  //     dir: folder.dir,
-  //     names: names,
-  //   }
-  //   return true
-  // }
+  private _copy(copied: boolean): boolean {
+    if (this.isClosed) {
+      return false
+    }
+    const target = this.target
+    if (!target || target.length == 0) {
+      return false
+    }
+    const folder = this.folder
+    if (!folder) {
+      return false
+    }
+    const names = new Array<string>()
+    for (let i = 0; i < target.length; i++) {
+      names.push(target[i].name)
+    }
+    Settings.instance.setClipboard(new Clipboard(
+      folder.id, folder.root, folder.dir,
+      names, copied,
+    ))
+    return true
+  }
   onClickCopy() {
-    //   if (this._copy(true)) {
-    //     this.toasterService.pop(`success`, undefined, this.i18nService.get(`File has been copied`))
-    //   }
+    if (this._copy(true)) {
+      this.toasterService.pop(`success`, undefined, this.i18nService.get(`File has been copied`))
+    }
   }
   onClickCut() {
-    //   if (this._copy(false)) {
-    //     this.toasterService.pop(`success`, undefined, this.i18nService.get(`File has been cut`))
-    //   }
+    if (this._copy(false)) {
+      this.toasterService.pop(`success`, undefined, this.i18nService.get(`File has been cut`))
+    }
   }
   onClickPaste() {
-    //   const files = this.fileService.files
-    //   if (!files || !isObject(files.names) || !Array.isArray(files.names)) {
-    //     return
-    //   }
-    //   if (files.copy) {
-    //     this.matDialog.open(CopyComponent, {
-    //       data: {
-    //         names: files.names,
-    //         src: {
-    //           root: files.root,
-    //           dir: files.dir,
-    //         },
-    //         dst: {
-    //           root: this.folder.root,
-    //           dir: this.folder.dir,
-    //         },
-    //       },
-    //       disableClose: true,
-    //     }).afterClosed().toPromise().then(() => {
-    //       if (!this._closed) {
-    //         this.onClickRefresh()
-    //       }
-    //     })
-    //   } else {
-    //     this.matDialog.open(CutComponent, {
-    //       data: {
-    //         names: files.names,
-    //         src: {
-    //           root: files.root,
-    //           dir: files.dir,
-    //         },
-    //         dst: {
-    //           root: this.folder.root,
-    //           dir: this.folder.dir,
-    //         },
-    //       },
-    //       disableClose: true,
-    //     }).afterClosed().toPromise().then((ok) => {
-    //       if (ok) {
-    //         this.fileService.clear(files)
-    //       }
-    //       if (!this._closed) {
-    //         this.onClickRefresh()
-    //       }
-    //     })
-    //   }
+    if (this.isClosed) {
+      return
+    }
+    const clipboard = Settings.instance.getClipboard()
+    if (!clipboard) {
+      return
+    }
+    const folder = this.folder
+    if (!folder || folder.id != clipboard.id) {
+      return
+    }
+    if (folder.root == clipboard.root && folder.dir == clipboard.dir) {
+      return
+    }
+    this.matDialog.open(CopyComponent, {
+      data: {
+        copied: clipboard.copied,
+        src: clipboard,
+        dst: {
+          root: folder.root,
+          dir: folder.dir,
+        }
+      },
+      disableClose: true,
+    }).afterClosed().toPromise().then(() => {
+      if (this.isNotClosed) {
+        this.onClickRefresh()
+      }
+    })
   }
   onClickUpload() {
     //   this.matDialog.open(UploadComponent, {

@@ -1,0 +1,16 @@
+<h1 mat-dialog-title>
+    <ng-container *ngIf="copied;then copyView;else cutView"></ng-container>
+    <ng-template #copyView>
+        <ng-container i18n>Copy File</ng-container>
+    </ng-template>
+    <ng-template #cutView>
+        <ng-container i18n>Move File</ng-container>
+    </ng-template>
+    <mat-spinner color="accent" diameter='32'></mat-spinner>
+</h1>
+<div mat-dialog-content>
+    <div *ngIf="progress">{{progress}}</div>
+</div>
+<div mat-dialog-actions>
+    <button type="button" mat-stroked-button i18n (click)="onClose()">Close</button>
+</div>

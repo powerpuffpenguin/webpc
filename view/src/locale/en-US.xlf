@@ -210,6 +210,38 @@
           <context context-type="linenumber">56</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="f4e07f670b3e023b4567c62eb0e72c0a3c5524df" datatype="html">
+        <source>File has been copied</source>
+        <target>File has been copied</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.html</context>
+          <context context-type="linenumber">57</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="4b3043ba7f889476f6c4d3872f52e0365f778d31" datatype="html">
+        <source>File has been cut</source>
+        <target>File has been cut</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.html</context>
+          <context context-type="linenumber">58</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c9deeeaf20150eff0c1c123b49b23b2fb54c570b" datatype="html">
+        <source>Copy file done</source>
+        <target>Copy file done</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.html</context>
+          <context context-type="linenumber">59</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f5e73e8e81a70bfa4717f496e0c77e51b15ef856" datatype="html">
+        <source>Move file done</source>
+        <target>Move file done</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.html</context>
+          <context context-type="linenumber">60</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="8a3e5253b801997bb641fd367390cdae7e987656" datatype="html">
         <source>Add Device</source>
         <target>Add Device</target>
@@ -504,6 +536,10 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-fs/dialog/compress/compress.component.html</context>
           <context context-type="linenumber">30</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/copy/copy.component.html</context>
+          <context context-type="linenumber">15</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-fs/dialog/new-file/new-file.component.html</context>
@@ -820,6 +856,22 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-fs/manager/manager.component.html</context>
           <context context-type="linenumber">96</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="3184e50c67bb613c0e2b808625b906c0481c6105" datatype="html">
+        <source>Copy File</source>
+        <target>Copy File</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/copy/copy.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="69c4e6c44fbdca4e60934f47249ad8b528f94a14" datatype="html">
+        <source>Move File</source>
+        <target>Move File</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/copy/copy.component.html</context>
+          <context context-type="linenumber">7</context>
         </context-group>
       </trans-unit>
       <trans-unit id="12eee93d38b580cb50e7658edd9cad3eb035d898" datatype="html">
@@ -1148,6 +1200,30 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-fs/view/video/video.component.html</context>
           <context context-type="linenumber">11</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d5a6db764ecb9e06d3c5fda4dfd17802758406f9" datatype="html">
+        <source>Filesystem</source>
+        <target>Filesystem</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward/home/home.component.html</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="b735003aa0ea101ec66419a0c87ac62104cbe624" datatype="html">
+        <source>Shared</source>
+        <target>Shared</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward/home/home.component.html</context>
+          <context context-type="linenumber">24</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="da82eb16485fefa8b1fac22b0349eac0bab41513" datatype="html">
+        <source>Logger</source>
+        <target>Logger</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward/home/home.component.html</context>
+          <context context-type="linenumber">27</context>
         </context-group>
       </trans-unit>
       <trans-unit id="84cd855cdd79e346fb01958d34e4d4504f830034" datatype="html">

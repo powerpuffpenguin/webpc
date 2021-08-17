@@ -26,7 +26,7 @@ service FS {
         };
     }
     // Update file data
-    // put /api/forward/v1/fs
+    // websocket /api/forward/v1/fs/:id/:root/*path
     rpc Put (stream PutRequest) returns (PutResponse){}
 
     // Create a new folder or file
@@ -48,10 +48,12 @@ service FS {
             body: "*"
         };
     }
-    // websocket /api/forward/v1/fs/compress
+    // websocket /api/forward/v1/fs/:id/compress
     rpc Compress (stream CompressRequest) returns (stream CompressResponse){}
-    // websocket /api/forward/v1/fs/uncompress
+    // websocket /api/forward/v1/fs/:id/uncompress
     rpc Uncompress (stream UncompressRequest) returns (stream UncompressResponse){}
+    // websocket /api/forward/v1/fs/:id/copy
+    rpc Copy (stream CopyRequest) returns (stream CopyResponse){}
 }
 message MountRequest{
 }
@@ -158,6 +160,21 @@ message UncompressRequest{
     string name = 4;
 }
 message UncompressResponse{
+    Event event = 1;
+    string value = 2;
+}
+message CopyRequest{
+    Event event = 1;
+
+    // init
+    string srcRoot = 2;
+    string srcDir = 3;
+    string dstRoot = 4;
+    string dstDir = 5;
+    repeated string names = 6;
+    bool copied = 7;
+}
+message CopyResponse{
     Event event = 1;
     string value = 2;
 }

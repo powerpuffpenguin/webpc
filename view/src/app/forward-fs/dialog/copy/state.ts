@@ -4,7 +4,16 @@ import { SessionService } from "src/app/core/session/session.service";
 import { Response } from "src/app/core/session/session_client";
 import { SessionRequest } from "src/app/core/session/session_request";
 import { EventCode, fromString, sendRequest } from '../event';
+import { Clipboard } from '../../manager/settings'
 
+export interface Data {
+    copied: boolean
+    src: Clipboard,
+    dst: {
+        root: string
+        dir: string
+    }
+}
 const HeartInterval = 40 * 1000
 interface Message {
     event: string
@@ -18,19 +27,22 @@ interface callbacks {
 export class Client extends SessionRequest {
     private init_ = '';
     constructor(
-        id: string,
         httpClient: HttpClient,
         sessionService: SessionService,
-        root: string, dir: string,
-        name: string,
+        private readonly data: Data,
         private readonly callbacks: callbacks,
     ) {
-        super(ServerAPI.forward.v1.fs.websocketURL(id, 'uncompress'), HeartInterval, httpClient, sessionService)
+        super(ServerAPI.forward.v1.fs.websocketURL(data.src.id, 'copy'), HeartInterval, httpClient, sessionService)
+        const src = data.src
+        const dst = data.dst
         this.init_ = JSON.stringify({
             event: EventCode.Init,
-            root: root,
-            dir: dir,
-            name: name,
+            srcRoot: src.root,
+            srcDir: src.dir,
+            dstRoot: dst.root,
+            dstDir: dst.dir,
+            names: src.names,
+            copied: src.copied,
         })
         this._connect()
     }
