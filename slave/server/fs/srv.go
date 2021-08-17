@@ -491,7 +491,6 @@ func (s server) Uncompress(server grpc_fs.FS_UncompressServer) (e error) {
 				zap.String(`root`, w.Root),
 				zap.String(`dir`, w.Dir),
 				zap.String(`name`, w.Name),
-				zap.Strings(`dst`, w.Dst),
 			)
 		}
 	} else {
@@ -502,7 +501,6 @@ func (s server) Uncompress(server grpc_fs.FS_UncompressServer) (e error) {
 				zap.String(`root`, w.Root),
 				zap.String(`dir`, w.Dir),
 				zap.String(`name`, w.Name),
-				zap.Strings(`dst`, w.Dst),
 			)
 		}
 	}

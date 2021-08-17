@@ -202,6 +202,14 @@
           <context context-type="linenumber">55</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="ad8669488cbb0bb2daa8e2bf7edfe6d1e020dc85" datatype="html">
+        <source>Uncompress done</source>
+        <target>解压完成</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.html</context>
+          <context context-type="linenumber">56</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="8a3e5253b801997bb641fd367390cdae7e987656" datatype="html">
         <source>Add Device</source>
         <target>添加设备</target>
@@ -514,6 +522,10 @@
           <context context-type="linenumber">25</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/uncompress/uncompress.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/group/dialog/add/add.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
@@ -814,6 +826,10 @@
         <source>File conflict</source>
         <target>档案冲突</target>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/exists-choice/exists-choice.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-fs/dialog/exists/exists.component.html</context>
           <context context-type="linenumber">2</context>
         </context-group>
@@ -821,6 +837,10 @@
       <trans-unit id="439c595f0fc3553a53e937e5ecee878ffc132996" datatype="html">
         <source>Replace file</source>
         <target>取代档案</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/exists-choice/exists-choice.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-fs/dialog/exists/exists.component.html</context>
           <context context-type="linenumber">7</context>
@@ -830,6 +850,10 @@
         <source>Sure</source>
         <target>确认</target>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/exists-choice/exists-choice.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-fs/dialog/exists/exists.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
@@ -838,9 +862,37 @@
           <context context-type="linenumber">17</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="cb44d23a0e8b00e8ddb0f13cdc970f3d036073c6" datatype="html">
+        <source>Replace All</source>
+        <target>全部替换</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/exists-choice/exists-choice.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eb075d0450deb6f381616f7da4b9244ced843053" datatype="html">
+        <source>Skip</source>
+        <target>跳过</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/exists-choice/exists-choice.component.html</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="34af55408b654ca513d7ba4f1c99935b93a8e80d" datatype="html">
+        <source>Skip All</source>
+        <target>全部跳过</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/exists-choice/exists-choice.component.html</context>
+          <context context-type="linenumber">15</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="d7b35c384aecd25a516200d6921836374613dfe7" datatype="html">
         <source>Cancel</source>
         <target>取消</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/exists-choice/exists-choice.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-fs/dialog/exists/exists.component.html</context>
           <context context-type="linenumber">13</context>
@@ -868,6 +920,18 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-fs/manager/manager.component.html</context>
           <context context-type="linenumber">76</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eee748902e363090150f4fa84687f2ebe353eaac" datatype="html">
+        <source>Uncompress</source>
+        <target>解压</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/uncompress/uncompress.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/manager/manager.component.html</context>
+          <context context-type="linenumber">101</context>
         </context-group>
       </trans-unit>
       <trans-unit id="170919b6c28b7eb90fead8af3d10ce8f10dc041e" datatype="html">
@@ -980,14 +1044,6 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-fs/manager/manager.component.html</context>
           <context context-type="linenumber">91</context>
-        </context-group>
-      </trans-unit>
-      <trans-unit id="eee748902e363090150f4fa84687f2ebe353eaac" datatype="html">
-        <source>Uncompress</source>
-        <target>解压</target>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/forward-fs/manager/manager.component.html</context>
-          <context context-type="linenumber">101</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8bffe465080d61e1835737553e2bceb00868e939" datatype="html">

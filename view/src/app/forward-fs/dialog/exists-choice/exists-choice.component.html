@@ -1,0 +1,17 @@
+<h1 mat-dialog-title>
+    <ng-container i18n>File conflict</ng-container>
+</h1>
+
+<div mat-dialog-content>
+    <div>
+        <ng-container i18n>Replace file</ng-container>
+        「{{filename}}」
+    </div>
+</div>
+<div mat-dialog-actions>
+    <button type="button" mat-stroked-button i18n (click)="onYes()">Sure</button>
+    <button type="button" mat-stroked-button i18n (click)="onYesAll()">Replace All</button>
+    <button type="button" mat-stroked-button i18n (click)="onSkip()">Skip</button>
+    <button type="button" mat-stroked-button i18n (click)="onSkipAll()">Skip All</button>
+    <button type="button" mat-stroked-button i18n (click)="onNo()">Cancel</button>
+</div>

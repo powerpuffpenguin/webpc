@@ -30,7 +30,6 @@ type Worker struct {
 
 	Root string
 	Dir  string
-	Dst  []string
 	Name string
 }
 
@@ -157,7 +156,7 @@ func (w *Worker) doInit(req *grpc_fs.UncompressRequest) (e error) {
 	w.Root = req.Root
 	w.Dir = req.Dir
 	w.Name = req.Name
-	w.Dst, e = w.serve(m, algorithm)
+	e = w.serve(m, algorithm)
 	if e == nil {
 		w.server.Send(&grpc_fs.UncompressResponse{
 			Event: grpc_fs.Event_Success,
@@ -165,7 +164,7 @@ func (w *Worker) doInit(req *grpc_fs.UncompressRequest) (e error) {
 	}
 	return
 }
-func (w *Worker) serve(m *mount.Mount, algorithm Algorithm) (dst []string, e error) {
+func (w *Worker) serve(m *mount.Mount, algorithm Algorithm) (e error) {
 	name := filepath.Join(w.Dir, w.Name)
 	f, e := m.Open(name)
 	if e != nil {
@@ -196,7 +195,7 @@ func (w *Worker) serve(m *mount.Mount, algorithm Algorithm) (dst []string, e err
 		}
 	}
 	un = NewUncompressor(w, m, reader)
-	dst, e = un.Root(w.Dir)
+	e = un.Root(w.Dir)
 	if gf != nil {
 		err := gf.Close()
 		if e == nil {

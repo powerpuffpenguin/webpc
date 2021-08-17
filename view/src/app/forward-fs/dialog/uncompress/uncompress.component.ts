@@ -3,9 +3,10 @@ import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ToasterService } from 'angular2-toaster';
 import { I18nService } from 'src/app/core/i18n/i18n.service';
-import { FileInfo, Dir, split } from '../../fs';
+import { FileInfo, Dir } from '../../fs';
 import { Client } from './state';
 import { SessionService } from "src/app/core/session/session.service";
+import { ExistsChoiceComponent } from '../exists-choice/exists-choice.component'
 interface Target {
   dir: Dir
   source: FileInfo
@@ -50,11 +51,10 @@ export class UncompressComponent implements OnInit, OnDestroy {
         this.progress = name
       },
       onExists: (name) => {
-        return Promise.resolve(0)
-        // return this.matDialog.open(ExistsComponent, {
-        //   data: name,
-        //   disableClose: true,
-        // }).afterClosed().toPromise()
+        return this.matDialog.open(ExistsChoiceComponent, {
+          data: name,
+          disableClose: true,
+        }).afterClosed().toPromise()
       },
     },
     )

@@ -29,7 +29,7 @@ func NewUncompressor(w *Worker, m *mount.Mount, r reader) *Uncompressor {
 		style: grpc_fs.Event_EventUniversal,
 	}
 }
-func (un *Uncompressor) Root(dir string) (dst []string, e error) {
+func (un *Uncompressor) Root(dir string) (e error) {
 	r := un.r
 	e = r.Root(un.root)
 	return
@@ -68,7 +68,7 @@ func (un *Uncompressor) openFile(path string, perm os.FileMode) (f *os.File, e e
 		return
 	}
 	f, e = un.m.OpenFile(name, os.O_RDWR|os.O_CREATE|os.O_EXCL, perm)
-	if !os.IsExist(e) {
+	if status.Code(e) != codes.AlreadyExists {
 		return
 	}
 	if un.style == grpc_fs.Event_SkipAll {
