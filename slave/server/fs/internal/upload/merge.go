@@ -51,7 +51,7 @@ func Merge(m *mount.Mount, req *grpc_fs.MergeRequest) (resp *grpc_fs.MergeRespon
 		return
 	}
 	resp = &emptyMergeResponse
-	// m.RemoveAll(dir)
+	m.RemoveAll(dir)
 	return
 }
 func merge(m *mount.Mount, dir string, val uint32, count uint64, w io.Writer) (e error) {

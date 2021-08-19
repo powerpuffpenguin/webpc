@@ -373,7 +373,7 @@ func (s server) Remove(ctx context.Context, req *grpc_fs.RemoveRequest) (resp *g
 		return
 	}
 
-	e = m.RemoveAll(req.Dir, req.Names)
+	e = m.RemoveAllItem(req.Dir, req.Names)
 	if e != nil {
 		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
 			ce.Write(

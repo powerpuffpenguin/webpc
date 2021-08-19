@@ -229,7 +229,15 @@ func (m *Mount) Create(file bool, dir, name string, perm os.FileMode) (info os.F
 	}
 	return
 }
-func (m *Mount) RemoveAll(dir string, names []string) (e error) {
+func (m *Mount) RemoveAll(name string) (e error) {
+	path, e := m.Filename(name)
+	if e != nil {
+		return
+	}
+	e = os.RemoveAll(path)
+	return
+}
+func (m *Mount) RemoveAllItem(dir string, names []string) (e error) {
 	if len(names) == 0 {
 		return
 	}
