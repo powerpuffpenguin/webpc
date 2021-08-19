@@ -132,6 +132,25 @@ func (s server) Mount(ctx context.Context, req *grpc_fs.MountRequest) (resp *grp
 	return
 }
 
+var emptySharedResponse grpc_fs.SharedResponse
+
+func (s server) Shared(ctx context.Context, req *grpc_fs.SharedRequest) (resp *grpc_fs.SharedResponse, e error) {
+	fs := mount.Default()
+
+	s.SetHTTPCacheMaxAge(ctx, 5)
+	e = s.ServeMessage(ctx, modtime, func(nobody bool) error {
+		if nobody {
+			resp = &emptySharedResponse
+		} else {
+			resp = &grpc_fs.SharedResponse{
+				Name: fs.Shareds(),
+			}
+		}
+		return nil
+	})
+	return
+}
+
 var emptyListResponse grpc_fs.ListResponse
 
 func (s server) List(ctx context.Context, req *grpc_fs.ListRequest) (resp *grpc_fs.ListResponse, e error) {

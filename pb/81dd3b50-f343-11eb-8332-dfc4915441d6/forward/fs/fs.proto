@@ -13,6 +13,12 @@ service FS {
             get: "/api/forward/v1/fs/mount"
         };
     }
+    // Get Shared Mount list
+    rpc Shared (SharedRequest) returns (SharedResponse){
+        option (google.api.http) = {
+            get: "/api/forward/v1/fs/shared"
+        };
+    }
     // list file info
     rpc List (ListRequest) returns (ListResponse){
         option (google.api.http) = {
@@ -81,6 +87,11 @@ service FS {
 message MountRequest{
 }
 message MountResponse{
+    repeated string name = 1;
+}
+message SharedRequest{
+}
+message SharedResponse{
     repeated string name = 1;
 }
 message Dir{

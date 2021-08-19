@@ -7,8 +7,9 @@ func Default() *FileSystem {
 }
 
 type FileSystem struct {
-	ms    []Mount
-	names []string
+	ms      []Mount
+	names   []string
+	shareds []string
 }
 
 func (f *FileSystem) Push(name, root string, read, write, shared bool) {
@@ -20,9 +21,15 @@ func (f *FileSystem) Push(name, root string, read, write, shared bool) {
 		shared: shared,
 	})
 	f.names = append(f.names, name)
+	if shared {
+		f.shareds = append(f.shareds, name)
+	}
 }
 func (f *FileSystem) Names() []string {
 	return f.names
+}
+func (f *FileSystem) Shareds() []string {
+	return f.shareds
 }
 func (f *FileSystem) List() []Mount {
 	return f.ms
