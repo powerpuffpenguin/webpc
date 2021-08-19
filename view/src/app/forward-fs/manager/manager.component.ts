@@ -17,6 +17,7 @@ import { PropertyComponent } from '../dialog/property/property.component';
 import { RemoveComponent } from '../dialog/remove/remove.component';
 import { RenameComponent } from '../dialog/rename/rename.component';
 import { UncompressComponent } from '../dialog/uncompress/uncompress.component';
+import { UploadComponent } from '../dialog/upload/upload.component';
 import { CheckEvent } from '../file/file.component';
 import { FileInfo, Dir } from '../fs';
 import { Box, Point } from './box';
@@ -559,17 +560,14 @@ export class ManagerComponent implements OnInit, OnDestroy {
     })
   }
   onClickUpload() {
-    //   this.matDialog.open(UploadComponent, {
-    //     data: {
-    //       root: this.folder.root,
-    //       dir: this.folder.dir,
-    //     },
-    //     disableClose: true,
-    //   }).afterClosed().toPromise().then(() => {
-    //     if (this._closed) {
-    //       return
-    //     }
-    //     this.onClickRefresh()
-    //   })
+    const dir = this.folder
+    this.matDialog.open(UploadComponent, {
+      data: dir,
+      disableClose: true,
+    }).afterClosed().toPromise().then((ok) => {
+      if (ok && this.isNotClosed) {
+        this.onClickRefresh()
+      }
+    })
   }
 }

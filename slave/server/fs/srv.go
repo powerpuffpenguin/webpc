@@ -618,7 +618,7 @@ func (s server) Merge(ctx context.Context, req *grpc_fs.MergeRequest) (resp *grp
 				zap.String(`who`, userdata.Who()),
 				zap.String(`root`, req.Root),
 				zap.String(`path`, req.Path),
-				zap.Uint32(`hash`, req.Hash),
+				zap.String(`hash`, req.Hash),
 				zap.Uint32(`count`, req.Count),
 			)
 		}
@@ -629,7 +629,7 @@ func (s server) Merge(ctx context.Context, req *grpc_fs.MergeRequest) (resp *grp
 				zap.String(`who`, userdata.Who()),
 				zap.String(`root`, req.Root),
 				zap.String(`path`, req.Path),
-				zap.Uint32(`hash`, req.Hash),
+				zap.String(`hash`, req.Hash),
 				zap.Uint32(`count`, req.Count),
 			)
 		}

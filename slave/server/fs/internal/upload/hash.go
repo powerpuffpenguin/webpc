@@ -2,6 +2,7 @@ package upload
 
 import (
 	"encoding/binary"
+	"encoding/hex"
 	"hash/crc32"
 	"io"
 	"os"
@@ -24,6 +25,9 @@ func checkSize(size int64) error {
 	}
 	return nil
 }
+
+var emptyHashResponse grpc_fs.HashResponse
+
 func Hash(m *mount.Mount, req *grpc_fs.HashRequest) (resp *grpc_fs.HashResponse, e error) {
 	e = checkSize(req.Size)
 	if e != nil {
@@ -36,28 +40,31 @@ func Hash(m *mount.Mount, req *grpc_fs.HashRequest) (resp *grpc_fs.HashResponse,
 
 	f, e := m.Open(req.Path)
 	if e != nil {
+		if status.Code(e) == codes.NotFound {
+			e = nil
+			resp = &emptyHashResponse
+		}
 		return
 	}
-	hash, match, e := hash(f, req.Size, req.Chunk)
+	hash, e := hash(f, req.Size, req.Chunk)
 	f.Close()
 	if e != nil {
 		return
 	}
 	resp = &grpc_fs.HashResponse{
-		Match: match,
-		Hash:  hash,
+		Exists: true,
+		Hash:   hash,
 	}
 	return
 }
-func hash(r io.ReadSeeker, size int64, chunk uint32) (val uint32, match bool, e error) {
+func hash(r io.ReadSeeker, size int64, chunk uint32) (val string, e error) {
 	offset, e := r.Seek(0, os.SEEK_END)
 	if e != nil {
 		return
 	} else if offset != size {
 		return
 	}
-	match = true
-	_, e = r.Seek(0, os.SEEK_CUR)
+	_, e = r.Seek(0, os.SEEK_SET)
 	if e != nil {
 		return
 	}
@@ -76,11 +83,12 @@ func hash(r io.ReadSeeker, size int64, chunk uint32) (val uint32, match bool, e 
 			hash.Write(b32)
 		}
 		if e == io.EOF || e == io.ErrUnexpectedEOF {
+			e = nil
 			break
 		} else if e != nil {
 			return
 		}
 	}
-	val = hash.Sum32()
+	val = hex.EncodeToString(hash.Sum(nil))
 	return
 }

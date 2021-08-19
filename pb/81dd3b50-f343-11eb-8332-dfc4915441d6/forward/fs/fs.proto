@@ -26,7 +26,7 @@ service FS {
         };
     }
     // Update file data
-    // put /api/forward/v1/fs/:id/:root/*path
+    // put /api/forward/v1/fs/put/:id/:root/*path
     rpc Put (stream PutRequest) returns (PutResponse){}
 
     // Create a new folder or file
@@ -67,11 +67,16 @@ service FS {
         };
     }
     // upload chunk
-    // put /api/forward/v1/fs/:id/:root/*path
+    // post /api/forward/v1/fs/upload/:id/:root/:chunk/*path
     rpc Upload (UploadRequest) returns (UploadResponse){}
 
     // merge chunk to file
-    rpc Merge (MergeRequest) returns (MergeResponse);
+    rpc Merge (MergeRequest) returns (MergeResponse){
+        option (google.api.http) = {
+            post: "/api/forward/v1/fs/merge"
+            body: "*"
+        };
+    }
 }
 message MountRequest{
 }
@@ -205,23 +210,21 @@ message HashRequest{
     uint32 chunk = 4;
 }
 message HashResponse{
-    bool match = 2; // size match
+    bool exists = 1;
     // crc32(chunks.map((chunk)=>crc32(chunk)).join())
-    uint32 hash = 1; // if size not match,set hash empty string
+    string hash = 2; // if size not match,set hash empty string
 }
 message ChunkRequest{
     string root = 1;
     string path = 2;
-    // chunk index
-    repeated uint32 chunk = 3;
+    // chunk index offset
+    uint32 chunk = 3;
+    // chunk count
+    uint32 count = 4;
 } 
-message ChunkData{
-    bool exists = 1;
-    uint32 hash = 2;
-}
 message ChunkResponse{
     // crc32(chunk)
-    repeated ChunkData result = 1;
+    repeated string result = 1;
 }
 message UploadRequest{
     string root = 1;
@@ -234,7 +237,7 @@ message UploadResponse{
 message MergeRequest{
     string root = 1;
     string path =2;
-    uint32 hash = 3;
+    string hash = 3;
     uint32 count = 4;
 }
 message MergeResponse{

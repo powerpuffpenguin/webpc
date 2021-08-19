@@ -1,0 +1,57 @@
+<h1 mat-dialog-title i18n>Upload Files</h1>
+<div mat-dialog-content>
+    <input #file type="file" name="files" multiple style="display: none;" (change)="onAdd($event)" />
+    <div #drop [class]="dragover?'drop-zone-over':'drop-zone'">
+        <ng-container i18n>Queue length</ng-container> : {{ source?.length }}
+        <ng-container *ngIf="source && source.length!=0;then listView;else emptyView;"></ng-container>
+        <ng-template #emptyView>
+            <p i18n style="color: green;">Drag files here to upload</p>
+        </ng-template>
+        <ng-template #listView>
+            <mat-list>
+                <mat-list-item *ngFor="let item of source">
+                    <p matLine>
+                        {{item.file.name}}
+                    </p>
+                    <p matLine>
+                        {{item.sizeString}}
+                        <ng-container *ngIf="item.error">{{item.error}}</ng-container>
+                    </p>
+                    <p matLine>
+                        <mat-progress-bar mode="determinate" value="{{item.progress}}"></mat-progress-bar>
+                        {{item.progress}}%
+                    </p>
+
+                    <button *ngIf="item.isOk()" mat-icon-button disabled="true">
+                        <mat-icon color="primary">cloud_done</mat-icon>
+                    </button>
+                    <button *ngIf="item.isSkip()" mat-icon-button (click)="onClickDelete(item)">
+                        <mat-icon color="accent">cloud_off</mat-icon>
+                    </button>
+                    <button *ngIf="item.isError()" mat-icon-button disabled="true">
+                        <mat-icon color="warn">error</mat-icon>
+                    </button>
+
+                    <button *ngIf="item.isWorking()" mat-icon-button disabled="true">
+                        <mat-spinner color="accent" diameter='24'></mat-spinner>
+                    </button>
+                    <button mat-icon-button [disabled]="item.isWorking()" (click)="onClickDelete(item)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </mat-list-item>
+            </mat-list>
+        </ng-template>
+    </div>
+</div>
+<div mat-dialog-actions>
+    <button mat-stroked-button [disabled]="disabled" (click)="file.click()">
+        <ng-container i18n>Add Files</ng-container>
+    </button>
+    <button mat-stroked-button [disabled]="disabled" (click)="onClickStart()">
+        <ng-container i18n>Start Upload</ng-container>
+    </button>
+    <button mat-stroked-button (click)="onClickClear()">
+        <ng-container i18n>Clear Queue</ng-container>
+    </button>
+    <button mat-stroked-button (click)="onClose()" i18n>Close</button>
+</div>

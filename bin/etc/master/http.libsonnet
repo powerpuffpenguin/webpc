@@ -15,7 +15,7 @@ local duration = def.Duration;
         ReadBufferSize: 32*size.KB,
         InitialWindowSize: 0*size.KB, // < 64k ignored
         InitialConnWindowSize: 0*size.KB, // < 64k ignored
-        MaxRecvMsgSize: 0, // <1 4mb
+        MaxRecvMsgSize: 0, // <1 6mb
         MaxSendMsgSize: 0, // <1 math.MaxInt32
         MaxConcurrentStreams: 0,
         ConnectionTimeout: 120 * duration.Second,

@@ -1,6 +1,7 @@
 package upload
 
 import (
+	"encoding/hex"
 	"hash/crc32"
 	"io"
 	"path/filepath"
@@ -16,26 +17,22 @@ func Chunk(m *mount.Mount, req *grpc_fs.ChunkRequest) (resp *grpc_fs.ChunkRespon
 	dir, name := filepath.Split(req.Path)
 	dir = filepath.Join(dir, `.chunks_`+name)
 	var (
-		val    uint32
-		exists bool
-		items  []*grpc_fs.ChunkData
+		val   string
+		items []string
 	)
-	for _, index := range req.Chunk {
-		val, exists, e = chunk(m, filepath.Join(dir, strconv.FormatInt(int64(index), 10)))
+	for i := req.Chunk; i < req.Count; i++ {
+		val, e = chunk(m, filepath.Join(dir, strconv.FormatInt(int64(i), 10)))
 		if e != nil {
 			return
 		}
-		items = append(items, &grpc_fs.ChunkData{
-			Exists: exists,
-			Hash:   val,
-		})
+		items = append(items, val)
 	}
 	resp = &grpc_fs.ChunkResponse{
 		Result: items,
 	}
 	return
 }
-func chunk(m *mount.Mount, path string) (val uint32, exists bool, e error) {
+func chunk(m *mount.Mount, path string) (val string, e error) {
 	f, e := m.Open(path)
 	if e != nil {
 		if status.Code(e) == codes.NotFound {
@@ -49,7 +46,6 @@ func chunk(m *mount.Mount, path string) (val uint32, exists bool, e error) {
 	if e != nil {
 		return
 	}
-	exists = true
-	val = hash.Sum32()
+	val = hex.EncodeToString(hash.Sum(nil))
 	return
 }

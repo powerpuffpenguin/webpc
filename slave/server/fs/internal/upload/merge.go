@@ -2,6 +2,7 @@ package upload
 
 import (
 	"encoding/binary"
+	"encoding/hex"
 	"hash/crc32"
 	"io"
 	"os"
@@ -54,7 +55,7 @@ func Merge(m *mount.Mount, req *grpc_fs.MergeRequest) (resp *grpc_fs.MergeRespon
 	m.RemoveAll(dir)
 	return
 }
-func merge(m *mount.Mount, dir string, val uint32, count uint64, w io.Writer) (e error) {
+func merge(m *mount.Mount, dir string, val string, count uint64, w io.Writer) (e error) {
 	var (
 		hash  = crc32.NewIEEE()
 		chunk = crc32.NewIEEE()
@@ -78,7 +79,7 @@ func merge(m *mount.Mount, dir string, val uint32, count uint64, w io.Writer) (e
 		binary.BigEndian.PutUint32(b32, chunk.Sum32())
 		hash.Write(b32)
 	}
-	if hash.Sum32() != val {
+	if hex.EncodeToString(hash.Sum(nil)) != val {
 		e = status.Error(codes.InvalidArgument, `hash not match`)
 		return
 	}

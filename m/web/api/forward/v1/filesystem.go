@@ -2,6 +2,7 @@ package v1
 
 import (
 	"io"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -19,10 +20,12 @@ type Filesystem struct {
 
 func (h Filesystem) Register(cc *grpc.ClientConn, router *gin.RouterGroup) {
 	r := router.Group(`fs`)
-	r.PUT(`:id/:root/*path`, h.put)
+	r.PUT(`put/:id/:root/*path`, h.put)
 	r.GET(`:id/compress`, h.compress)
 	r.GET(`:id/uncompress`, h.uncompress)
 	r.GET(`:id/copy`, h.copy)
+	r.POST(`upload/:id/:root/:chunk/*path`, h.upload)
+
 }
 
 func (h Filesystem) put(c *gin.Context) {
@@ -240,4 +243,38 @@ func (h Filesystem) copy(c *gin.Context) {
 		return stream.CloseSend()
 	})
 	ws.Forward(f)
+}
+func (h Filesystem) upload(c *gin.Context) {
+	var obj struct {
+		ID    int64  `uri:"id"`
+		Root  string `uri:"root" binding:"required"`
+		Chunk uint32 `uri:"chunk"`
+		Path  string `uri:"path"  binding:"required"`
+	}
+	e := h.BindURI(c, &obj)
+	if e != nil {
+		return
+	}
+	cc, e := forward.Default().Get(obj.ID)
+	if e != nil {
+		h.Error(c, e)
+		return
+	}
+	b, e := ioutil.ReadAll(c.Request.Body)
+	if e != nil {
+		h.Error(c, e)
+		return
+	}
+	ctx := h.NewForwardContext(c)
+	client := grpc_fs.NewFSClient(cc)
+	_, e = client.Upload(ctx, &grpc_fs.UploadRequest{
+		Root:  obj.Root,
+		Path:  obj.Path,
+		Chunk: obj.Chunk,
+		Data:  b,
+	})
+	if e != nil {
+		h.Error(c, e)
+		return
+	}
 }

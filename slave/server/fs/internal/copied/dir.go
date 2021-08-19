@@ -24,20 +24,7 @@ func (w *Worker) copyDir(m *mount.Mount, dst string, perm os.FileMode) (e error)
 	if codes.NotFound != status.Code(e) {
 		return
 	}
-	path, e := m.Filename(dst)
-	if e != nil {
-		return
-	}
-	e = os.Mkdir(path, perm)
-	if e != nil {
-		if os.IsNotExist(e) {
-			e = status.Error(codes.NotFound, `not exists: `+dst)
-		} else if os.IsExist(e) {
-			e = status.Error(codes.AlreadyExists, `already exists: `+dst)
-		} else if os.IsPermission(e) {
-			e = status.Error(codes.PermissionDenied, `forbidden: `+dst)
-		}
-	}
+	e = m.Mkdir(dst, perm)
 	return
 }
 func (w *Worker) onExists(m *mount.Mount, name string, perm os.FileMode) (e error) {

@@ -44,7 +44,7 @@ func (un *Uncompressor) root(r io.Reader, path string, perm os.FileMode) (e erro
 	}
 	if r == nil {
 		path = filepath.Join(un.w.Dir, path)
-		e = un.m.MkdirAll(path, perm)
+		e = un.m.SyncDir(path, perm)
 	} else {
 		e = un.file(path, r, perm)
 	}

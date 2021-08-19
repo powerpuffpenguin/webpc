@@ -140,7 +140,7 @@ func (m *Mount) Filename(path string) (filename string, e error) {
 	return
 }
 
-func (m *Mount) MkdirAll(name string, perm os.FileMode) (e error) {
+func (m *Mount) SyncDir(name string, perm os.FileMode) (e error) {
 	path, e := m.Filename(name)
 	if e != nil {
 		return
@@ -161,6 +161,18 @@ func (m *Mount) MkdirAll(name string, perm os.FileMode) (e error) {
 	return
 }
 
+func (m *Mount) Mkdir(name string, perm os.FileMode) (e error) {
+	path, e := m.Filename(name)
+	if e != nil {
+		return
+	}
+	e = os.Mkdir(path, perm)
+	if e != nil {
+		e = m.toError(name, e)
+		return
+	}
+	return
+}
 func (m *Mount) Open(name string) (*os.File, error) {
 	return m.OpenFile(name, os.O_RDONLY, 0)
 }

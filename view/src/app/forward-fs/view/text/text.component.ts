@@ -126,7 +126,7 @@ export class TextComponent implements OnInit, OnDestroy {
   }
   onCLickSave() {
     this.saving_ = true
-    ServerAPI.forward.v1.fs.child(this.id, this.root, this.filepath).put(this.httpClient,
+    ServerAPI.forward.v1.fs.child('put', this.id, this.root, this.filepath).put(this.httpClient,
       this.val
     ).pipe(
       finalize(() => {

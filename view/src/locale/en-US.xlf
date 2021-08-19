@@ -562,6 +562,10 @@
           <context context-type="linenumber">13</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/upload/upload.component.html</context>
+          <context context-type="linenumber">56</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/group/dialog/add/add.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
@@ -984,6 +988,54 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-fs/manager/manager.component.html</context>
           <context context-type="linenumber">101</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="5295c847145e4896ae6fc638315e589f88052ee2" datatype="html">
+        <source>Upload Files</source>
+        <target>Upload Files</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/upload/upload.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="d2225b3e00af653ad30e16f0f5ede3a42ffc206b" datatype="html">
+        <source>Queue length</source>
+        <target>Queue length</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/upload/upload.component.html</context>
+          <context context-type="linenumber">5</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="6e18bb916fb16d2c797ba21f184e5ab095345d3c" datatype="html">
+        <source>Drag files here to upload</source>
+        <target>Drag files here to upload</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/upload/upload.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="aa0e7b4db68e2c0683d29a313d473c8436e2b5bf" datatype="html">
+        <source>Add Files</source>
+        <target>Add Files</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/upload/upload.component.html</context>
+          <context context-type="linenumber">48</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f3a53562e5590b56eba115f35467621184c51845" datatype="html">
+        <source>Start Upload</source>
+        <target>Start Upload</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/upload/upload.component.html</context>
+          <context context-type="linenumber">51</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="7c0ea667ba0515aa5c087882529bf7add7d6c0e6" datatype="html">
+        <source>Clear Queue</source>
+        <target>Clear Queue</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/dialog/upload/upload.component.html</context>
+          <context context-type="linenumber">54</context>
         </context-group>
       </trans-unit>
       <trans-unit id="170919b6c28b7eb90fead8af3d10ce8f10dc041e" datatype="html">
