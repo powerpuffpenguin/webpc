@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package jsgenerate_webpc.forward.shell;
+option go_package = "github.com/powerpuffpenguin/webpc/protocol/forward/shell";
+
+import "google/api/annotations.proto";
+
+service Shell {
+    rpc List (ListRequest) returns (ListResponse){
+        option (google.api.http) = {
+            get: "/api/forward/v1/shell/list"
+        };
+    }
+    rpc Rename (RenameRequest) returns (RenameResponse){
+        option (google.api.http) = {
+            post: "/api/forward/v1/shell/rename"
+            body: "*"
+        };
+    }
+    rpc Remove (RemoveRequest) returns (RemoveResponse){
+        option (google.api.http) = {
+            delete: "/api/forward/v1/shell/{id}"
+        };
+    }
+    rpc Connect (stream ConnectRequest) returns (stream ConnectResponse);
+}
+message ListResult{
+    int64 id = 1;
+	string name = 2;
+	bool attached = 3;
+}
+message ListRequest{
+}
+message ListResponse{
+    repeated ListResult result = 1;
+}
+message RenameRequest{
+    int64 id = 1;
+    string name = 2;
+}
+message RenameResponse{
+    bool changed = 1;
+}
+message RemoveRequest{
+    int64 id = 1;
+}
+message RemoveResponse{
+    bool changed = 1;
+}
+enum Event {
+    EventUniversal = 0;
+    Heart = 1;
+
+    Connect = 2;
+    Resize = 3;
+    FontSize = 4;
+    FontFamily = 5;
+
+    Binary = 6;
+};
+message ConnectRequest{
+    Event event = 1;
+
+    // connect
+    int64 id = 2;
+    // resize
+    uint32 cols = 3;
+    uint32 rows = 4;
+    // font
+    int32 num = 5;
+    string str = 6;
+
+    bytes binary = 7;
+}
+message ConnectResponse{
+    // resize
+    uint32 cols = 1;
+    uint32 rows = 2;
+    // font
+    int32 num = 3;
+    string str = 4;
+
+    bytes binary = 5;
+}

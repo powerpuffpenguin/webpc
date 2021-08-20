@@ -21,4 +21,5 @@ Protos=(
     forward/fs/fs.proto
     forward/logger/logger.proto
     forward/system/system.proto
+    forward/shell/shell.proto
 )
