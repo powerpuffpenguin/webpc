@@ -6,9 +6,8 @@ import (
 
 	"github.com/powerpuffpenguin/webpc/logger"
 	"github.com/powerpuffpenguin/webpc/m/helper"
+	grpc_logger "github.com/powerpuffpenguin/webpc/protocol/forward/logger"
 	"github.com/powerpuffpenguin/webpc/single/logger/db"
-
-	grpc_logger "github.com/powerpuffpenguin/webpc/protocol/logger"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -21,7 +20,7 @@ type server struct {
 }
 
 func (s server) Level(ctx context.Context, req *grpc_logger.LevelRequest) (resp *grpc_logger.LevelResponse, e error) {
-	TAG := `logger Level`
+	TAG := `forward.logger Level`
 
 	file, e := logger.Logger.FileLevel().MarshalText()
 	if e != nil {
@@ -48,7 +47,7 @@ func (s server) Level(ctx context.Context, req *grpc_logger.LevelRequest) (resp 
 var emptySetLevelResponse grpc_logger.SetLevelResponse
 
 func (s server) SetLevel(ctx context.Context, req *grpc_logger.SetLevelRequest) (resp *grpc_logger.SetLevelResponse, e error) {
-	TAG := `logger SetLevel`
+	TAG := `forward.logger SetLevel`
 	var (
 		at    zap.AtomicLevel
 		level zapcore.Level
@@ -93,7 +92,7 @@ func (s server) SetLevel(ctx context.Context, req *grpc_logger.SetLevelRequest) 
 	return
 }
 func (s server) Attach(req *grpc_logger.AttachRequest, stream grpc_logger.Logger_AttachServer) (e error) {
-	// TAG := `logger Atach`
+	// TAG := `forward.logger Atach`
 	ctx := stream.Context()
 	var respose grpc_logger.AttachResponse
 	e = stream.Send(&respose)
@@ -131,7 +130,7 @@ func (s server) Attach(req *grpc_logger.AttachRequest, stream grpc_logger.Logger
 var emptyListResponse grpc_logger.ListResponse
 
 func (s server) List(ctx context.Context, req *grpc_logger.ListRequest) (resp *grpc_logger.ListResponse, e error) {
-	TAG := `logger List`
+	TAG := `forward.logger List`
 	filesystem := db.DefaultFilesystem()
 	stat, e := filesystem.Stat()
 	if e != nil {
@@ -167,7 +166,7 @@ func (s server) List(ctx context.Context, req *grpc_logger.ListRequest) (resp *g
 	return
 }
 func (s server) Download(req *grpc_logger.DownloadRequest, stream grpc_logger.Logger_DownloadServer) (e error) {
-	// TAG := `logger Download`
+	// TAG := `forward.logger Download`
 	if req.Name == `` {
 		e = s.Error(codes.InvalidArgument, `name not supported empty`)
 		return

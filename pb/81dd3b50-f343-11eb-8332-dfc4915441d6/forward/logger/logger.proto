@@ -1,7 +1,7 @@
 syntax = "proto3";
 
-package jsgenerate_webpc.logger;
-option go_package = "github.com/powerpuffpenguin/webpc/protocol/logger";
+package jsgenerate_webpc.forward.logger;
+option go_package = "github.com/powerpuffpenguin/webpc/protocol/forward/logger";
 
 import "google/api/annotations.proto";
 import "google/api/httpbody.proto";
@@ -10,29 +10,29 @@ service Logger {
     // Level return loggers level
     rpc Level (LevelRequest) returns (LevelResponse){
         option (google.api.http) = {
-            get: "/api/v1/logger/level"
+            get: "/api/forward/v1/logger/level"
         };
     }
     // SetLevel set logger level
     rpc SetLevel (SetLevelRequest) returns (SetLevelResponse){
         option (google.api.http) = {
-            post: "/api/v1/logger/level"
+            post: "/api/forward/v1/logger/level"
             body: "*"
         };
     }
     // Attach console logger stdout
-    // websocket /api/v1/logger/attach
+    // websocket /api/forward/v1/logger/attach
     rpc Attach (AttachRequest) returns (stream AttachResponse);
     // List return log files name
     rpc List (ListRequest) returns (ListResponse){
         option (google.api.http) = {
-            get: "/api/v1/logger"
+            get: "/api/forward/v1/logger"
         };
     }
     // Download log file
     rpc Download (DownloadRequest) returns (stream google.api.HttpBody){
         option (google.api.http) = {
-            get: "/api/v1/logger/download/{name}"
+            get: "/api/forward/v1/logger/download/{name}"
         };
     }
 }

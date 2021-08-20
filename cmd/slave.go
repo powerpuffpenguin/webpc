@@ -9,6 +9,7 @@ import (
 	"github.com/powerpuffpenguin/webpc/configure"
 	"github.com/powerpuffpenguin/webpc/db/manipulator"
 	"github.com/powerpuffpenguin/webpc/logger"
+	"github.com/powerpuffpenguin/webpc/single/logger/db"
 	"github.com/powerpuffpenguin/webpc/single/mount"
 	"github.com/powerpuffpenguin/webpc/utils"
 
@@ -49,6 +50,7 @@ func init() {
 			if e != nil {
 				log.Fatalln(e)
 			}
+			db.Init(cnf.Logger.Filename)
 
 			// init db
 			manipulator.Init(&cnf.DB)

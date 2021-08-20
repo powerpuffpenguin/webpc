@@ -3,7 +3,7 @@ package logger
 import (
 	"context"
 
-	grpc_logger "github.com/powerpuffpenguin/webpc/protocol/logger"
+	grpc_logger "github.com/powerpuffpenguin/webpc/protocol/forward/logger"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"

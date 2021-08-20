@@ -33,7 +33,7 @@ func (w *Worker) mountShared(name string) (m *mount.Mount, e error) {
 		return
 	}
 	if !m.Shared() {
-		e = status.Error(codes.PermissionDenied, `filesystem is not writable`)
+		e = status.Error(codes.PermissionDenied, `filesystem is not shared`)
 		return
 	}
 	return
