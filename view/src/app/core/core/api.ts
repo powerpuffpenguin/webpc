@@ -15,6 +15,7 @@ export const ServerAPI = {
             system: MakeRESTful(root, 'forward', 'v1', 'system'),
             fs: MakeRESTful(root, 'forward', 'v1', 'fs'),
             static: MakeRESTful(root, 'forward', 'v1', 'static'),
+            logger: MakeRESTful(root, 'forward', 'v1', 'logger'),
         }
     },
     static: {

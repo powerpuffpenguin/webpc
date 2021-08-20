@@ -77,7 +77,13 @@ func (f *Forward) Put(id int64, cc *grpc.ClientConn, gateway *runtime.ServeMux) 
 		gateway: gateway,
 	}
 }
-func (f *Forward) Get(id int64) (cc *grpc.ClientConn, e error) {
+func (f *Forward) Get(str string) (cc *grpc.ClientConn, e error) {
+	id, e := strconv.ParseInt(str, 10, 64)
+	if e != nil {
+		e = status.Error(codes.NotFound, `slave id error: `+e.Error())
+		return
+	}
+
 	f.rw.RLock()
 	ele, exists := f.keys[id]
 	if exists {
@@ -96,7 +102,12 @@ func (f *Forward) forwardShared(gateway *runtime.ServeMux, c *gin.Context, expir
 	}
 	gateway.ServeHTTP(c.Writer, c.Request)
 }
-func (f *Forward) Forward(id int64, c *gin.Context) {
+func (f *Forward) Forward(str string, c *gin.Context) {
+	id, e := strconv.ParseInt(str, 10, 64)
+	if e != nil {
+		f.web.Error(c, status.Error(codes.NotFound, `slave id error: `+e.Error()))
+		return
+	}
 	f.rw.RLock()
 	ele, exists := f.keys[id]
 	f.rw.RUnlock()

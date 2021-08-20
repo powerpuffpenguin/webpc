@@ -1,0 +1,38 @@
+<div class="viewcard">
+    <mat-card>
+        <mat-card-title i18n>Download log file</mat-card-title>
+        <mat-card-content>
+            <ng-container *ngIf="ready;then readyView;else notReadyView"></ng-container>
+        </mat-card-content>
+
+        <mat-card-actions *ngIf="ready && err">
+            <button mat-stroked-button i18n (click)="load()">Refresh</button>
+        </mat-card-actions>
+    </mat-card>
+</div>
+
+
+<ng-template #notReadyView>
+    <p>
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    </p>
+    <p>
+        <ng-container i18n>connecting to server, please wait...</ng-container>
+    </p>
+</ng-template>
+<ng-template #readyView>
+    <ng-container *ngIf="err;then errView;else okView"></ng-container>
+</ng-template>
+<ng-template #errView>
+    {{err}}
+</ng-template>
+<ng-template #okView>
+    <mat-list>
+        <mat-list-item *ngFor="let node of source">
+            <mat-icon matListIcon>description</mat-icon>
+            <h3 matLine>
+                <a mat-button download="{{node}}" [href]="getURL(node)">{{node}}</a>
+            </h3>
+        </mat-list-item>
+    </mat-list>
+</ng-template>

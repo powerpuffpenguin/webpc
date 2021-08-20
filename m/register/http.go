@@ -40,7 +40,7 @@ func HTTP(cc *grpc.ClientConn, engine *gin.Engine, gateway *runtime.ServeMux, sw
 		}
 		if strings.HasPrefix(c.Request.URL.Path, `/api/forward/`) {
 			var query struct {
-				ID int64 `form:"slave_id"`
+				ID string `form:"slave_id" binding:"required"`
 			}
 			e := c.BindQuery(&query)
 			if e != nil {

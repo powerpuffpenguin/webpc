@@ -30,7 +30,7 @@ func (h Filesystem) Register(cc *grpc.ClientConn, router *gin.RouterGroup) {
 
 func (h Filesystem) put(c *gin.Context) {
 	var obj struct {
-		ID   int64  `uri:"id"`
+		ID   string `uri:"id" binding:"required"`
 		Root string `uri:"root" binding:"required"`
 		Path string `uri:"path"  binding:"required"`
 	}
@@ -111,7 +111,7 @@ func (h Filesystem) compress(c *gin.Context) {
 	defer ws.Close()
 
 	var obj struct {
-		ID int64 `uri:"id"`
+		ID string `uri:"id" binding:"required"`
 	}
 	e = c.ShouldBindUri(&obj)
 	if e != nil {
@@ -158,7 +158,7 @@ func (h Filesystem) uncompress(c *gin.Context) {
 	defer ws.Close()
 
 	var obj struct {
-		ID int64 `uri:"id"`
+		ID string `uri:"id" binding:"required"`
 	}
 	e = c.ShouldBindUri(&obj)
 	if e != nil {
@@ -205,7 +205,7 @@ func (h Filesystem) copy(c *gin.Context) {
 	defer ws.Close()
 
 	var obj struct {
-		ID int64 `uri:"id"`
+		ID string `uri:"id" binding:"required"`
 	}
 	e = c.ShouldBindUri(&obj)
 	if e != nil {
@@ -246,7 +246,7 @@ func (h Filesystem) copy(c *gin.Context) {
 }
 func (h Filesystem) upload(c *gin.Context) {
 	var obj struct {
-		ID    int64  `uri:"id"`
+		ID    string `uri:"id" binding:"required"`
 		Root  string `uri:"root" binding:"required"`
 		Chunk uint32 `uri:"chunk"`
 		Path  string `uri:"path"  binding:"required"`

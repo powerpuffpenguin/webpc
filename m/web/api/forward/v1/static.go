@@ -37,7 +37,7 @@ func (h Static) redirect(c *gin.Context) {
 }
 func (h Static) get(c *gin.Context) {
 	var obj struct {
-		ID   int64  `uri:"id"`
+		ID   string `uri:"id" binding:"required"`
 		Root string `uri:"root" binding:"required"`
 		Path string `uri:"path"`
 	}

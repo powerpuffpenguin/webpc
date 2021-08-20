@@ -1,0 +1,65 @@
+<div class="viewcard">
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title i18n>Logger Management</mat-card-title>
+
+            <a mat-icon-button [routerLink]="['/forward/logger/download',id]" i18n-matTooltip
+                matTooltip="Download log file">
+                <mat-icon>cloud_download</mat-icon>
+            </a>
+        </mat-card-header>
+        <mat-card-content>
+            <ng-container *ngIf="ready;then readyView;else notReadyView"></ng-container>
+        </mat-card-content>
+        <mat-card-actions *ngIf="ready && err">
+            <button mat-stroked-button i18n (click)="load()">Refresh</button>
+        </mat-card-actions>
+    </mat-card>
+    <ng-template #notReadyView>
+        <p>
+            <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        </p>
+        <p>
+            <ng-container i18n>connecting to server, please wait...</ng-container>
+        </p>
+    </ng-template>
+    <ng-template #readyView>
+        <ng-container *ngIf="err;then errView;else okView"></ng-container>
+    </ng-template>
+    <ng-template #errView>
+        {{err}}
+    </ng-template>
+    <ng-template #okView>
+        <div>
+            <mat-form-field appearance="fill">
+                <mat-label i18n>File Level</mat-label>
+                <mat-select [(ngModel)]="data.file" [disabled]="disabled">
+                    <mat-option *ngFor="let level of levels" [value]="level">
+                        {{level}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <button mat-stroked-button [disabled]="disabled || isFileNotChanged" (click)="onClickSetFile()"
+                i18n>Set</button>
+            <button mat-stroked-button [disabled]="disabled || isFileNotChanged" (click)="onClickResetFile()"
+                i18n>Reset</button>
+        </div>
+        <div>
+            <mat-form-field appearance="fill">
+                <mat-label i18n>Console Level</mat-label>
+                <mat-select [(ngModel)]="data.console" [disabled]="disabled">
+                    <mat-option *ngFor="let level of levels" [value]="level">
+                        {{level}}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+            <button mat-stroked-button [disabled]="disabled || isConsoleNotChanged" (click)="onClickSetConsole()"
+                i18n>Set</button>
+            <button mat-stroked-button [disabled]="disabled || isConsoleNotChanged" (click)="onClickResetConsole()"
+                i18n>Reset</button>
+        </div>
+        <p>
+            <logger-attach></logger-attach>
+        </p>
+    </ng-template>
+</div>

@@ -8,6 +8,7 @@ import { WebLinksAddon } from 'xterm-addon-web-links';
 import { Subject } from 'rxjs';
 import { Closed } from 'src/app/core/utils/closed';
 import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'logger-attach',
@@ -18,6 +19,7 @@ export class AttachComponent implements OnInit, OnDestroy, AfterViewInit {
   private token_ = ''
   constructor(private readonly sessionService: SessionService,
     private readonly httpClient: HttpClient,
+    private readonly activatedRoute: ActivatedRoute,
   ) { }
   private closed_ = new Closed()
   listener: Listener | undefined
@@ -28,7 +30,9 @@ export class AttachComponent implements OnInit, OnDestroy, AfterViewInit {
     return this.listener ? false : true
   }
   checked = true
+  id = ''
   ngOnInit(): void {
+    this.id = this.activatedRoute.snapshot.params['id']
     this.sessionService.observable.pipe(
       takeUntil(this.closed_.observable),
       filter((session) => {
@@ -88,6 +92,7 @@ export class AttachComponent implements OnInit, OnDestroy, AfterViewInit {
       this.httpClient,
       this.sessionService,
       this,
+      this.id,
     )
   }
   onClickDetach() {

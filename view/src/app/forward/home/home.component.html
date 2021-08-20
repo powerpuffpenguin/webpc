@@ -2,21 +2,42 @@
     <ng-container *ngIf="ready;then readyView;else loadView"></ng-container>
 </div>
 
-<ng-template #loadView>
-    <shared-load-view [hasErr]="hasErr" [errs]="errs" (valChange)="onClickRefresh()"></shared-load-view>
-</ng-template>
-
 <ng-template #readyView>
     <mat-card>
+        <mat-card-header>
+            <mat-card-title>{{data.name}} -> {{data.id}}</mat-card-title>
+            <mat-card-subtitle *ngIf="data.description?.length">{{data.description}}</mat-card-subtitle>
+        </mat-card-header>
         <mat-card-content>
-            <mat-card-header>
-                <mat-card-title>{{data.name}} -> {{data.id}}</mat-card-title>
-                <mat-card-subtitle *ngIf="data.description?.length">{{data.description}}</mat-card-subtitle>
-            </mat-card-header>
-            <div>
-                <p>{{version.platform}}</p>
-                <p>{{version.version}}</p>
-                <p>start at {{startAt.at.format('YYYY-MM-DD HH:mm:ss')}}, started {{startAt.started}}.</p>
+            <p>{{version.platform}}</p>
+            <p>{{version.version}}</p>
+            <p>start at {{startAt.at.format('YYYY-MM-DD HH:mm:ss')}}, started {{startAt.started}}.</p>
+        </mat-card-content>
+        <mat-card-actions>
+            <a mat-stroked-button [routerLink]="['/forward/fs']" [queryParams]="{id:data.id}" i18n>Filesystem</a>
+            <a mat-stroked-button [routerLink]="['/forward/shared',data.id]" i18n>Shared</a>
+            <a mat-stroked-button routerLink="/forward/shell" [queryParams]="{id:data.id}">Shell</a>
+            <a mat-stroked-button routerLink="/forward/vnc" [queryParams]="{id:data.id}">VNC</a>
+            <a mat-stroked-button [routerLink]="['/forward/logger/view',data.id]" i18n>Logger</a>
+        </mat-card-actions>
+    </mat-card>
+</ng-template>
+
+<ng-template #loadView>
+    <ng-container *ngIf="hasErr;then errorView;else refreshView"></ng-container>
+</ng-template>
+<ng-template #refreshView>
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    <p i18n>connecting to server, please wait...</p>
+</ng-template>
+<ng-template #errorView>
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title i18n>Error</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <div *ngFor="let err of errs; ">
+                {{err.id}} -> {{err.err}}
             </div>
         </mat-card-content>
         <mat-card-actions>
@@ -24,7 +45,8 @@
             <a mat-stroked-button [routerLink]="['/forward/shared',data.id]" i18n>Shared</a>
             <a mat-stroked-button routerLink="/forward/shell" [queryParams]="{id:data.id}">Shell</a>
             <a mat-stroked-button routerLink="/forward/vnc" [queryParams]="{id:data.id}">VNC</a>
-            <a mat-stroked-button routerLink="/forward/logger" [queryParams]="{id:data.id}" i18n>Logger</a>
+            <a mat-stroked-button [routerLink]="['/forward/logger/view',data.id]" i18n>Logger</a>
+            <button mat-stroked-button i18n (click)="onClickRefresh()">Refresh</button>
         </mat-card-actions>
     </mat-card>
 </ng-template>

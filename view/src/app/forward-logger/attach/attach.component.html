@@ -1,0 +1,11 @@
+<button mat-stroked-button *ngIf="isNotAttach" (click)="onClickAttach()" i18n>Attach</button>
+<div *ngIf="isAttach">
+    <button mat-stroked-button (click)="onClickDetach()" class="left" i18n>Detach</button>
+    <button mat-stroked-button (click)="onClickClear()" class="left" i18n>Clear</button>
+    <mat-slide-toggle class="left" [checked]="checked" (change)="checked=!checked" i18n>Receive log</mat-slide-toggle>
+</div>
+
+
+<div #view (window:resize)="onResize()" class="view">
+    <div #xterm style="height: 100%;" contentEditable="true"></div>
+</div>
