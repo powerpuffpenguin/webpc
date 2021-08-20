@@ -83,6 +83,9 @@ service FS {
             body: "*"
         };
     }
+
+    // http filesystem
+    rpc Open (stream OpenRequest) returns (stream OpenResponse);
 }
 message MountRequest{
 }
@@ -252,4 +255,51 @@ message MergeRequest{
     uint32 count = 4;
 }
 message MergeResponse{
+}
+message FSInfo{
+    string name = 1;       // base name of the file
+	int64 size = 2;         // length in bytes for regular files; system-dependent for others
+	uint32 mode = 3;      // file mode bits
+	int64 modTime = 4; // modification time
+	bool isDir = 5;        // abbrev
+}
+enum FSEvent {
+    FSEventUniversal = 0;
+    Open = 1;
+    Close = 2;
+    Read = 3;
+    Seek = 4;
+    Readdir = 5;
+    Stat= 6;
+};
+message OpenRequest{
+    FSEvent event = 1;
+    // open
+    string root = 2;
+    string path = 3;
+
+    // read buffer
+    uint32 read = 4;
+
+    // seek
+    int64 offset = 5;
+    int32 whence = 6;
+
+    // readdir
+    int32 readdir = 7;
+}
+message OpenResponse{
+    FSEvent event = 1;
+
+    // read
+    bytes read = 2;
+    bool eof = 3;
+
+    // seek
+    int64 seek = 4;
+
+    // readdir
+    repeated FSInfo readdir = 5;
+
+    FSInfo stat = 6;
 }

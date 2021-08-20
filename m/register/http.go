@@ -62,16 +62,34 @@ func HTTP(cc *grpc.ClientConn, engine *gin.Engine, gateway *runtime.ServeMux, sw
 		r.Use(w.Compression())
 		r.StaticFS(``, document)
 	}
-	static, e := fs.NewWithNamespace(`static`)
-	if e != nil {
-		logger.Logger.Panic(`statik static error`,
-			zap.Error(e),
-		)
-	}
-	engine.Group(`static`).Use(w.Compression()).StaticFS(``, static)
+	makeStatic(engine)
 	var views view.Helper
 	views.Register(&engine.RouterGroup)
 	// other gin route
 	var apis api.Helper
 	apis.Register(cc, &engine.RouterGroup)
+}
+
+type Static struct {
+	web.Helper
+	fileSystem http.FileSystem
+}
+
+func makeStatic(engine *gin.Engine) {
+	fileSystem, e := fs.NewWithNamespace(`static`)
+	if e != nil {
+		logger.Logger.Panic(`statik static error`,
+			zap.Error(e),
+		)
+	}
+	h := Static{
+		fileSystem: fileSystem,
+	}
+	compression := h.Compression()
+	engine.GET(`favicon.ico`, compression, h.favicon)
+	engine.HEAD(`favicon.ico`, compression, h.favicon)
+	engine.Group(`static`).Use(compression).StaticFS(``, fileSystem)
+}
+func (h Static) favicon(c *gin.Context) {
+	h.NegotiateFilesystem(c, h.fileSystem, `/favicon.ico`, false)
 }

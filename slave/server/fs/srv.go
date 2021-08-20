@@ -17,6 +17,7 @@ import (
 	"github.com/powerpuffpenguin/webpc/single/mount"
 	"github.com/powerpuffpenguin/webpc/slave/server/fs/internal/compress"
 	"github.com/powerpuffpenguin/webpc/slave/server/fs/internal/copied"
+	"github.com/powerpuffpenguin/webpc/slave/server/fs/internal/open"
 	"github.com/powerpuffpenguin/webpc/slave/server/fs/internal/uncompress"
 	"github.com/powerpuffpenguin/webpc/slave/server/fs/internal/upload"
 	"go.uber.org/zap"
@@ -654,4 +655,8 @@ func (s server) Merge(ctx context.Context, req *grpc_fs.MergeRequest) (resp *grp
 		}
 	}
 	return
+}
+func (s server) Open(server grpc_fs.FS_OpenServer) error {
+	w := open.New(server)
+	return w.Serve()
 }

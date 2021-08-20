@@ -1,0 +1,23 @@
+<div class="view">
+    <ng-container *ngIf="ready;then readyView;else loadView"></ng-container>
+</div>
+
+<ng-template #loadView>
+    <shared-load-view [hasErr]="hasErr" [errs]="errs" (valChange)="onClickRefresh()"></shared-load-view>
+</ng-template>
+
+<ng-template #readyView>
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title i18n>Filesystem management</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <mat-nav-list>
+                <a [href]="url(node)" mat-list-item *ngFor="let node of names">
+                    <mat-icon matListIcon>folder_special</mat-icon>
+                    <h3 matLine>{{node}}</h3>
+                </a>
+            </mat-nav-list>
+        </mat-card-content>
+    </mat-card>
+</ng-template>
