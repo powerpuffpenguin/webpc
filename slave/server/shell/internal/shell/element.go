@@ -35,6 +35,10 @@ func (element *Element) Attach(conn Conn, username string, shellid int64, cols, 
 			shellid:  shellid,
 			name:     time.Unix(shellid, 0).Local().Format(`2006/01/02 15:04:05`),
 		}
+		fontSize := int32(15)
+		fontFamily := `Lucida Console`
+		shell.SetFontSize(fontSize)
+		shell.SetFontFamily(fontFamily)
 		e = shell.Run(conn, cols, rows)
 		if e != nil {
 			return
@@ -42,10 +46,13 @@ func (element *Element) Attach(conn Conn, username string, shellid int64, cols, 
 		s = shell
 		element.keys[shellid] = s
 		// add to db
+
 		err := db.Add(&db.DataOfSlaveShell{
-			ID:       shellid,
-			UserName: username,
-			Name:     s.name,
+			ID:         shellid,
+			UserName:   username,
+			Name:       s.name,
+			FontSize:   fontSize,
+			FontFamily: fontFamily,
 		})
 		if err != nil {
 			if ce := logger.Logger.Check(zap.WarnLevel, `add shell to db err`); ce != nil {

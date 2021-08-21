@@ -2,6 +2,10 @@
 @import "xterm/css/xterm.css";
 @import "angular2-toaster/toaster.min.css";
 
+.terminal{
+    padding-left: 4px;
+}
+
 .fill-flex{
     flex: 1 1 auto;
 }

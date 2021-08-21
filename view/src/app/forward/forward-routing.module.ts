@@ -24,6 +24,10 @@ const routes: Routes = [
     path: 'shared/:id',
     component: SharedComponent,
   },
+  {
+    path: 'shell',
+    loadChildren: () => import('../forward-shell/forward-shell.module').then(m => m.ForwardShellModule),
+  },
 ];
 
 @NgModule({

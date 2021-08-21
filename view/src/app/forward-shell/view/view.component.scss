@@ -1,0 +1,26 @@
+.shell{
+    height: calc(100vh - 225px);
+    height: calc(var(--vh, 1vh) * 100 - 225px);
+    min-height: 100px;
+}
+.fullview{
+    height: calc(100vh - 80px);
+    height: calc(var(--vh, 1vh) * 100 - 80px);
+    min-height: 100px;
+}
+.mat-spinner{
+    display: inline-block;
+    margin-left: 8px;
+}
+
+.footer{
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    box-shadow: 0 2px 5px 0 rgba(0,0,0,.3);
+    z-index: 10;
+}
+.fill{
+    height: 64px;
+}

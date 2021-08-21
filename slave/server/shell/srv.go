@@ -22,6 +22,7 @@ func (s server) List(ctx context.Context, req *grpc_shell.ListRequest) (resp *gr
 		return
 	}
 	items := shell.DefaultManager().List(userdata.Name)
+
 	resp = &grpc_shell.ListResponse{
 		Result: make([]*grpc_shell.ListResult, len(items)),
 	}

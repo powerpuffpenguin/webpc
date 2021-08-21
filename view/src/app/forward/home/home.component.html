@@ -16,7 +16,7 @@
         <mat-card-actions>
             <a mat-stroked-button [routerLink]="['/forward/fs']" [queryParams]="{id:data.id}" i18n>Filesystem</a>
             <a mat-stroked-button [routerLink]="['/forward/shared',data.id]" i18n>Shared</a>
-            <a mat-stroked-button routerLink="/forward/shell" [queryParams]="{id:data.id}">Shell</a>
+            <a mat-stroked-button [routerLink]="['/forward/shell',data.id]">Shell</a>
             <a mat-stroked-button routerLink="/forward/vnc" [queryParams]="{id:data.id}">VNC</a>
             <a mat-stroked-button [routerLink]="['/forward/logger/view',data.id]" i18n>Logger</a>
         </mat-card-actions>
@@ -43,7 +43,7 @@
         <mat-card-actions>
             <a mat-stroked-button [routerLink]="['/forward/fs']" [queryParams]="{id:data.id}" i18n>Filesystem</a>
             <a mat-stroked-button [routerLink]="['/forward/shared',data.id]" i18n>Shared</a>
-            <a mat-stroked-button routerLink="/forward/shell" [queryParams]="{id:data.id}">Shell</a>
+            <a mat-stroked-button [routerLink]="['/forward/shell',data.id]">Shell</a>
             <a mat-stroked-button routerLink="/forward/vnc" [queryParams]="{id:data.id}">VNC</a>
             <a mat-stroked-button [routerLink]="['/forward/logger/view',data.id]" i18n>Logger</a>
             <button mat-stroked-button i18n (click)="onClickRefresh()">Refresh</button>

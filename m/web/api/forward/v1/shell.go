@@ -25,7 +25,6 @@ func (h Shell) connect(c *gin.Context) {
 		return
 	}
 	defer ws.Close()
-
 	var obj struct {
 		ID      string `uri:"id" binding:"required"`
 		Shellid int64  `uri:"shellid" `
@@ -76,7 +75,7 @@ func (h Shell) connect(c *gin.Context) {
 		resp, e := stream.Recv()
 		if e != nil {
 			return
-		} else if resp.Event == websocket.BinaryMessage {
+		} else if resp.Event == grpc_shell.Event_Binary {
 			return ws.SendBinary(resp.Binary)
 		}
 		return ws.SendMessage(resp)

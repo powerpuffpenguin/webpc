@@ -20,7 +20,7 @@ func newConn(server grpc_shell.Shell_ConnectServer) *conn {
 	return &conn{
 		server: server,
 		close:  make(chan struct{}),
-		resp:   make(chan *grpc_shell.ConnectResponse),
+		resp:   make(chan *grpc_shell.ConnectResponse, 10),
 	}
 }
 func (c *conn) Close() (e error) {

@@ -1,0 +1,32 @@
+<div class="view">
+    <div *ngIf="info">
+        <button mat-icon-button [disabled]="true">
+            <mat-icon color="accent">{{ok ? 'done':'close'}}</mat-icon>
+        </button>
+
+        <ng-container *ngIf="fullscreen;then fullscreenView;else normalView;"></ng-container>
+        <ng-template #fullscreenView>
+            <button mat-icon-button i18n-matTooltip matTooltip="fullscreen exit" (click)="onClickFullscreen(false)">
+                <mat-icon>fullscreen_exit</mat-icon>
+            </button>
+        </ng-template>
+        <ng-template #normalView>
+            <button mat-icon-button i18n-matTooltip matTooltip="fullscreen" (click)="onClickFullscreen(true)">
+                <mat-icon>fullscreen</mat-icon>
+            </button>
+        </ng-template>
+
+
+        {{info.id}}
+        {{info.name}}
+        {{this.duration}}
+
+        <button *ngIf="!ok" (click)="onClickConnect()" mat-icon-button i18n-matTooltip matTooltip="Connect">
+            <mat-icon>settings_ethernet</mat-icon>
+        </button>
+    </div>
+
+    <div #view (window:resize)="onResize()" [class]="fullscreen?'fullview':'shell'">
+        <div #xterm style="height: 100%;" contentEditable="true"></div>
+    </div>
+</div>
