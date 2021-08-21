@@ -27,7 +27,7 @@ func doInit() (e error) {
 	defer session.Close()
 
 	// sync
-	bean := &DataOfSingleShell{}
+	bean := &DataOfSlaveShell{}
 	e = manipulator.SyncTable(session, bean)
 	if e != nil {
 		return

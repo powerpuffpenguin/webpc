@@ -22,6 +22,7 @@ service Shell {
             delete: "/api/forward/v1/shell/{id}"
         };
     }
+    // websocket /api/forward/v1/shell/:id/:shellid/:cols/:rows
     rpc Connect (stream ConnectRequest) returns (stream ConnectResponse);
 }
 message ListResult{
@@ -57,28 +58,31 @@ enum Event {
     FontFamily = 5;
 
     Binary = 6;
+    Info = 7;
 };
 message ConnectRequest{
     Event event = 1;
 
-    // connect
-    int64 id = 2;
-    // resize
-    uint32 cols = 3;
-    uint32 rows = 4;
-    // font
-    int32 num = 5;
-    string str = 6;
+    bytes binary = 2;
 
-    bytes binary = 7;
+    // connect
+    int64 id = 3;
+    // resize
+    uint32 cols = 4;
+    uint32 rows = 5;
+    // font
+    int32 fontSize = 6;
+    string fontFamily = 7;
+
 }
 message ConnectResponse{
-    // resize
-    uint32 cols = 1;
-    uint32 rows = 2;
-    // font
-    int32 num = 3;
-    string str = 4;
+    Event event = 1;
 
-    bytes binary = 5;
+    bytes binary = 2;
+
+    int64 id = 3;
+    int32 fontSize = 6;
+    string fontFamily = 7;
+    string name = 8;
+    int64 at = 9;
 }

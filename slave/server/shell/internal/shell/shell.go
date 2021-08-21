@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/powerpuffpenguin/webpc/logger"
-	"github.com/powerpuffpenguin/webpc/single/shell/internal/db"
-	"github.com/powerpuffpenguin/webpc/single/shell/internal/term"
+	"github.com/powerpuffpenguin/webpc/slave/server/shell/internal/db"
+	"github.com/powerpuffpenguin/webpc/slave/server/shell/internal/term"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

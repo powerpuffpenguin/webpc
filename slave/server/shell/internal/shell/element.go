@@ -6,17 +6,12 @@ import (
 	"time"
 
 	"github.com/powerpuffpenguin/webpc/logger"
-	"github.com/powerpuffpenguin/webpc/single/shell/internal/db"
-	"github.com/powerpuffpenguin/webpc/single/shell/internal/term"
+	"github.com/powerpuffpenguin/webpc/slave/server/shell/internal/db"
+	"github.com/powerpuffpenguin/webpc/slave/server/shell/internal/term"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
-
-func Init(shell string) {
-	command = shell
-
-}
 
 var command = ``
 
@@ -47,7 +42,7 @@ func (element *Element) Attach(conn Conn, username string, shellid int64, cols, 
 		s = shell
 		element.keys[shellid] = s
 		// add to db
-		err := db.Add(&db.DataOfSingleShell{
+		err := db.Add(&db.DataOfSlaveShell{
 			ID:       shellid,
 			UserName: username,
 			Name:     s.name,

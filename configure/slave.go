@@ -57,6 +57,7 @@ func (c *Slave) Load(filename string) (e error) {
 	if c.Connect.Option.MaxRecvMsgSize < 1 {
 		c.Connect.Option.MaxRecvMsgSize = 1024 * 1024 * 6
 	}
+	defaultSystem = &c.System
 	return
 }
 

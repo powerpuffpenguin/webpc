@@ -51,7 +51,6 @@ func init() {
 
 			// init db
 			manipulator.Init(&cnf.DB)
-
 			sessions.Init(&cnf.Session)
 			if cnf.System.Enable {
 				mount.Init(cnf.System.Mount)

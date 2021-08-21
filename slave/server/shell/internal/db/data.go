@@ -1,7 +1,7 @@
 package db
 
 const (
-	tableName = `data_of_single_shell`
+	tableName = `data_of_slave_shell`
 
 	colID         = `id`
 	colUserName   = `username`
@@ -10,7 +10,7 @@ const (
 	colFontFamily = `fontFamily`
 )
 
-type DataOfSingleShell struct {
+type DataOfSlaveShell struct {
 	ID         int64  `xorm:"pk 'id'"`
 	UserName   string `xorm:"index 'username' default('') "`
 	Name       string `xorm:"'name' default('') "`
@@ -18,6 +18,6 @@ type DataOfSingleShell struct {
 	FontFamily string `xorm:"'fontFamily' default('') "`
 }
 
-func (DataOfSingleShell) TableName() string {
+func (DataOfSlaveShell) TableName() string {
 	return tableName
 }

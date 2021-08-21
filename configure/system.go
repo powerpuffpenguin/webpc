@@ -2,12 +2,21 @@ package configure
 
 import (
 	"path/filepath"
+	"runtime"
 
 	"github.com/powerpuffpenguin/webpc/utils"
 )
 
+var defaultSystem *System
+
+func DefaultSystem() *System {
+	return defaultSystem
+}
+
 type System struct {
 	Enable bool
+	Shell  string
+	VNC    string
 	Mount  []Mount
 }
 
@@ -21,6 +30,18 @@ func (s *System) format() (e error) {
 		if e != nil {
 			return
 		}
+	}
+	if s.Shell == `` {
+		if runtime.GOOS == "windows" {
+			s.Shell = `shell-windows.bat`
+		} else {
+			s.Shell = `shell-linux`
+		}
+	}
+	if filepath.IsAbs(s.Shell) {
+		s.Shell = filepath.Clean(s.Shell)
+	} else {
+		s.Shell = filepath.Clean(filepath.Join(basePath, s.Shell))
 	}
 	return
 }

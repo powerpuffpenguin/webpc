@@ -57,6 +57,7 @@ func (c *Configure) Load(filename string) (e error) {
 	if c.HTTP.Option.MaxRecvMsgSize < 1 {
 		c.HTTP.Option.MaxRecvMsgSize = 1024 * 1024 * 6
 	}
+	defaultSystem = &c.System
 	return
 }
 
