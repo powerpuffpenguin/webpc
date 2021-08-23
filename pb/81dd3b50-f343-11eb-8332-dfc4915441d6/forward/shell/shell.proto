@@ -71,7 +71,6 @@ message ConnectRequest{
     // font
     int32 fontSize = 6;
     string fontFamily = 7;
-
 }
 message ConnectResponse{
     Event event = 1;

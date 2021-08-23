@@ -22,7 +22,7 @@ func init() {
 		debug, test bool
 		basePath    = utils.BasePath()
 
-		addr string
+		addr, vnc string
 	)
 
 	cmd := &cobra.Command{
@@ -37,6 +37,9 @@ func init() {
 			}
 			if addr != `` {
 				cnf.HTTP.Addr = addr
+			}
+			if vnc != `` {
+				cnf.System.VNC = vnc
 			}
 			if test {
 				fmt.Println(cnf)
@@ -69,6 +72,11 @@ func init() {
 		`a`,
 		``,
 		`listen address`,
+	)
+	flags.StringVarP(&vnc, `vnc`,
+		`v`,
+		``,
+		`connect vnc address`,
 	)
 
 	flags.BoolVarP(&debug, `debug`,

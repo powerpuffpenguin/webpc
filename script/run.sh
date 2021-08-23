@@ -87,11 +87,11 @@ fi
 cd "$Dir/bin"
 if [[ $slave == 0 ]];then
     args=(
-        ./"$Target" master -d
+        ./"$Target" master -d -v "192.168.251.50:5900"
     )
 else
     args=(
-        ./"$Target" slave
+        ./"$Target" slave -d
     )
 fi
 exec="${args[@]}"

@@ -22,7 +22,7 @@ func init() {
 		insecure, debug, test bool
 		basePath              = utils.BasePath()
 
-		url string
+		url, vnc string
 	)
 
 	cmd := &cobra.Command{
@@ -37,6 +37,9 @@ func init() {
 			}
 			if url != `` {
 				cnf.Connect.URL = url
+			}
+			if vnc != `` {
+				cnf.System.VNC = vnc
 			}
 			if insecure {
 				cnf.Connect.Insecure = insecure
@@ -70,6 +73,11 @@ func init() {
 		`u`,
 		``,
 		`connect websocket url`,
+	)
+	flags.StringVarP(&vnc, `vnc`,
+		`v`,
+		``,
+		`connect vnc address`,
 	)
 	flags.BoolVarP(&insecure, `insecure`,
 		`k`,

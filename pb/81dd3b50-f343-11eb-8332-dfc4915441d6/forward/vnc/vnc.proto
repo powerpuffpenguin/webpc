@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package jsgenerate_webpc.forward.vnc;
+option go_package = "github.com/powerpuffpenguin/webpc/protocol/forward/vnc";
+
+service Vnc {
+    // websocket /api/forward/v1/vnc/:id
+    rpc Connect (stream ConnectRequest) returns (stream ConnectResponse);
+}
+enum Event {
+    EventUniversal = 0;
+    Heart  = 1;
+    Connect = 2;
+    Binary = 3;
+};
+message ConnectRequest{
+    Event event = 1;
+
+    bytes binary = 2;
+}
+message ConnectResponse{
+    Event event = 1;
+
+    bytes binary = 2;
+}
