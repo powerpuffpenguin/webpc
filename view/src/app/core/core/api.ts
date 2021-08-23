@@ -17,6 +17,7 @@ export const ServerAPI = {
             static: MakeRESTful(root, 'forward', 'v1', 'static'),
             logger: MakeRESTful(root, 'forward', 'v1', 'logger'),
             shell: MakeRESTful(root, 'forward', 'v1', 'shell'),
+            vnc: MakeRESTful(root, 'forward', 'v1', 'vnc'),
         }
     },
     static: {

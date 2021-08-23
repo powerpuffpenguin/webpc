@@ -1,7 +1,9 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntil } from 'rxjs/operators';
+import { ServerAPI } from 'src/app/core/core/api';
+import { SessionService } from 'src/app/core/session/session.service';
 import { Closed } from 'src/app/core/utils/closed';
 import { State } from './state';
 
@@ -15,9 +17,18 @@ export class HomeComponent implements OnInit, OnDestroy {
   state = {} as State
   constructor(private readonly activatedRoute: ActivatedRoute,
     private readonly httpClient: HttpClient,
+    private readonly sessionService: SessionService,
   ) {
   }
+  private accessToken_ = ''
   ngOnInit(): void {
+    this.sessionService.observable.pipe(
+      takeUntil(this.closed_.observable)
+    ).subscribe((session) => {
+      if (session && session.access) {
+        this.accessToken_ = session.access
+      }
+    })
     this.activatedRoute.params.pipe(
       takeUntil(this.closed_.observable)
     ).subscribe((params) => {
@@ -51,5 +62,19 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
   get startAt() {
     return this.state.startAt
+  }
+  get vncURL(): string {
+    let params = new HttpParams({
+      fromObject: {
+        access_token: this.accessToken_,
+      },
+    })
+    const path = ServerAPI.forward.v1.vnc.httpURL(this.data.id)
+    params = new HttpParams({
+      fromObject: {
+        path: `${path}?${params.toString()}`,
+      },
+    })
+    return `/static/noVNC/vnc.html?${params.toString()}`
   }
 }
