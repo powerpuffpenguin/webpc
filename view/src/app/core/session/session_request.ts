@@ -62,7 +62,7 @@ export class SessionRequest extends SessionClient {
             return
         }
 
-        if (this.state_ != State.None) {
+        if (this.state_ == State.None || this.state_ == State.Completed) {
             this.state_ = State.Retry
             super.optOnClose(ws)
         } else {
@@ -71,7 +71,7 @@ export class SessionRequest extends SessionClient {
     }
     _onConnected() {
         super._onConnected()
-        if (this.state_ == State.None) {
+        if (this.state_ == State.None || this.state_ == State.Retry) {
             this.state_ = State.Connected
         }
     }

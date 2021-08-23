@@ -40,6 +40,10 @@ func (h Helper) NewForwardContext(c *gin.Context) context.Context {
 				`Authorization`, `Bearer `+base64.RawURLEncoding.EncodeToString(b),
 			))
 		}
+	} else if status.Code(e) == codes.Unauthenticated {
+		return metadata.NewOutgoingContext(ctx, metadata.Pairs(
+			`Authorization`, `Bearer Expired`,
+		))
 	}
 	return ctx
 }
