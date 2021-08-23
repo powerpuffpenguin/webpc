@@ -1,8 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntil } from 'rxjs/operators';
 import { Closed } from 'src/app/core/utils/closed';
+import { DeleteComponent } from '../dialog/delete/delete.component';
+import { EditComponent } from '../dialog/edit/edit.component';
 import { ListResult } from './load_state';
 import { State } from './state';
 @Component({
@@ -16,6 +19,7 @@ export class ListComponent implements OnInit, OnDestroy {
   state = {} as State
   constructor(private readonly activatedRoute: ActivatedRoute,
     private readonly httpClient: HttpClient,
+    private readonly matDialog: MatDialog,
   ) { }
 
   ngOnInit(): void {
@@ -50,9 +54,33 @@ export class ListComponent implements OnInit, OnDestroy {
     return this.state.target
   }
   onClickEdit(node: ListResult) {
-
+    this.matDialog.open(EditComponent, {
+      data: {
+        id: this.id,
+        result: node,
+      },
+      disableClose: true,
+    })
   }
   onClickDelete(node: ListResult) {
-
+    this.matDialog.open(DeleteComponent, {
+      data: {
+        id: this.id,
+        result: node,
+      },
+      disableClose: true,
+    }).afterClosed().toPromise<boolean>().then((deleted) => {
+      if (this.closed_.isClosed || !deleted || typeof deleted !== "boolean") {
+        return
+      }
+      const items = this.state.list.result
+      const index = items.indexOf(node)
+      if (index > -1) {
+        const source = new Array<ListResult>()
+        items.splice(index, 1)
+        source.push(...items)
+        this.state.list.result = source
+      }
+    })
   }
 }

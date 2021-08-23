@@ -25,6 +25,14 @@ export class State {
         }
         this.loader = new Loader([
             new ListState(opts, (data) => {
+                if (data && data.result.length) {
+                    data.result.sort((l, r) => {
+                        if (l.id == r.id) {
+                            return 0
+                        }
+                        return l.id > r.id ? 1 : -1
+                    })
+                }
                 this.list = data
             }, (e) => {
                 this.errs.push({

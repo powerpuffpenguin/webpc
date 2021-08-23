@@ -1,0 +1,11 @@
+<h1 mat-dialog-title i18n>delete {{data.name}}</h1>
+
+<div mat-dialog-content class="dialog-content">
+    <ng-container i18n>Once deleted, the data cannot be recovered. Please confirm the operation.</ng-container>
+</div>
+<div mat-dialog-actions>
+    <button type="button" mat-stroked-button i18n [disabled]="disabled  " (click)="onSubmit()">Submit</button>
+    <button type="button" cdkFocusInitial mat-stroked-button i18n [disabled]="disabled"
+        (click)="onClose()">Close</button>
+    <mat-spinner diameter='36' *ngIf="disabled"></mat-spinner>
+</div>

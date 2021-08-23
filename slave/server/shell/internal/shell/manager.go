@@ -1,7 +1,6 @@
 package shell
 
 import (
-	"fmt"
 	"strconv"
 	"sync"
 
@@ -31,8 +30,6 @@ type Manager struct {
 }
 
 func (m *Manager) Unattach(username string, shellid int64) (e error) {
-	fmt.Println(`Unattach`)
-	defer fmt.Println(`Unattach end`)
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 

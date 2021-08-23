@@ -96,7 +96,7 @@ func (element *Element) Unattach(shellid int64) (ok bool) {
 func (element *Element) Rename(shellid int64, name string) (e error) {
 	s, ok := element.keys[shellid]
 	if !ok {
-		e = status.Error(codes.NotFound, `shell not exists: `+strconv.FormatInt(s.shellid, 10))
+		e = status.Error(codes.NotFound, `shell not exists: `+strconv.FormatInt(shellid, 10))
 		return
 	}
 	_, e = db.Rename(shellid, name)
@@ -114,7 +114,7 @@ func (element *Element) Rename(shellid int64, name string) (e error) {
 func (element *Element) Kill(shellid int64) (e error) {
 	s, ok := element.keys[shellid]
 	if !ok {
-		e = status.Error(codes.NotFound, `shell not exists: `+strconv.FormatInt(s.shellid, 10))
+		e = status.Error(codes.NotFound, `shell not exists: `+strconv.FormatInt(shellid, 10))
 		return
 	}
 	s.Kill()

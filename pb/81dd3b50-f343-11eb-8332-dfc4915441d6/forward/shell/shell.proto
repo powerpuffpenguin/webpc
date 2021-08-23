@@ -40,13 +40,11 @@ message RenameRequest{
     string name = 2;
 }
 message RenameResponse{
-    bool changed = 1;
 }
 message RemoveRequest{
     int64 id = 1;
 }
 message RemoveResponse{
-    bool changed = 1;
 }
 enum Event {
     EventUniversal = 0;

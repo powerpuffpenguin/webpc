@@ -15,17 +15,23 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialogModule } from '@angular/material/dialog';
 
 import { ListComponent } from './list/list.component';
 import { ViewComponent } from './view/view.component';
 import { SettingsComponent } from './dialog/settings/settings.component';
+import { DeleteComponent } from './dialog/delete/delete.component';
+import { EditComponent } from './dialog/edit/edit.component';
 
 
 @NgModule({
   declarations: [
     ListComponent,
     ViewComponent,
-    SettingsComponent
+    SettingsComponent,
+    DeleteComponent,
+    EditComponent
   ],
   imports: [
     CommonModule,
@@ -34,7 +40,7 @@ import { SettingsComponent } from './dialog/settings/settings.component';
     MatProgressBarModule, MatButtonModule, MatCardModule,
     MatIconModule, MatListModule, MatTooltipModule,
     MatToolbarModule, MatAutocompleteModule, MatFormFieldModule,
-    MatInputModule,
+    MatInputModule, MatProgressSpinnerModule, MatDialogModule,
     ForwardShellRoutingModule
   ]
 })

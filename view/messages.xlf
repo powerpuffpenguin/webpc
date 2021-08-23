@@ -214,6 +214,20 @@
           <context context-type="linenumber">60</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="e638d2f4ac91aa9566017b58dba7917c874ca914" datatype="html">
+        <source>terminal has been deleted</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.html</context>
+          <context context-type="linenumber">62</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="e9a1e99ed0b3b197b9bfaeba769afee15f8430d5" datatype="html">
+        <source>change terminal completed</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.html</context>
+          <context context-type="linenumber">63</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="8a3e5253b801997bb641fd367390cdae7e987656" datatype="html">
         <source>Add Device</source>
         <context-group purpose="location">
@@ -298,6 +312,10 @@
           <context context-type="linenumber">16</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-shell/dialog/edit/edit.component.html</context>
+          <context context-type="linenumber">6</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/group/dialog/add/add.component.html</context>
           <context context-type="linenumber">7</context>
         </context-group>
@@ -347,6 +365,10 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-fs/dialog/rename/rename.component.html</context>
           <context context-type="linenumber">18</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-shell/dialog/edit/edit.component.html</context>
+          <context context-type="linenumber">8</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/group/dialog/add/add.component.html</context>
@@ -425,6 +447,14 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-fs/dialog/rename/rename.component.html</context>
           <context context-type="linenumber">24</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-shell/dialog/delete/delete.component.html</context>
+          <context context-type="linenumber">7</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-shell/dialog/edit/edit.component.html</context>
+          <context context-type="linenumber">13</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/group/dialog/add/add.component.html</context>
@@ -530,6 +560,14 @@
           <context context-type="linenumber">56</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-shell/dialog/delete/delete.component.html</context>
+          <context context-type="linenumber">9</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-shell/dialog/edit/edit.component.html</context>
+          <context context-type="linenumber">14</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/group/dialog/add/add.component.html</context>
           <context context-type="linenumber">20</context>
         </context-group>
@@ -599,6 +637,10 @@
           <context context-type="linenumber">1</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-shell/dialog/delete/delete.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/group/dialog/delete/delete.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
@@ -614,6 +656,10 @@
           <context context-type="linenumber">4</context>
         </context-group>
         <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-shell/dialog/delete/delete.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+        <context-group purpose="location">
           <context context-type="sourcefile">src/app/group/dialog/delete/delete.component.html</context>
           <context context-type="linenumber">4</context>
         </context-group>
@@ -626,6 +672,10 @@
         <source>properties of <x id="INTERPOLATION" equiv-text="{{data.name}}"/></source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/dialog/edit/edit.component.html</context>
+          <context context-type="linenumber">1</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-shell/dialog/edit/edit.component.html</context>
           <context context-type="linenumber">1</context>
         </context-group>
         <context-group purpose="location">

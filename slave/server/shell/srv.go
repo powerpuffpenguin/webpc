@@ -35,6 +35,9 @@ func (s server) List(ctx context.Context, req *grpc_shell.ListRequest) (resp *gr
 	}
 	return
 }
+
+var emptyRenameResponse grpc_shell.RenameResponse
+
 func (s server) Rename(ctx context.Context, req *grpc_shell.RenameRequest) (resp *grpc_shell.RenameResponse, e error) {
 	TAG := `forward.shell Rename`
 	_, userdata, e := s.JSONUserdata(ctx)
@@ -45,6 +48,7 @@ func (s server) Rename(ctx context.Context, req *grpc_shell.RenameRequest) (resp
 	if e != nil {
 		return
 	}
+	resp = &emptyRenameResponse
 	if ce := logger.Logger.Check(zap.InfoLevel, TAG); ce != nil {
 		ce.Write(
 			zap.String(`who`, userdata.Who()),
@@ -54,6 +58,9 @@ func (s server) Rename(ctx context.Context, req *grpc_shell.RenameRequest) (resp
 	}
 	return
 }
+
+var emptyRemoveResponse grpc_shell.RemoveResponse
+
 func (s server) Remove(ctx context.Context, req *grpc_shell.RemoveRequest) (resp *grpc_shell.RemoveResponse, e error) {
 	TAG := `forward.shell Remove`
 	_, userdata, e := s.JSONUserdata(ctx)
@@ -64,6 +71,7 @@ func (s server) Remove(ctx context.Context, req *grpc_shell.RemoveRequest) (resp
 	if e != nil {
 		return
 	}
+	resp = &emptyRemoveResponse
 	if ce := logger.Logger.Check(zap.InfoLevel, TAG); ce != nil {
 		ce.Write(
 			zap.String(`who`, userdata.Who()),
