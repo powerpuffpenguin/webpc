@@ -24,6 +24,10 @@
                 <mat-icon>settings_ethernet</mat-icon>
             </button>
         </ng-template>
+
+        <a mat-button [routerLink]="['/forward/shell/',id]" i18n-matTooltip matTooltip="Connect">
+            <ng-container i18n>Terminal List</ng-container>
+        </a>
     </div>
 
     <div #view (window:resize)="onResize()" [class]="fullscreen?'fullview':'shell'">

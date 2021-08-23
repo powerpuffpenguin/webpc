@@ -850,11 +850,60 @@
           <context context-type="linenumber">8,12</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="76b8339d5b6a70b6871600727ac3a9510e59d26f" datatype="html">
-        <source>Source Code</source>
+      <trans-unit id="b3f58b665bd64f968196a3efe1562d9552170e5e" datatype="html">
+        <source>about webpc...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/about/about.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f79828107da21b25585849fadbc17c069f4263ee" datatype="html">
+        <source>features</source>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/content/about/about.component.html</context>
           <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ce32158cafaa7d5b58227b229b27afa9e506a8bc" datatype="html">
+        <source>features fs...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/about/about.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1460534fa2459a69e97d34e2a430552e18c82f37" datatype="html">
+        <source>features shared...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/about/about.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="81fcfdd133518cf2da519a7e5387e8e7900a8c25" datatype="html">
+        <source>features shell...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/about/about.component.html</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eb6e6c9c84042f3aec46c138942dfad4c2d1d296" datatype="html">
+        <source>features vnc...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/about/about.component.html</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="950b5f04a2efd3f11c0f76418d5a4212381e792e" datatype="html">
+        <source>Origin</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/about/about.component.html</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="beb0a5d8115139f6a81fde5e28714c382294b7c7" datatype="html">
+        <source>webpc origin ...</source>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/about/about.component.html</context>
+          <context context-type="linenumber">37</context>
         </context-group>
       </trans-unit>
       <trans-unit id="f1aea024fc1f74582f6863f215ddc3438ca65956" datatype="html">
@@ -1448,6 +1497,10 @@
           <context context-type="sourcefile">src/app/forward-shell/list/list.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-shell/view/view.component.html</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="da6aa9950c74cadd85a3bf26272f34f28d8338c8" datatype="html">
         <source>Connect</source>
@@ -1458,6 +1511,10 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-shell/view/view.component.html</context>
           <context context-type="linenumber">23</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-shell/view/view.component.html</context>
+          <context context-type="linenumber">28</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2d64c5ec475afbe35d9309b8405d6654441b386b" datatype="html">

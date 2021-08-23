@@ -906,12 +906,68 @@
           <context context-type="linenumber">8,12</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="76b8339d5b6a70b6871600727ac3a9510e59d26f" datatype="html">
-        <source>Source Code</source>
-        <target>源代碼</target>
+      <trans-unit id="b3f58b665bd64f968196a3efe1562d9552170e5e" datatype="html">
+        <source>about webpc...</source>
+        <target>webpc 是本喵開發的一個跨平臺遠控解決方案，允許使用者通過瀏覽器控制遠端計算機。webpc 使用 golang 開發，所以理論上受控端可以是任意 golang 支持的平臺，但一些功能使用到了第三方軟體這部分功能需要對應軟體對平臺的支持，例如遠程桌面功能需要受控端平臺支持 VNC。</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/about/about.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f79828107da21b25585849fadbc17c069f4263ee" datatype="html">
+        <source>features</source>
+        <target>特性</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/content/about/about.component.html</context>
           <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ce32158cafaa7d5b58227b229b27afa9e506a8bc" datatype="html">
+        <source>features fs...</source>
+        <target>fs -> 模仿本地系統的檔案操作，用於管理遠程計算機的檔案系統。由受控端指定可管理的範圍和讀寫權限。</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/about/about.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1460534fa2459a69e97d34e2a430552e18c82f37" datatype="html">
+        <source>features shared...</source>
+        <target>shared -> fs 模塊的檔案下載路徑，並不符合web習慣，因爲這種習慣不利益 fs 模塊的其它功能開發。受控端設置爲 shared 的目錄，將提供符合 web 習慣的下載路徑(固定前綴的 web 靜態服務器)。</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/about/about.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="81fcfdd133518cf2da519a7e5387e8e7900a8c25" datatype="html">
+        <source>features shell...</source>
+        <target>shell -> 遠程 shell，執行任意指令控制計算機(例如 vim)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/about/about.component.html</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eb6e6c9c84042f3aec46c138942dfad4c2d1d296" datatype="html">
+        <source>features vnc...</source>
+        <target>vnc -> 對於 *inux-like 來說遠程 shell 就足夠完美了，然而偶爾需要控制 windows，固本喵在新的 webpc 上加入了 vnc 功能來實現圖像化的遠程桌面支持。</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/about/about.component.html</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="950b5f04a2efd3f11c0f76418d5a4212381e792e" datatype="html">
+        <source>Origin</source>
+        <target>起源</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/about/about.component.html</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="beb0a5d8115139f6a81fde5e28714c382294b7c7" datatype="html">
+        <source>webpc origin ...</source>
+        <target>大學畢業後的本喵突然之間無法像學生時代一樣一直宅在寢室玩電腦，無法時刻控制自己的筆記本感覺隨時都在浪費筆記本的算力。ssh 可以解決大部分問題，然而因爲遊戲的原因筆記本有時運行者 windows 系統。此外遠程播放筆記本上的電影或音樂都是 ssh 無法解決的，同時 ssh 客戶端也不是隨處可見（例如我去表妹家玩她的計算機上沒有 ssh 客戶端）。感謝 html5，播放電影和音樂使用瀏覽器的 video 和 audio 標籤即可，shell 使用 websocket 轉到 ssh 或 僞終端即可。於是本喵開發了舊版的 webpc 來完成這兩個功能暫且稱爲 old-webpc。貓咪都是貪婪的當，old-webpc 只能控制一臺計算機。當本喵可以使用瀏覽器控制家裏的筆記本後，又開始想要控制公司的辦公電腦，遠程服務器。於是爲它們各自安裝上 old-webpc，然而公司的電腦處於內網本喵無權設置端口映射，且每個安裝了 old-webpc 的電腦都會暴露一個不同的 url 訪問地址。最終本喵重寫了 old-webpc 即現在的 webpc 項目，相對舊版提供了管理多臺設備的能力，同時後端實現全部改爲 grpc 實現（old-webpc 使用 http 框架 gin 實現）。新的 webpc 使用了全新的項目是因爲內部全部重寫了，這主要是因爲使用 grpc 可以偷懶的代碼量讓本喵無法抵抗故本喵已經基本放棄了直接開發 http 接口。</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/about/about.component.html</context>
+          <context context-type="linenumber">37</context>
         </context-group>
       </trans-unit>
       <trans-unit id="f1aea024fc1f74582f6863f215ddc3438ca65956" datatype="html">
@@ -1565,6 +1621,10 @@
           <context context-type="sourcefile">src/app/forward-shell/list/list.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-shell/view/view.component.html</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="da6aa9950c74cadd85a3bf26272f34f28d8338c8" datatype="html">
         <source>Connect</source>
@@ -1576,6 +1636,10 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-shell/view/view.component.html</context>
           <context context-type="linenumber">23</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-shell/view/view.component.html</context>
+          <context context-type="linenumber">28</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2d64c5ec475afbe35d9309b8405d6654441b386b" datatype="html">

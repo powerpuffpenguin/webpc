@@ -906,12 +906,68 @@
           <context context-type="linenumber">8,12</context>
         </context-group>
       </trans-unit>
-      <trans-unit id="76b8339d5b6a70b6871600727ac3a9510e59d26f" datatype="html">
-        <source>Source Code</source>
-        <target>Source Code</target>
+      <trans-unit id="b3f58b665bd64f968196a3efe1562d9552170e5e" datatype="html">
+        <source>about webpc...</source>
+        <target>webpc is a cross-platform remote control solution developed by me, allowing users to control remote computers through a browser. webpc is developed using golang, so theoretically the controlled end can be any platform supported by golang, but some functions use third-party software. This part of the function requires the corresponding software to support the platform. For example, the remote desktop function requires the controlled end platform to support VNC.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/about/about.component.html</context>
+          <context context-type="linenumber">13</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="f79828107da21b25585849fadbc17c069f4263ee" datatype="html">
+        <source>features</source>
+        <target>features</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/content/about/about.component.html</context>
           <context context-type="linenumber">14</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="ce32158cafaa7d5b58227b229b27afa9e506a8bc" datatype="html">
+        <source>features fs...</source>
+        <target>fs -> Imitate the file operation of the local system, used to manage the file system of the remote computer. The manageable range and read and write permissions are specified by the controlled end.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/about/about.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="1460534fa2459a69e97d34e2a430552e18c82f37" datatype="html">
+        <source>features shared...</source>
+        <target>The file download path of the fs module does not conform to web habits, because this habit does not benefit the development of other functions of the fs module. The directory set to the shared on the controlled end will provide a download path that conforms to web habits (web static server with a fixed prefix).</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/about/about.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="81fcfdd133518cf2da519a7e5387e8e7900a8c25" datatype="html">
+        <source>features shell...</source>
+        <target>shell -> Remote shell, execute arbitrary commands to control the computer (such as vim)</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/about/about.component.html</context>
+          <context context-type="linenumber">18</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="eb6e6c9c84042f3aec46c138942dfad4c2d1d296" datatype="html">
+        <source>features vnc...</source>
+        <target>vnc -> For *inux-like, the remote shell is perfect enough, but occasionally you need to control windows os. So i added the vnc function to the new webpc to achieve graphical remote desktop support .</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/about/about.component.html</context>
+          <context context-type="linenumber">19</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="950b5f04a2efd3f11c0f76418d5a4212381e792e" datatype="html">
+        <source>Origin</source>
+        <target>Origin</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/about/about.component.html</context>
+          <context context-type="linenumber">34</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="beb0a5d8115139f6a81fde5e28714c382294b7c7" datatype="html">
+        <source>webpc origin ...</source>
+        <target>After graduating from university, I couldn't stay in the bedroom and play on the computer like I did when I was a student, and I couldn't control my laptop at all times, this makes me feel that computing power is wasted every second. ssh can solve most of the problems, but because of the game, the laptop sometimes runs on the windows system. In addition, remote playback of movies or music on the laptop is not possible with ssh, and the ssh client is not everywhere(for example, I went to my cousin's house to play and there is no ssh client on her computer).  Thanks to html5, you can use the video and audio tags of the browser to play movies and music, and you can use websocket to switch to ssh or pseudo-terminal for the shell. So I developed an old version of webpc to complete these two functions, temporarily called old-webpc. Cats are greedy, old-webpc can only control one computer. When I can use the browser to control the laptop at home, I start to want to control the company’s office computer and remote server. So I installed old-webpc for each of them, but the company’s computer is in the intranet, I don’t have the right to set port mapping, and every computer with old-webpc installed will expose a different url access address. In the end, I rewrote old-webpc, the current webpc project. Compared with the old version, it provides the ability to manage multiple devices. At the same time, the back-end implementation is changed to grpc implementation (old-webpc is implemented using http framework gin). The new webpc uses a brand-new project because it has been completely rewritten internally. This is mainly because the amount of code that can be lazy using grpc makes me unable to resist, so I have basically given up on direct development of the http interface.</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/content/about/about.component.html</context>
+          <context context-type="linenumber">37</context>
         </context-group>
       </trans-unit>
       <trans-unit id="f1aea024fc1f74582f6863f215ddc3438ca65956" datatype="html">
@@ -1565,6 +1621,10 @@
           <context context-type="sourcefile">src/app/forward-shell/list/list.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-shell/view/view.component.html</context>
+          <context context-type="linenumber">29</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="da6aa9950c74cadd85a3bf26272f34f28d8338c8" datatype="html">
         <source>Connect</source>
@@ -1576,6 +1636,10 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-shell/view/view.component.html</context>
           <context context-type="linenumber">23</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-shell/view/view.component.html</context>
+          <context context-type="linenumber">28</context>
         </context-group>
       </trans-unit>
       <trans-unit id="2d64c5ec475afbe35d9309b8405d6654441b386b" datatype="html">

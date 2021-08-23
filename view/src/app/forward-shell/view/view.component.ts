@@ -34,6 +34,9 @@ export class ViewComponent implements OnInit, OnDestroy, AfterViewInit {
   get info(): Info | undefined {
     return this.info_.value
   }
+  get id(): string {
+    return this.target_.value.id
+  }
   private xterm_: Terminal | undefined
   private fitAddon_: FitAddon | undefined
   private textarea_: Document | undefined
@@ -144,11 +147,13 @@ export class ViewComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     })
     // on change
-    this.target_.pipe(
-      takeUntil(this.closed_.observable),
-    ).subscribe((target) => {
-      this._connect(xterm, target.id, target.shellid)
-    })
+    setTimeout(() => {
+      this.target_.pipe(
+        takeUntil(this.closed_.observable),
+      ).subscribe((target) => {
+        this._connect(xterm, target.id, target.shellid)
+      })
+    }, 0)
   }
   private _connect(xterm: Terminal, id: string, shellid: string) {
     let shell = this.shell_
