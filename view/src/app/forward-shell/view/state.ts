@@ -4,7 +4,6 @@ import { ServerAPI } from "src/app/core/core/api";
 import { Codes } from "src/app/core/core/restful";
 import { SessionService } from "src/app/core/session/session.service";
 import { SessionRequest } from "src/app/core/session/session_request";
-import { Closed } from "src/app/core/utils/closed";
 import { Terminal } from "xterm";
 const HeartInterval = 40 * 1000
 enum EventCode {
@@ -15,7 +14,7 @@ enum EventCode {
     Info = 7,
 }
 export interface Info {
-    id: number
+    id: string
     name: string
     at: number
     fontSize: number
@@ -56,6 +55,7 @@ export class Shell extends SessionRequest {
     }
     _onMessage(ws: WebSocket, resp: any) {
         if (resp.event == "Info") {
+            this.shellid = resp.id
             this.subject.next(resp)
         } else {
             console.warn('unknow msg: ', resp)
@@ -86,6 +86,15 @@ export class Shell extends SessionRequest {
             ws.send(JSON.stringify({
                 event: EventCode.FontSize,
                 fontSize: fontSize,
+            }))
+        }
+    }
+    sendFontFamily(fontFamily: string) {
+        const ws = this.ws()
+        if (ws) {
+            ws.send(JSON.stringify({
+                event: EventCode.FontFamily,
+                fontFamily: fontFamily,
             }))
         }
     }

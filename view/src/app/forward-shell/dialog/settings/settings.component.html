@@ -1,0 +1,32 @@
+<h1 mat-dialog-title>
+    <ng-container i18n>Settings</ng-container>
+
+</h1>
+
+<form #viewForm="ngForm">
+
+    <div mat-dialog-content>
+
+        <div>
+            <mat-form-field>
+                <mat-label i18n>Font Family</mat-label>
+                <input type="text" matInput required [(ngModel)]="this.data.fontFamily" [matAutocomplete]="auto"
+                    name="fontFamily">
+            </mat-form-field>
+            <button class="setbtn" mat-stroked-button (click)="onClickFontFamily()" i18n>Set Option</button>
+            <mat-autocomplete #auto="matAutocomplete">
+                <mat-option *ngFor="let option of options" [value]="option">{{option}}</mat-option>
+            </mat-autocomplete>
+        </div>
+        <div>
+            <mat-form-field>
+                <mat-label i18n>Font Size</mat-label>
+                <input type="number" matInput required [(ngModel)]="this.data.fontSize" name="fontSize" [min]="10">
+                <mat-error i18n>Font Size Invalid</mat-error>
+            </mat-form-field>
+            <button class="setbtn" mat-stroked-button (click)="onClickFontSize()" i18n>Set Option</button>
+        </div>
+
+    </div>
+
+</form>

@@ -1,9 +1,8 @@
 <div class="view">
-    <div *ngIf="info">
+    <div>
         <button mat-icon-button [disabled]="true">
             <mat-icon color="accent">{{ok ? 'done':'close'}}</mat-icon>
         </button>
-
         <ng-container *ngIf="fullscreen;then fullscreenView;else normalView;"></ng-container>
         <ng-template #fullscreenView>
             <button mat-icon-button i18n-matTooltip matTooltip="fullscreen exit" (click)="onClickFullscreen(false)">
@@ -16,17 +15,47 @@
             </button>
         </ng-template>
 
-
-        {{info.id}}
-        {{info.name}}
-        {{this.duration}}
-
-        <button *ngIf="!ok" (click)="onClickConnect()" mat-icon-button i18n-matTooltip matTooltip="Connect">
-            <mat-icon>settings_ethernet</mat-icon>
-        </button>
+        <ng-container *ngIf="info;then infoView"></ng-container>
+        <ng-template #infoView>
+            {{info?.id}}
+            {{info?.name}}
+            {{this.duration}}
+            <button *ngIf="!ok" (click)="onClickConnect()" mat-icon-button i18n-matTooltip matTooltip="Connect">
+                <mat-icon>settings_ethernet</mat-icon>
+            </button>
+        </ng-template>
     </div>
 
     <div #view (window:resize)="onResize()" [class]="fullscreen?'fullview':'shell'">
         <div #xterm style="height: 100%;" contentEditable="true"></div>
     </div>
+
+    <div *ngIf="!fullscreen" class="fill"></div>
+    <mat-toolbar *ngIf="!fullscreen" class="footer" color="primary">
+        <button mat-button (click)="onClickTab($event)">
+            <span>TAB</span>
+        </button>
+        <button mat-button (click)="onClickCDHome($event)">
+            <span>~</span>
+        </button>
+        <button mat-button (click)="onClickESC($event)">
+            <span>ESC</span>
+        </button>
+        <button mat-icon-button (click)="onClickArrowUp($event)">
+            <mat-icon>keyboard_arrow_up</mat-icon>
+        </button>
+        <button mat-icon-button (click)="onClickArrowDown($event)">
+            <mat-icon>keyboard_arrow_down</mat-icon>
+        </button>
+        <button mat-icon-button (click)="onClickArrowLeft($event)">
+            <mat-icon>keyboard_arrow_left</mat-icon>
+        </button>
+        <button mat-icon-button (click)="onClickArrowRight($event)">
+            <mat-icon>keyboard_arrow_right</mat-icon>
+        </button>
+        <button mat-icon-button [disabled]="!ok" (click)="onClickSettings()">
+            <mat-icon>settings</mat-icon>
+        </button>
+    </mat-toolbar>
+
 </div>

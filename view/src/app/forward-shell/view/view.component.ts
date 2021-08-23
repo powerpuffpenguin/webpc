@@ -1,14 +1,16 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, fromEvent, of, Subject } from 'rxjs';
 import { takeUntil, concatAll, debounceTime } from 'rxjs/operators';
+import { FullscreenService } from 'src/app/core/fullscreen/fullscreen.service';
 import { SessionService } from 'src/app/core/session/session.service';
 import { Closed } from 'src/app/core/utils/closed';
 import { Terminal } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit';
 import { WebLinksAddon } from 'xterm-addon-web-links';
+import { SettingsComponent } from '../dialog/settings/settings.component';
 import { Info, Shell, Target } from './state';
 const DefaultFontFamily = "Lucida Console"
 @Component({
@@ -19,9 +21,11 @@ const DefaultFontFamily = "Lucida Console"
 export class ViewComponent implements OnInit, OnDestroy, AfterViewInit {
   private closed_ = new Closed()
   constructor(private readonly activatedRoute: ActivatedRoute,
+    private readonly router: Router,
     private readonly matDialog: MatDialog,
     private readonly httpClient: HttpClient,
     private readonly sessionService: SessionService,
+    private readonly fullscreenService: FullscreenService,
   ) { }
   fullscreen = false
   ok = false
@@ -39,6 +43,11 @@ export class ViewComponent implements OnInit, OnDestroy, AfterViewInit {
   private target_ = new BehaviorSubject<Target>({ id: '', shellid: '' })
   private resize_ = new Subject()
   ngOnInit(): void {
+    this.fullscreenService.observable.pipe(
+      takeUntil(this.closed_.observable)
+    ).subscribe((ok) => {
+      this.fullscreen = ok
+    })
     this.activatedRoute.params.pipe(
       takeUntil(this.closed_.observable)
     ).subscribe((params) => {
@@ -128,35 +137,44 @@ export class ViewComponent implements OnInit, OnDestroy, AfterViewInit {
         xterm.resize(1, 1)
         fitAddon.fit()
       }
+
+      const target = this.target_.value
+      if (info.id != target.shellid) {
+        this.router.navigate(['/forward/shell', target.id, info.id])
+      }
     })
     // on change
     this.target_.pipe(
       takeUntil(this.closed_.observable),
     ).subscribe((target) => {
-      let shell = this.shell_
-      if (shell && shell.id == target.id && shell.shellid == target.shellid) {
-        return
-      } else if (shell) {
-        shell.close()
-      }
-      shell = new Shell(
-        this.httpClient, this.sessionService,
-        target.id, target.shellid,
-        xterm, this.info_,
-      )
-      this.ok = true
-      shell.result.catch((e) => {
-        if (this.closed_.isClosed) {
-          console.log(e)
-        }
-      }).finally(() => {
-        if (this.closed_.isClosed && this.shell_ == shell) {
-          this.ok = false
-          this.shell_ = undefined
-        }
-      })
-      this.shell_ = shell
+      this._connect(xterm, target.id, target.shellid)
     })
+  }
+  private _connect(xterm: Terminal, id: string, shellid: string) {
+    let shell = this.shell_
+    if (shell && shell.id == id && shell.shellid == shellid) {
+      return
+    } else if (shell) {
+      shell.close()
+    }
+    shell = new Shell(
+      this.httpClient, this.sessionService,
+      id, shellid,
+      xterm, this.info_,
+    )
+    this.ok = true
+    shell.result.catch((e) => {
+      if (this.closed_.isNotClosed) {
+        console.log(e)
+      }
+    }).finally(() => {
+      xterm.setOption("cursorBlink", false)
+      if (this.closed_.isNotClosed && this.shell_ == shell) {
+        this.ok = false
+        this.shell_ = undefined
+      }
+    })
+    this.shell_ = shell
   }
   onResize() {
     this.resize_.next(new Date())
@@ -187,7 +205,7 @@ export class ViewComponent implements OnInit, OnDestroy, AfterViewInit {
     const fitAddon = this.fitAddon_
     const shell = this.shell_
     const fontSize = this.fontSize
-    if (!xterm || !fitAddon || this.fontSize < 5 || !shell) {
+    if (!xterm || !fitAddon || fontSize < 5 || !shell) {
       return
     }
     if (fontSize == xterm.getOption("fontSize")) {
@@ -197,10 +215,89 @@ export class ViewComponent implements OnInit, OnDestroy, AfterViewInit {
     fitAddon.fit()
     shell.sendFontSize(fontSize)
   }
-  onClickFullscreen(ok: boolean) {
-
+  onClickFontFamily() {
+    const xterm = this.xterm_
+    const fitAddon = this.fitAddon_
+    const shell = this.shell_
+    const fontFamily = this.fontFamily
+    if (!xterm || !fitAddon || !shell) {
+      return
+    }
+    if (xterm.getOption("fontFamily") == fontFamily) {
+      return
+    }
+    xterm.setOption("fontFamily", fontFamily)
+    xterm.resize(1, 1)
+    xterm.clear()
+    fitAddon.fit()
+    shell.sendFontFamily(fontFamily)
   }
   onClickConnect() {
-
+    const xterm = this.xterm_
+    if (!xterm) {
+      return
+    }
+    const target = this.target_.value
+    xterm.clear()
+    this._connect(xterm, target.id, target.shellid)
+  }
+  onClickSettings() {
+    this.matDialog.open(SettingsComponent, {
+      data: {
+        fontFamily: this.fontFamily,
+        onFontFamily: (str: string) => {
+          this.fontFamily = str
+          this.onClickFontFamily()
+        },
+        fontSize: this.fontSize,
+        onFontSize: (size: number) => {
+          this.fontSize = size
+          this.onClickFontSize()
+        },
+      },
+    })
+  }
+  onClickTab(evt: MouseEvent) {
+    this._keyboardKeyDown(9, 'Tab', evt)
+  }
+  onClickCDHome(evt: MouseEvent) {
+    this._keyboardKeyDown(192, '~', evt)
+  }
+  onClickESC(evt: MouseEvent) {
+    this._keyboardKeyDown(27, 'Escape', evt)
+  }
+  onClickArrowUp(evt: MouseEvent) {
+    this._keyboardKeyDown(38, 'ArrowUp', evt)
+  }
+  onClickArrowDown(evt: MouseEvent) {
+    this._keyboardKeyDown(40, 'ArrowDown', evt)
+  }
+  onClickArrowLeft(evt: MouseEvent) {
+    this._keyboardKeyDown(37, 'ArrowLeft', evt)
+  }
+  onClickArrowRight(evt: MouseEvent) {
+    this._keyboardKeyDown(39, 'ArrowRight', evt)
+  }
+  onClickFullscreen(ok: boolean) {
+    this.fullscreen = ok
+    this.fullscreenService.fullscreen = ok
+    this.onResize()
+  }
+  private _keyboardKeyDown(keyCode: number, key: string, evt: any) {
+    const textarea = this.textarea_
+    const xterm = this.xterm_
+    if (!textarea) {
+      return
+    }
+    textarea.dispatchEvent(new KeyboardEvent('keydown', {
+      keyCode: keyCode,
+      key: key,
+      code: key,
+    } as any))
+    if (xterm) {
+      setTimeout(() => {
+        xterm.focus()
+      }, 0)
+    }
   }
 }

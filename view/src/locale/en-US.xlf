@@ -1462,6 +1462,50 @@
           <context context-type="linenumber">48</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="121cc5391cd2a5115bc2b3160379ee5b36cd7716" datatype="html">
+        <source>Settings</source>
+        <target>Settings</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-shell/dialog/settings/settings.component.html</context>
+          <context context-type="linenumber">2</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="19aa1a8b38d58eefa14cf82146f7165bf8acac71" datatype="html">
+        <source>Font Family</source>
+        <target>Font Family</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-shell/dialog/settings/settings.component.html</context>
+          <context context-type="linenumber">12</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="a36cbf882f4d743c19a2dfdd899ec6ba44006289" datatype="html">
+        <source>Set Option</source>
+        <target>Set Option</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-shell/dialog/settings/settings.component.html</context>
+          <context context-type="linenumber">16</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-shell/dialog/settings/settings.component.html</context>
+          <context context-type="linenumber">27</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="0bd1b7ca428a0c47d189e1f26194062b13a0aa6c" datatype="html">
+        <source>Font Size</source>
+        <target>Font Size</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-shell/dialog/settings/settings.component.html</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="450d56b40f37bf040e7eb84e2668903ddf020e7a" datatype="html">
+        <source>Font Size Invalid</source>
+        <target>Font Size Invalid</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-shell/dialog/settings/settings.component.html</context>
+          <context context-type="linenumber">25</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="7a890188d24cc8449764f72befdb37458adced07" datatype="html">
         <source>Terminal List</source>
         <target>Terminal List</target>
@@ -1477,6 +1521,10 @@
           <context context-type="sourcefile">src/app/forward-shell/list/list.component.html</context>
           <context context-type="linenumber">24</context>
         </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-shell/view/view.component.html</context>
+          <context context-type="linenumber">23</context>
+        </context-group>
       </trans-unit>
       <trans-unit id="2d64c5ec475afbe35d9309b8405d6654441b386b" datatype="html">
         <source>Create Connect</source>
@@ -1484,6 +1532,22 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-shell/list/list.component.html</context>
           <context context-type="linenumber">41</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="fa2e968f224776e4ade5a06b83428389435bef2b" datatype="html">
+        <source>fullscreen exit</source>
+        <target>fullscreen exit</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-shell/view/view.component.html</context>
+          <context context-type="linenumber">8</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="839a318fc31740d6982ef9eb4b073a62a34cdeff" datatype="html">
+        <source>fullscreen</source>
+        <target>fullscreen</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-shell/view/view.component.html</context>
+          <context context-type="linenumber">13</context>
         </context-group>
       </trans-unit>
       <trans-unit id="d5a6db764ecb9e06d3c5fda4dfd17802758406f9" datatype="html">

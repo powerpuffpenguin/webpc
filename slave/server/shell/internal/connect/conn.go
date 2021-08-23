@@ -32,12 +32,14 @@ func (c *conn) Close() (e error) {
 	return
 }
 func (c *conn) WriteBinary(b []byte) (e error) {
+	dst := make([]byte, len(b))
+	copy(dst, b)
 	select {
 	case <-c.close:
 		e = errAlreadyClosed
 	case c.resp <- &grpc_shell.ConnectResponse{
 		Event:  grpc_shell.Event_Binary,
-		Binary: b,
+		Binary: dst,
 	}:
 	}
 	return

@@ -13,8 +13,6 @@ type Userdata struct {
 	Nickname      string
 	Authorization []int32
 	Parent        int64
-
-	Expired bool // only for forward
 }
 
 func (d *Userdata) Who() string {
