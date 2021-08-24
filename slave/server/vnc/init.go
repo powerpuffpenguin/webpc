@@ -14,12 +14,13 @@ type Module int
 
 func (Module) RegisterGRPC(srv *grpc.Server) {
 	grpc_vnc.RegisterVncServer(srv, server{})
-}
-func (Module) RegisterGateway(gateway *runtime.ServeMux, cc *grpc.ClientConn) error {
+
 	vnc := configure.DefaultSystem().VNC
 	connect.VNC = vnc
 	if ce := logger.Logger.Check(zap.InfoLevel, `VNC`); ce != nil {
 		ce.Write(zap.String(`connect`, vnc))
 	}
+}
+func (Module) RegisterGateway(gateway *runtime.ServeMux, cc *grpc.ClientConn) error {
 	return nil
 }

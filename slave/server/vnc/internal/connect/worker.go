@@ -5,7 +5,9 @@ import (
 	"net"
 	"time"
 
+	"github.com/powerpuffpenguin/webpc/logger"
 	grpc_vnc "github.com/powerpuffpenguin/webpc/protocol/forward/vnc"
+	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -84,6 +86,11 @@ func (w *Worker) doInit(req *grpc_vnc.ConnectRequest) (e error) {
 	}
 	c, e := net.Dial(`tcp`, VNC)
 	if e != nil {
+		if ce := logger.Logger.Check(zap.WarnLevel, `dial to vnc`); ce != nil {
+			ce.Write(
+				zap.Error(e),
+			)
+		}
 		return
 	}
 	e = w.server.Send(&grpc_vnc.ConnectResponse{

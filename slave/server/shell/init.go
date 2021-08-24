@@ -13,10 +13,11 @@ import (
 type Module int
 
 func (Module) RegisterGRPC(srv *grpc.Server) {
+	db.Init()
+	shell.Init()
+	
 	grpc_shell.RegisterShellServer(srv, server{})
 }
 func (Module) RegisterGateway(gateway *runtime.ServeMux, cc *grpc.ClientConn) error {
-	db.Init()
-	shell.Init()
 	return grpc_shell.RegisterShellHandler(context.Background(), gateway, cc)
 }
