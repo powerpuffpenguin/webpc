@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -18,13 +18,14 @@ import { GroupComponent } from '../dialog/group/group.component';
 import { TreeSelectComponent } from 'src/app/shared/tree-select/tree-select.component';
 import { Element } from 'src/app/core/group/tree';
 import { StateManager } from './state';
+import { RequireNet } from 'src/app/core/utils/requirenet';
 
 @Component({
   selector: 'app-query',
   templateUrl: './query.component.html',
   styleUrls: ['./query.component.scss']
 })
-export class QueryComponent implements OnInit, OnDestroy {
+export class QueryComponent implements OnInit, OnDestroy, AfterViewInit {
   disabled = false
   private request_ = new Request()
   request = new Request()
@@ -75,6 +76,27 @@ export class QueryComponent implements OnInit, OnDestroy {
           this._query(request)
         }
       }
+    })
+  }
+  @ViewChild("clipboard")
+  private readonly clipboard_: ElementRef | undefined
+  private clipboardjs_: any
+  ngAfterViewInit() {
+    RequireNet('clipboard').then((ClipboardJS) => {
+      if (this.closed_.isClosed) {
+        return
+      }
+      this.clipboardjs_ = new ClipboardJS(this.clipboard_?.nativeElement).on('success', () => {
+        if (this.closed_.isNotClosed) {
+          this.toasterService.pop('info', '', "copied")
+        }
+      }).on('error', (evt: any) => {
+        if (this.closed_.isNotClosed) {
+          this.toasterService.pop('error', undefined, "copied error")
+          console.error('Action:', evt.action)
+          console.error('Trigger:', evt.trigger)
+        }
+      })
     })
   }
   ngOnDestroy() {
@@ -320,5 +342,20 @@ export class QueryComponent implements OnInit, OnDestroy {
       keys.set(item.id, item)
       item.ready = this.stateManager.isReady(item.id)
     })
+  }
+  onCliCkCopyClipboard(code: string) {
+    const clipboard = this.clipboard_
+    if (!clipboard) {
+      return
+    }
+    const element = clipboard.nativeElement
+    if (!element) {
+      return
+    }
+    element.setAttribute(
+      'data-clipboard-text',
+      ServerAPI.v1.dialer.websocketURL(code),
+    )
+    element.click()
   }
 }

@@ -9,6 +9,7 @@ export const ServerAPI = {
         users: MakeRESTful(root, 'v1', 'users'),
         slaves: MakeRESTful(root, 'v1', 'slaves'),
         logger: MakeRESTful(root, 'v1', 'logger'),
+        dialer: MakeRESTful(root, 'v1', 'dialer'),
     },
     forward: {
         v1: {

@@ -1,4 +1,5 @@
 <div class="view">
+    <button #clipboard class="hide" data-clipboard-text="">copy</button>
     <mat-form-field class="query">
         <mat-label i18n>Name</mat-label>
         <input matInput [disabled]="disabled" cdkFocusInitial [(ngModel)]="request.name" name="name">
@@ -54,7 +55,13 @@
         </ng-container>
         <ng-container matColumnDef="code">
             <th mat-header-cell *matHeaderCellDef i18n>Code</th>
-            <td mat-cell *matCellDef="let element"> {{element.code}} </td>
+            <td mat-cell *matCellDef="let element">
+                {{element.code}}
+                <button mat-icon-button matSuffix matTooltip="content copy"
+                    (click)="onCliCkCopyClipboard(element.code)">
+                    <mat-icon>content_copy</mat-icon>
+                </button>
+            </td>
         </ng-container>
         <ng-container matColumnDef="buttons">
             <th mat-header-cell *matHeaderCellDef [width]="200">
