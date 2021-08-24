@@ -51,7 +51,7 @@ service Slave {
         };
     }
     // subscribe status
-    rpc subscribe (stream SubscribeRequest) returns (stream SubscribeResponse);
+    rpc Subscribe (stream SubscribeRequest) returns (stream SubscribeResponse);
 }
 
 message Data {

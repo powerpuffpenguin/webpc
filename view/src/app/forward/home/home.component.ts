@@ -64,6 +64,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     return this.state.startAt
   }
   get vncURL(): string {
+    if (!this.data.id) {
+      return ''
+    }
     let params = new HttpParams({
       fromObject: {
         access_token: this.accessToken_,
