@@ -69,7 +69,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         access_token: this.accessToken_,
       },
     })
-    const path = ServerAPI.forward.v1.vnc.httpURL(this.data.id)
+    const path = ServerAPI.forward.v1.vnc.httpURL(this.data.id).substring(1)
     params = new HttpParams({
       fromObject: {
         path: `${path}?${params.toString()}`,

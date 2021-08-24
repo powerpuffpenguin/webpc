@@ -1,0 +1,11 @@
+
+<configuration>
+	<id>webpc-slave-service</id>
+	<name>WebPC Slave Service</name>
+	<description>WebPC Slave Service</description>
+	<workingdirectory>%BASE%</workingdirectory>
+	<executable>%BASE%\webpc</executable>
+	<startargument>slave</startargument>
+	<log mode="none"/>
+	<onfailure action="restart" delay="10 sec"/>
+</configuration>

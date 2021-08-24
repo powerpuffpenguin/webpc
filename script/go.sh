@@ -96,6 +96,7 @@ if [[ "$clear" == 1 ]];then
     exit $?
 fi
 
+export CGO_ENABLED=1
 export GOOS="$os"
 export GOARCH="$arch"
 target="$Target"
@@ -103,6 +104,8 @@ if [[ "$debug" == 1 ]];then
     target="$target"d
 fi
 if [[ "$os" == "windows" ]];then
+    export CC="x86_64-w64-mingw32-gcc-posix"
+    export CXX="x86_64-w64-mingw32-g++-posix"
     target="$target.exe"
 fi
 if [[ "$debug" == 1 ]];then

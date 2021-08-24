@@ -116,10 +116,23 @@ cd "$Dir/bin"
 if [[ -f "$name" ]];then
     rm "$name"
 fi
-source=(
-    "$target"
-    etc
-)
+if [[ "$os" == "windows" ]];then
+    source=(
+        "$target"
+        etc
+        winpty-agent.exe winpty.dll
+        shell-windows.bat shell-bash.bat
+        webpc-master.exe webpc-slave.exe webpc-master.xml webpc-slave.xml
+        install-master.bat uninstall-master.bat install-slave.bat uninstall-slave.bat
+    )
+else
+    source=(
+        "$target"
+        etc
+        useradd.sh run-linux shell-linux
+        webpc-master.service webpc-slave.service
+    )
+fi
 exec="${args[@]} ${source[@]}"
 echo $exec
 eval "$exec >> /dev/null"

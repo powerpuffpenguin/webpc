@@ -1,0 +1,14 @@
+[Unit]
+Description=WebPC Slave Service
+After=network.target
+ 
+[Service]
+#User=webpc
+Type=simple
+ExecStart=/opt/webpc/webpc slave
+KillMode=control-group
+Restart=on-failure
+ LimitNOFILE=100000
+ 
+[Install]
+WantedBy=multi-user.target

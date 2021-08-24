@@ -30,11 +30,14 @@ export class NewFileComponent implements OnInit {
     this.disabled = true
     const data = this.data
     ServerAPI.forward.v1.fs.post<FileInfo>(this.httpClient, {
-      slave_id: data.id,
       root: data.root,
       dir: data.dir,
       name: this.name,
       file: true,
+    }, {
+      params: {
+        slave_id: data.id,
+      },
     }).pipe(
       finalize(() => {
         this.disabled = false

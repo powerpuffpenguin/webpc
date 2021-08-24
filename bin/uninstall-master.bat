@@ -1,0 +1,3 @@
+webpc-master uninstall
+
+pause
