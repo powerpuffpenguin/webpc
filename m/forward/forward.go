@@ -17,6 +17,7 @@ import (
 	signal_slave "github.com/powerpuffpenguin/webpc/signal/slave"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 )
 
@@ -77,7 +78,7 @@ func (f *Forward) Put(id int64, cc *grpc.ClientConn, gateway *runtime.ServeMux) 
 		gateway: gateway,
 	}
 }
-func (f *Forward) Get(str string) (cc *grpc.ClientConn, e error) {
+func (f *Forward) Get(c *gin.Context, str string) (ctx context.Context, cc *grpc.ClientConn, e error) {
 	id, e := strconv.ParseInt(str, 10, 64)
 	if e != nil {
 		e = status.Error(codes.NotFound, `slave id error: `+e.Error())
@@ -92,8 +93,51 @@ func (f *Forward) Get(str string) (cc *grpc.ClientConn, e error) {
 		e = status.Error(codes.NotFound, `slave id not found: `+strconv.FormatInt(id, 10))
 	}
 	f.rw.RUnlock()
+	if e != nil {
+		return
+	}
+
+	// public api
+	shared := false
+	if c.Request.URL.Path == `/api/forward/v1/fs/` || strings.HasPrefix(c.Request.URL.Path, `/api/forward/v1/fs/`) {
+		shared = true
+	}
+
+	ctx = c.Request.Context()
+	// userdata
+	userdata, e := f.web.ShouldBindUserdata(c)
+	if e != nil {
+		if shared && status.Code(e) == codes.Unauthenticated {
+			ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs(
+				`Authorization`, `Bearer Expired`,
+			))
+			e = nil
+		}
+		return
+	}
+
+	// check group
+	e = f.checkGroup(c, id, &userdata)
+	if e != nil {
+		if shared && status.Code(e) == codes.Unauthenticated {
+			ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs(
+				`Authorization`, `Bearer Expired`,
+			))
+			e = nil
+		}
+		return
+	}
+
+	// token
+	b, e := json.Marshal(userdata)
+	if e == nil {
+		ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs(
+			`Authorization`, `Bearer `+base64.RawURLEncoding.EncodeToString(b),
+		))
+	}
 	return
 }
+
 func (f *Forward) forwardShared(gateway *runtime.ServeMux, c *gin.Context, expired bool) {
 	if expired {
 		c.Request.Header.Set(`Authorization`, `Bearer Expired`)
@@ -139,9 +183,6 @@ func (f *Forward) Forward(str string, c *gin.Context) {
 		b, e := json.Marshal(userdata)
 		if e == nil {
 			c.Request.Header.Set(`Authorization`, `Bearer `+base64.RawURLEncoding.EncodeToString(b))
-		} else if shared {
-			f.forwardShared(ele.gateway, c, true)
-			return
 		} else {
 			f.web.Error(c, e)
 			return

@@ -45,7 +45,7 @@ func (h Static) get(c *gin.Context) {
 	if e != nil {
 		return
 	}
-	cc, e := forward.Default().Get(obj.ID)
+	_, cc, e := forward.Default().Get(c, obj.ID)
 	if e != nil {
 		h.Error(c, e)
 		return

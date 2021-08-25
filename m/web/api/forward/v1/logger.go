@@ -34,13 +34,12 @@ func (h Logger) attach(c *gin.Context) {
 		return
 	}
 
-	cc, e := forward.Default().Get(obj.ID)
+	ctx, cc, e := forward.Default().Get(c, obj.ID)
 	if e != nil {
 		ws.Error(e)
 		return
 	}
 
-	ctx := h.NewForwardContext(c)
 	client := grpc_logger.NewLoggerClient(cc)
 	stream, e := client.Attach(ctx, &grpc_logger.AttachRequest{})
 	if e != nil {

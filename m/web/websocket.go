@@ -1,8 +1,6 @@
 package web
 
 import (
-	"encoding/base64"
-	"encoding/json"
 	"net/http"
 	"sync/atomic"
 
@@ -30,23 +28,7 @@ func (h Helper) NewContext(c *gin.Context) context.Context {
 	}
 	return ctx
 }
-func (h Helper) NewForwardContext(c *gin.Context) context.Context {
-	ctx := c.Request.Context()
-	userdata, e := h.ShouldBindUserdata(c)
-	if e == nil {
-		b, e := json.Marshal(userdata)
-		if e == nil {
-			return metadata.NewOutgoingContext(ctx, metadata.Pairs(
-				`Authorization`, `Bearer `+base64.RawURLEncoding.EncodeToString(b),
-			))
-		}
-	} else if status.Code(e) == codes.Unauthenticated {
-		return metadata.NewOutgoingContext(ctx, metadata.Pairs(
-			`Authorization`, `Bearer Expired`,
-		))
-	}
-	return ctx
-}
+
 func (h Helper) CheckWebsocket(c *gin.Context) {
 	if !c.IsWebsocket() {
 		h.Error(c, status.Error(codes.InvalidArgument, `expect websocket`))

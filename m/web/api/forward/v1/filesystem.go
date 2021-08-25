@@ -38,13 +38,12 @@ func (h Filesystem) put(c *gin.Context) {
 	if e != nil {
 		return
 	}
-	cc, e := forward.Default().Get(obj.ID)
+	ctx, cc, e := forward.Default().Get(c, obj.ID)
 	if e != nil {
 		h.Error(c, e)
 		return
 	}
 
-	ctx := h.NewForwardContext(c)
 	client := grpc_fs.NewFSClient(cc)
 	stream, e := client.Put(ctx)
 	if e != nil {
@@ -119,13 +118,12 @@ func (h Filesystem) compress(c *gin.Context) {
 		return
 	}
 
-	cc, e := forward.Default().Get(obj.ID)
+	ctx, cc, e := forward.Default().Get(c, obj.ID)
 	if e != nil {
 		ws.Error(e)
 		return
 	}
 
-	ctx := h.NewForwardContext(c)
 	client := grpc_fs.NewFSClient(cc)
 	stream, e := client.Compress(ctx)
 	if e != nil {
@@ -166,13 +164,12 @@ func (h Filesystem) uncompress(c *gin.Context) {
 		return
 	}
 
-	cc, e := forward.Default().Get(obj.ID)
+	ctx, cc, e := forward.Default().Get(c, obj.ID)
 	if e != nil {
 		ws.Error(e)
 		return
 	}
 
-	ctx := h.NewForwardContext(c)
 	client := grpc_fs.NewFSClient(cc)
 	stream, e := client.Uncompress(ctx)
 	if e != nil {
@@ -213,13 +210,12 @@ func (h Filesystem) copy(c *gin.Context) {
 		return
 	}
 
-	cc, e := forward.Default().Get(obj.ID)
+	ctx, cc, e := forward.Default().Get(c, obj.ID)
 	if e != nil {
 		ws.Error(e)
 		return
 	}
 
-	ctx := h.NewForwardContext(c)
 	client := grpc_fs.NewFSClient(cc)
 	stream, e := client.Copy(ctx)
 	if e != nil {
@@ -255,7 +251,7 @@ func (h Filesystem) upload(c *gin.Context) {
 	if e != nil {
 		return
 	}
-	cc, e := forward.Default().Get(obj.ID)
+	ctx, cc, e := forward.Default().Get(c, obj.ID)
 	if e != nil {
 		h.Error(c, e)
 		return
@@ -265,7 +261,6 @@ func (h Filesystem) upload(c *gin.Context) {
 		h.Error(c, e)
 		return
 	}
-	ctx := h.NewForwardContext(c)
 	client := grpc_fs.NewFSClient(cc)
 	_, e = client.Upload(ctx, &grpc_fs.UploadRequest{
 		Root:  obj.Root,

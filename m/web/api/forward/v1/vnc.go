@@ -33,12 +33,11 @@ func (h VNC) connect(c *gin.Context) {
 		ws.Error(status.Error(codes.InvalidArgument, e.Error()))
 		return
 	}
-	cc, e := forward.Default().Get(obj.ID)
+	ctx, cc, e := forward.Default().Get(c, obj.ID)
 	if e != nil {
 		ws.Error(e)
 		return
 	}
-	ctx := h.NewForwardContext(c)
 	client := grpc_vnc.NewVncClient(cc)
 	stream, e := client.Connect(ctx)
 	if e != nil {
