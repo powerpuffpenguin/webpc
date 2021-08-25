@@ -123,7 +123,7 @@ if [[ "$os" == "windows" ]];then
         winpty-agent.exe winpty.dll
         shell-windows.bat shell-bash.bat
         webpc-master.exe webpc-slave.exe webpc-master.xml webpc-slave.xml
-        install-master.bat uninstall-master.bat install-slave.bat uninstall-slave.bat
+        controller.bat
     )
 else
     source=(

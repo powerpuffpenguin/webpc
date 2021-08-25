@@ -1,3 +1,0 @@
-webpc-slave install
-
-pause

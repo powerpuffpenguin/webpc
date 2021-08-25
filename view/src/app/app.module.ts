@@ -30,6 +30,8 @@ import { CodeComponent } from './app/dialog/code/code.component';
 import { EditComponent } from './app/dialog/edit/edit.component';
 import { DeleteComponent } from './app/dialog/delete/delete.component';
 import { GroupComponent } from './app/dialog/group/group.component';
+import { ServiceWorkerModule } from '@angular/service-worker';
+import { environment } from '../environments/environment';
 
 @NgModule({
   declarations: [
@@ -50,7 +52,12 @@ import { GroupComponent } from './app/dialog/group/group.component';
     MatInputModule, MatPaginatorModule, MatTableModule,
     MatTooltipModule, MatIconModule, MatDialogModule,
     MatProgressSpinnerModule,
-    AppRoutingModule, ToasterModule.forRoot()
+    AppRoutingModule, ToasterModule.forRoot(), ServiceWorkerModule.register('ngsw-worker.js', {
+  enabled: environment.production,
+  // Register the ServiceWorker as soon as the app is stable
+  // or after 30 seconds (whichever comes first).
+  registrationStrategy: 'registerWhenStable:30000'
+})
   ],
   providers: [
     {

@@ -1,3 +1,0 @@
-webpc-master install
-
-pause

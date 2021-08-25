@@ -3,9 +3,10 @@ Description=WebPC Slave Service
 After=network.target
  
 [Service]
-#User=webpc
+User=webpc
 Type=simple
-ExecStart=/opt/webpc/webpc slave
+WorkingDirectory=/opt/webpc
+ExecStart=./webpc slave
 KillMode=control-group
 Restart=on-failure
  LimitNOFILE=100000
