@@ -111,7 +111,7 @@ type ExcludedPathesRegexs []*regexp.Regexp
 
 // NewExcludedPathesRegexs .
 func NewExcludedPathesRegexs(regexs []string) ExcludedPathesRegexs {
-	result := make([]*regexp.Regexp, len(regexs), len(regexs))
+	result := make([]*regexp.Regexp, len(regexs))
 	for i, reg := range regexs {
 		result[i] = regexp.MustCompile(reg)
 	}

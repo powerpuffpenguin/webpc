@@ -41,7 +41,8 @@ func (g *_Writer) WriteString(s string) (int, error) {
 }
 
 func (g *_Writer) Write(data []byte) (int, error) {
-	return g.w.Write(data)
+	n, e := g.w.Write(data)
+	return n, e
 }
 
 // Fix: https://github.com/mholt/caddy/issues/38

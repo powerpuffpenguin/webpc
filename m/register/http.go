@@ -85,6 +85,10 @@ func makeStatic(engine *gin.Engine) {
 	h := Static{
 		fileSystem: fileSystem,
 	}
+	// engine.GET(`favicon.ico`, h.favicon)
+	// engine.HEAD(`favicon.ico`, h.favicon)
+	// engine.Group(`static`).StaticFS(``, fileSystem)
+
 	compression := h.Compression()
 	engine.GET(`favicon.ico`, compression, h.favicon)
 	engine.HEAD(`favicon.ico`, compression, h.favicon)

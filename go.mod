@@ -41,3 +41,7 @@ require (
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	xorm.io/xorm v1.2.2
 )
+
+replace (
+	github.com/andybalholm/brotli v1.0.3 => github.com/zuiwuchang/brotli v0.0.0-20210825022947-ec682fbe0a16
+)

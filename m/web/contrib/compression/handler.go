@@ -2,11 +2,11 @@ package compression
 
 import (
 	"compress/gzip"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -23,6 +23,7 @@ type helperHandler struct {
 	*Options
 	brPool *sync.Pool
 	gzPool *sync.Pool
+	br     *brotli.Writer
 }
 
 func newHandler(br, gz int, options ...Option) *helperHandler {
@@ -42,13 +43,13 @@ func newHandler(br, gz int, options ...Option) *helperHandler {
 		Options: DefaultOptions,
 		brPool:  &brPool,
 		gzPool:  &gzPool,
+		br:      brotli.NewWriterLevel(ioutil.Discard, br),
 	}
 	for _, setter := range options {
 		setter(handler.Options)
 	}
 	return handler
 }
-
 func (h *helperHandler) Handle(c *gin.Context) {
 	var encoding string
 	if fn := h.BrDecompressFn; fn != nil {
@@ -70,19 +71,18 @@ func (h *helperHandler) Handle(c *gin.Context) {
 	if !yes {
 		return
 	}
+
 	var w io.WriteCloser
 	switch algorithm {
 	case algorithmGzip:
 		gz := h.gzPool.Get().(*gzip.Writer)
 		defer h.gzPool.Put(gz)
-		defer gz.Reset(ioutil.Discard)
 		gz.Reset(c.Writer)
 		c.Header("Content-Encoding", "gzip")
 		w = gz
 	default:
 		br := h.brPool.Get().(*brotli.Writer)
 		defer h.brPool.Put(br)
-		defer br.Reset(ioutil.Discard)
 		br.Reset(c.Writer)
 		c.Header("Content-Encoding", "br")
 		w = br
@@ -91,7 +91,10 @@ func (h *helperHandler) Handle(c *gin.Context) {
 	c.Writer = &_Writer{c.Writer, w}
 	defer func() {
 		w.Close()
-		c.Header("Content-Length", fmt.Sprint(c.Writer.Size()))
+		contentLength := c.Writer.Size()
+		if contentLength > 0 {
+			c.Header("Content-Length", strconv.Itoa(contentLength))
+		}
 	}()
 	c.Next()
 }
