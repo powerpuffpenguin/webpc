@@ -20,7 +20,8 @@
 *.zip
 *.db
 *.log
-*sha256
+*.sha256
+*.sha256.txt
 
 /assets/
 /static/3rdpartylicenses.txt

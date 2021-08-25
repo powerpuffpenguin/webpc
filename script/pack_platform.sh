@@ -137,6 +137,6 @@ exec="${args[@]} ${source[@]}"
 echo $exec
 eval "$exec >> /dev/null"
 
-exec="sha256sum $name > $name.sha256"
+exec="sha256sum $name > $name.sha256.txt"
 echo $exec
 eval "$exec"
