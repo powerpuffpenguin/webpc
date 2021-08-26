@@ -28,6 +28,11 @@ WebPC mainly has the following characteristics:
 - [Build](#Build)
     - [Build-View](#Build-View)
     - [Build-WebPC](#Build-WebPC)
+
+![fs](document/fs.gif)
+![shell](document/shell.gif)
+![vnc](document/vnc.gif)
+
 ## Background
 
 The popularity of computer equipment and the rapid development of the network make remote operation of computers more and more necessary and common. ssh and rdp can only control a device with an independent external network ip, and each has its own advantages and disadvantages. Services that provide remote management and control of multiple devices such as TeamViewer are usually not suitable for non-commercial users. And usually only provides remote desktop but remote shell for Linux and other devices is usually more useful and efficient. In addition, it is annoying to install an annoying remote control program. So I sorted out the above needs, and realized all customer functions to the browser is this project WebPC.
