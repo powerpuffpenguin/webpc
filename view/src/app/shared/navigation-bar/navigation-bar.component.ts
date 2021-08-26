@@ -8,7 +8,7 @@ import { SignInComponent } from '../sign-in/sign-in.component';
 import { SessionService } from 'src/app/core/session/session.service';
 import { Session } from 'src/app/core/session/session';
 import { PasswordComponent } from '../password/password.component';
-import { FullscreenService } from 'src/app/core/fullscreen/fullscreen.service';
+import { NavigationService } from 'src/app/core/navigation/navigation.service';
 interface Data {
   id: Theme,
   name: string
@@ -38,10 +38,11 @@ const Themes: Array<Data> = [
 })
 export class NavigationBarComponent implements OnInit, OnDestroy {
   fullscreen = false
+  target = ''
   constructor(private readonly settingsService: SettingsService,
     private readonly matDialog: MatDialog,
     private readonly sessionService: SessionService,
-    private readonly fullscreenService: FullscreenService,
+    private readonly navigationService: NavigationService,
   ) {
   }
   session: Session | undefined
@@ -65,10 +66,15 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
     ).subscribe((session) => {
       this.session = session
     })
-    this.fullscreenService.observable.pipe(
+    this.navigationService.fullscreenObservable.pipe(
       takeUntil(this.closed_.observable),
     ).subscribe((ok) => {
       this.fullscreen = ok
+    })
+    this.navigationService.targetObservable.pipe(
+      takeUntil(this.closed_.observable),
+    ).subscribe((val) => {
+      this.target = val
     })
   }
   ngOnDestroy() {

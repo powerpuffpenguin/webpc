@@ -1,10 +1,11 @@
+import { Location } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BehaviorSubject, fromEvent, of, Subject } from 'rxjs';
 import { takeUntil, concatAll, debounceTime } from 'rxjs/operators';
-import { FullscreenService } from 'src/app/core/fullscreen/fullscreen.service';
+import { NavigationService } from 'src/app/core/navigation/navigation.service';
 import { SessionService } from 'src/app/core/session/session.service';
 import { Closed } from 'src/app/core/utils/closed';
 import { Terminal } from 'xterm';
@@ -21,11 +22,11 @@ const DefaultFontFamily = "Lucida Console"
 export class ViewComponent implements OnInit, OnDestroy, AfterViewInit {
   private closed_ = new Closed()
   constructor(private readonly activatedRoute: ActivatedRoute,
-    private readonly router: Router,
+    private readonly location: Location,
     private readonly matDialog: MatDialog,
     private readonly httpClient: HttpClient,
     private readonly sessionService: SessionService,
-    private readonly fullscreenService: FullscreenService,
+    private readonly navigationService: NavigationService,
   ) { }
   fullscreen = false
   ok = false
@@ -46,7 +47,7 @@ export class ViewComponent implements OnInit, OnDestroy, AfterViewInit {
   private target_ = new BehaviorSubject<Target>({ id: '', shellid: '' })
   private resize_ = new Subject()
   ngOnInit(): void {
-    this.fullscreenService.observable.pipe(
+    this.navigationService.fullscreenObservable.pipe(
       takeUntil(this.closed_.observable)
     ).subscribe((ok) => {
       this.fullscreen = ok
@@ -54,7 +55,9 @@ export class ViewComponent implements OnInit, OnDestroy, AfterViewInit {
     this.activatedRoute.params.pipe(
       takeUntil(this.closed_.observable)
     ).subscribe((params) => {
+      console.log(params)
       const id = params["id"]
+      this.navigationService.target = id
       const shellid = params["shellid"]
       if (typeof id === "string" && typeof shellid === "string") {
         this.target_.next({
@@ -84,6 +87,7 @@ export class ViewComponent implements OnInit, OnDestroy, AfterViewInit {
       this.xterm_.dispose()
       this.xterm_ = undefined
     }
+    this.navigationService.target = ''
   }
   @ViewChild("xterm")
   xterm: ElementRef | undefined
@@ -143,7 +147,7 @@ export class ViewComponent implements OnInit, OnDestroy, AfterViewInit {
 
       const target = this.target_.value
       if (info.id != target.shellid) {
-        this.router.navigate(['/forward/shell', target.id, info.id])
+        this.location.replaceState(`/forward/shell/${target.id}/${info.id}`)
       }
     })
     // on change
@@ -285,7 +289,7 @@ export class ViewComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   onClickFullscreen(ok: boolean) {
     this.fullscreen = ok
-    this.fullscreenService.fullscreen = ok
+    this.navigationService.fullscreen = ok
     this.onResize()
   }
   private _keyboardKeyDown(keyCode: number, key: string, evt: any) {

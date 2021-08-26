@@ -2,8 +2,8 @@ import { Component, OnDestroy, ViewChild, ElementRef, } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
 import { ToasterConfig } from 'angular2-toaster';
 import { filter, takeUntil } from 'rxjs/operators';
-import { FullscreenService } from './core/fullscreen/fullscreen.service';
 import { I18nService } from './core/i18n/i18n.service';
+import { NavigationService } from './core/navigation/navigation.service';
 import { SettingsService } from './core/settings/settings.service';
 import { Closed } from './core/utils/closed';
 
@@ -20,7 +20,7 @@ export class AppComponent implements OnDestroy {
   })
   fullscreen = false
   constructor(readonly settingsService: SettingsService,
-    readonly fullscreenService: FullscreenService,
+    readonly navigationService: NavigationService,
     private readonly matIconRegistry: MatIconRegistry,
     private readonly i18nService: I18nService,
   ) {
@@ -33,7 +33,7 @@ export class AppComponent implements OnDestroy {
       this.theme = theme
     })
 
-    this.fullscreenService.observable.pipe(
+    this.navigationService.fullscreenObservable.pipe(
       takeUntil(this.closed_.observable),
     ).subscribe((ok) => {
       this.fullscreen = ok

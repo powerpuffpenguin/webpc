@@ -3,6 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { filter, finalize, map, takeUntil } from 'rxjs/operators';
 import { ServerAPI } from 'src/app/core/core/api';
+import { NavigationService } from 'src/app/core/navigation/navigation.service';
 import { SessionService } from 'src/app/core/session/session.service';
 import { Closed } from 'src/app/core/utils/closed';
 interface Response {
@@ -18,6 +19,7 @@ export class DownloadComponent implements OnInit, OnDestroy {
   constructor(private readonly activatedRoute: ActivatedRoute,
     private readonly httpClient: HttpClient,
     private readonly sessionService: SessionService,
+    private readonly navigationService: NavigationService,
   ) { }
   err: any
   ready = false
@@ -27,6 +29,7 @@ export class DownloadComponent implements OnInit, OnDestroy {
   private id_ = ''
   ngOnInit(): void {
     this.id_ = this.activatedRoute.snapshot.params['id']
+    this.navigationService.target = this.id_
     this.load()
     this.sessionService.observable.pipe(
       takeUntil(this.closed_.observable),
@@ -43,6 +46,7 @@ export class DownloadComponent implements OnInit, OnDestroy {
   }
   ngOnDestroy() {
     this.closed_.close()
+    this.navigationService.target = ''
   }
   load() {
     this.err = null

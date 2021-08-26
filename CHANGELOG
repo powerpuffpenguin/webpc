@@ -3,6 +3,7 @@
 * fix shared not work
 * fix slave websocket not check group
 * fix some fs api not forward
+* function list on view's navigation-bar
 
 # v1.0.0
 

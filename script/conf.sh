@@ -1,7 +1,7 @@
 Target="webpc"
 Docker="github.com/powerpuffpenguin/webpc"
 Dir=$(cd "$(dirname $BASH_SOURCE)/.." && pwd)
-Version="v1.0.1"
+Version="v1.0.x"
 View=1
 Platforms=(
     windows/amd64

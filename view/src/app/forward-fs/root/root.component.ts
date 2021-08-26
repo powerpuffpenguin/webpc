@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntil } from 'rxjs/operators';
+import { NavigationService } from 'src/app/core/navigation/navigation.service';
 import { Closed } from 'src/app/core/utils/closed';
 import { State } from './state';
 
@@ -15,6 +16,7 @@ export class RootComponent implements OnInit, OnDestroy {
   state = {} as State
   constructor(private readonly activatedRoute: ActivatedRoute,
     private readonly httpClient: HttpClient,
+    private readonly navigationService: NavigationService,
   ) {
   }
   ngOnInit(): void {
@@ -22,6 +24,7 @@ export class RootComponent implements OnInit, OnDestroy {
       takeUntil(this.closed_.observable)
     ).subscribe((params) => {
       const id = params['id']
+      this.navigationService.target = id
       const state = new State(this.httpClient, id)
       this.state = state
       state.refresh()
@@ -30,6 +33,7 @@ export class RootComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.state.closed.close()
     this.closed_.close()
+    this.navigationService.target = ''
   }
   onClickRefresh() {
     this.state.refresh()

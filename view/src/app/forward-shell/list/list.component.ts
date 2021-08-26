@@ -3,6 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntil } from 'rxjs/operators';
+import { NavigationService } from 'src/app/core/navigation/navigation.service';
 import { Closed } from 'src/app/core/utils/closed';
 import { DeleteComponent } from '../dialog/delete/delete.component';
 import { EditComponent } from '../dialog/edit/edit.component';
@@ -20,6 +21,7 @@ export class ListComponent implements OnInit, OnDestroy {
   constructor(private readonly activatedRoute: ActivatedRoute,
     private readonly httpClient: HttpClient,
     private readonly matDialog: MatDialog,
+    private readonly navigationService: NavigationService,
   ) { }
 
   ngOnInit(): void {
@@ -27,6 +29,7 @@ export class ListComponent implements OnInit, OnDestroy {
       takeUntil(this.closed_.observable)
     ).subscribe((params) => {
       const id = params['id']
+      this.navigationService.target = id
       const state = new State(this.httpClient, id)
       this.state = state
       state.refresh()
@@ -34,6 +37,8 @@ export class ListComponent implements OnInit, OnDestroy {
   }
   ngOnDestroy() {
     this.closed_.close()
+    this.state.closed.close()
+    this.navigationService.target = ''
   }
   onClickRefresh() {
     this.state.refresh()

@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ToasterService } from 'angular2-toaster';
 import { finalize, takeUntil } from 'rxjs/operators';
 import { ServerAPI } from 'src/app/core/core/api';
+import { NavigationService } from 'src/app/core/navigation/navigation.service';
 import { SessionService } from 'src/app/core/session/session.service';
 import { Closed } from 'src/app/core/utils/closed';
 interface Response {
@@ -19,6 +20,7 @@ export class ViewComponent implements OnInit, OnDestroy {
   constructor(private readonly activatedRoute: ActivatedRoute,
     private readonly httpClient: HttpClient,
     private readonly toasterService: ToasterService,
+    private readonly navigationService: NavigationService,
   ) { }
   private closed_ = new Closed()
   ready = false
@@ -30,10 +32,12 @@ export class ViewComponent implements OnInit, OnDestroy {
   id = ''
   ngOnInit(): void {
     this.id = this.activatedRoute.snapshot.params['id']
+    this.navigationService.target = this.id
     this.load()
   }
   ngOnDestroy() {
     this.closed_.close()
+    this.navigationService.target = ''
   }
   load() {
     this.err = null

@@ -267,7 +267,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/query/query.component.html</context>
-          <context context-type="linenumber">61</context>
+          <context context-type="linenumber">68</context>
         </context-group>
       </trans-unit>
       <trans-unit id="4c90059afafb7e160384d9f512797c95bb95c6dc" datatype="html">
@@ -279,11 +279,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/query/query.component.html</context>
-          <context context-type="linenumber">10</context>
+          <context context-type="linenumber">11</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/query/query.component.html</context>
-          <context context-type="linenumber">52</context>
+          <context context-type="linenumber">53</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/user/dialog/add/add.component.html</context>
@@ -323,11 +323,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/query/query.component.html</context>
-          <context context-type="linenumber">3</context>
+          <context context-type="linenumber">4</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/query/query.component.html</context>
-          <context context-type="linenumber">44</context>
+          <context context-type="linenumber">45</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-fs/dialog/compress/compress.component.html</context>
@@ -435,7 +435,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/query/query.component.html</context>
-          <context context-type="linenumber">48</context>
+          <context context-type="linenumber">49</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/group/dialog/add/add.component.html</context>
@@ -739,7 +739,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward/home/home.component.html</context>
-          <context context-type="linenumber">36</context>
+          <context context-type="linenumber">37</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/group/list/list.component.html</context>
@@ -767,7 +767,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/query/query.component.html</context>
-          <context context-type="linenumber">71</context>
+          <context context-type="linenumber">78</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/user/dialog/group/group.component.html</context>
@@ -791,7 +791,7 @@
         <target>模糊匹配</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/query/query.component.html</context>
-          <context context-type="linenumber">7</context>
+          <context context-type="linenumber">8</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/user/query/query.component.html</context>
@@ -803,7 +803,7 @@
         <target>查询</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/query/query.component.html</context>
-          <context context-type="linenumber">17</context>
+          <context context-type="linenumber">18</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/user/query/query.component.html</context>
@@ -815,7 +815,7 @@
         <target>设备 ID</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/query/query.component.html</context>
-          <context context-type="linenumber">28</context>
+          <context context-type="linenumber">29</context>
         </context-group>
       </trans-unit>
       <trans-unit id="15467a52ace208c5811e3a51d7d344178b3546b1" datatype="html">
@@ -823,7 +823,7 @@
         <target>连接</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/query/query.component.html</context>
-          <context context-type="linenumber">32</context>
+          <context context-type="linenumber">33</context>
         </context-group>
       </trans-unit>
       <trans-unit id="68572de01b84c678be4bf8a27b990ecac2f41ce9" datatype="html">
@@ -831,7 +831,7 @@
         <target>代码</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/query/query.component.html</context>
-          <context context-type="linenumber">56</context>
+          <context context-type="linenumber">57</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3cb410619c186877f1bde944deb7d96513d8609e" datatype="html">
@@ -839,7 +839,7 @@
         <target>变更代码</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/query/query.component.html</context>
-          <context context-type="linenumber">67</context>
+          <context context-type="linenumber">74</context>
         </context-group>
       </trans-unit>
       <trans-unit id="28f86ffd419b869711aa13f5e5ff54be6d70731c" datatype="html">
@@ -847,7 +847,7 @@
         <target>编辑</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/query/query.component.html</context>
-          <context context-type="linenumber">75</context>
+          <context context-type="linenumber">82</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-shell/list/list.component.html</context>
@@ -867,7 +867,7 @@
         <target>删除</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/query/query.component.html</context>
-          <context context-type="linenumber">79</context>
+          <context context-type="linenumber">86</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-fs/dialog/remove/remove.component.html</context>
@@ -964,7 +964,7 @@
       </trans-unit>
       <trans-unit id="beb0a5d8115139f6a81fde5e28714c382294b7c7" datatype="html">
         <source>webpc origin ...</source>
-        <target>大学毕业后的本喵突然之间无法像学生时代一样一直宅在寝室玩电脑，无法时刻控制自己的笔记本感觉随时都在浪费笔记本的算力。ssh 可以解决大部分问题，然而因为游戏的原因笔记本有时运行者 windows 系统。此外远程播放笔记本上的电影或音乐都是 ssh 无法解决的，同时 ssh 客户端也不是随处可见（例如我去表妹家玩她的计算机上没有 ssh 客户端）。感谢 html5，播放电影和音乐使用浏览器的 video 和 audio 标签即可，shell 使用 websocket 转到 ssh 或 伪终端即可。于是本喵开发了旧版的 webpc 来完成这两个功能暂且称为 old-webpc。猫咪都是贪婪的当，old-webpc 只能控制一台计算机。当本喵可以使用浏览器控制家里的笔记本后，又开始想要控制公司的办公电脑，远程服务器。于是为它们各自安装上 old-webpc，然而公司的电脑处于内网本喵无权设置端口映射，且每个安装了 old-webpc 的电脑都会暴露一个不同的 url 访问地址。最终本喵重写了 old-webpc 即现在的 webpc 项目，相对旧版提供了管理多台设备的能力，同时后端实现全部改为 grpc 实现（old-webpc 使用 http 框架 gin 实现）。新的 webpc 使用了全新的项目是因为内部全部重写了，这主要是因为使用 grpc 可以偷懒的代码量让本喵无法抵抗故本喵已经基本放弃了直接开发 http 接口。</target>
+        <target>大学毕业后的本喵突然之间无法像学生时代一样一直宅在寝室玩电脑，无法时刻控制自己的笔记本感觉随时都在浪费笔记本的算力。ssh 可以解决大部分问题，然而因为游戏的原因笔记本有时运行着 windows 系统。此外远程播放笔记本上的电影或音乐都是 ssh 无法解决的，同时 ssh 客户端也不是随处可见（例如我去表妹家玩她的计算机上没有 ssh 客户端）。感谢 html5，播放电影和音乐使用浏览器的 video 和 audio 标签即可，shell 使用 websocket 转到 ssh 或 伪终端即可。于是本喵开发了旧版的 webpc 来完成这两个功能暂且称为 old-webpc。猫咪都是贪婪的当，old-webpc 只能控制一台计算机。当本喵可以使用浏览器控制家里的笔记本后，又开始想要控制公司的办公电脑，远程服务器。于是为它们各自安装上 old-webpc，然而公司的电脑处于内网本喵无权设置端口映射，且每个安装了 old-webpc 的电脑都会暴露一个不同的 url 访问地址。最终本喵重写了 old-webpc 即现在的 webpc 项目，相对旧版提供了管理多台设备的能力，同时后端实现全部改为 grpc 实现（old-webpc 使用 http 框架 gin 实现）。新的 webpc 使用了全新的项目是因为内部全部重写了，这主要是因为使用 grpc 可以偷懒的代码量让本喵无法抵抗故本喵已经基本放弃了直接开发 http 接口。</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/content/about/about.component.html</context>
           <context context-type="linenumber">37</context>
@@ -1191,7 +1191,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward/home/home.component.html</context>
-          <context context-type="linenumber">49</context>
+          <context context-type="linenumber">51</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/group/list/list.component.html</context>
@@ -1291,10 +1291,6 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward-fs/root/root.component.html</context>
-          <context context-type="linenumber">12</context>
-        </context-group>
-        <context-group purpose="location">
-          <context context-type="sourcefile">src/app/forward/shared/shared.component.html</context>
           <context context-type="linenumber">12</context>
         </context-group>
       </trans-unit>
@@ -1471,7 +1467,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward/home/home.component.html</context>
-          <context context-type="linenumber">31</context>
+          <context context-type="linenumber">32</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/group/list/list.component.html</context>
@@ -1503,7 +1499,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/navigation-bar/navigation-bar.component.html</context>
-          <context context-type="linenumber">57</context>
+          <context context-type="linenumber">61</context>
         </context-group>
       </trans-unit>
       <trans-unit id="a2252a948e0c04930a57b4b97df137cd2e8ba3f6" datatype="html">
@@ -1675,7 +1671,7 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward/home/home.component.html</context>
-          <context context-type="linenumber">44</context>
+          <context context-type="linenumber">45</context>
         </context-group>
       </trans-unit>
       <trans-unit id="b735003aa0ea101ec66419a0c87ac62104cbe624" datatype="html">
@@ -1687,7 +1683,11 @@
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward/home/home.component.html</context>
-          <context context-type="linenumber">45</context>
+          <context context-type="linenumber">46</context>
+        </context-group>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward/shared/shared.component.html</context>
+          <context context-type="linenumber">12</context>
         </context-group>
       </trans-unit>
       <trans-unit id="da82eb16485fefa8b1fac22b0349eac0bab41513" datatype="html">
@@ -1695,11 +1695,11 @@
         <target>记录器</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward/home/home.component.html</context>
-          <context context-type="linenumber">21</context>
+          <context context-type="linenumber">22</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/forward/home/home.component.html</context>
-          <context context-type="linenumber">48</context>
+          <context context-type="linenumber">50</context>
         </context-group>
       </trans-unit>
       <trans-unit id="84cd855cdd79e346fb01958d34e4d4504f830034" datatype="html">
@@ -1766,12 +1766,20 @@
           <context context-type="linenumber">12</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="f485671ad6d362026c8103c6a4f58bdd2dcb0e07" datatype="html">
+        <source>Function List Tooltip</source>
+        <target>功能列表</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/shared/navigation-bar/navigation-bar.component.html</context>
+          <context context-type="linenumber">17</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="2034b5a6cc6cfeddeeebb2936de216b8e3962d0f" datatype="html">
         <source>Select a theme for page</source>
         <target>选择页面主题</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/navigation-bar/navigation-bar.component.html</context>
-          <context context-type="linenumber">20</context>
+          <context context-type="linenumber">24</context>
         </context-group>
       </trans-unit>
       <trans-unit id="c32ef07f8803a223a83ed17024b38e8d82292407" datatype="html">
@@ -1779,7 +1787,7 @@
         <target>密码</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/navigation-bar/navigation-bar.component.html</context>
-          <context context-type="linenumber">40</context>
+          <context context-type="linenumber">44</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/sign-in/sign-in.component.html</context>
@@ -1799,7 +1807,7 @@
         <target>用户管理</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/navigation-bar/navigation-bar.component.html</context>
-          <context context-type="linenumber">47</context>
+          <context context-type="linenumber">51</context>
         </context-group>
       </trans-unit>
       <trans-unit id="0d65db91949bc98f9ca7b8ec02693a27351a5ed6" datatype="html">
@@ -1807,7 +1815,7 @@
         <target>分组管理</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/navigation-bar/navigation-bar.component.html</context>
-          <context context-type="linenumber">52</context>
+          <context context-type="linenumber">56</context>
         </context-group>
       </trans-unit>
       <trans-unit id="8fe73a4787b8068b2ba61f54ab7e0f9af2ea1fc9" datatype="html">
@@ -1815,7 +1823,7 @@
         <target>版本</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/navigation-bar/navigation-bar.component.html</context>
-          <context context-type="linenumber">62</context>
+          <context context-type="linenumber">66</context>
         </context-group>
       </trans-unit>
       <trans-unit id="5d22c795daf43877a5f708dca2bccd549eb0471d" datatype="html">
@@ -1823,7 +1831,7 @@
         <target>登出</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/navigation-bar/navigation-bar.component.html</context>
-          <context context-type="linenumber">68</context>
+          <context context-type="linenumber">72</context>
         </context-group>
       </trans-unit>
       <trans-unit id="287d3301a32a65a1b31116bda5d3a6463158c42a" datatype="html">
@@ -1831,7 +1839,7 @@
         <target>登入</target>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/navigation-bar/navigation-bar.component.html</context>
-          <context context-type="linenumber">73</context>
+          <context context-type="linenumber">77</context>
         </context-group>
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/shared/sign-in/sign-in.component.html</context>
