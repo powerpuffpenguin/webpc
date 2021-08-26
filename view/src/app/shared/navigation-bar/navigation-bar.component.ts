@@ -9,6 +9,7 @@ import { SessionService } from 'src/app/core/session/session.service';
 import { Session } from 'src/app/core/session/session';
 import { PasswordComponent } from '../password/password.component';
 import { NavigationService } from 'src/app/core/navigation/navigation.service';
+import { Authorization } from 'src/app/core/core/api';
 interface Data {
   id: Theme,
   name: string
@@ -102,5 +103,12 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
     this.matDialog.open(PasswordComponent, {
       disableClose: true,
     })
+  }
+  get server(): boolean {
+    const session = this.session
+    if (session) {
+      return session.anyAuth(Authorization.Root, Authorization.Server)
+    }
+    return false
   }
 }
