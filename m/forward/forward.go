@@ -98,19 +98,18 @@ func (f *Forward) Get(c *gin.Context, str string) (ctx context.Context, cc *grpc
 	}
 
 	// public api
-	shared := false
-	if c.Request.URL.Path == `/api/forward/v1/fs/` || strings.HasPrefix(c.Request.URL.Path, `/api/forward/v1/fs/`) {
-		shared = true
-	}
-
+	shared := strings.HasPrefix(c.Request.URL.Path, `/api/forward/v1/fs/`) ||
+		strings.HasPrefix(c.Request.URL.Path, `/api/forward/v1/static/`)
 	ctx = c.Request.Context()
 	// userdata
 	userdata, e := f.web.ShouldBindUserdata(c)
 	if e != nil {
-		if shared && status.Code(e) == codes.Unauthenticated {
-			ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs(
-				`Authorization`, `Bearer Expired`,
-			))
+		if shared {
+			if status.Code(e) == codes.Unauthenticated {
+				ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs(
+					`Authorization`, `Bearer Expired`,
+				))
+			}
 			e = nil
 		}
 		return
@@ -119,10 +118,12 @@ func (f *Forward) Get(c *gin.Context, str string) (ctx context.Context, cc *grpc
 	// check group
 	e = f.checkGroup(c, id, &userdata)
 	if e != nil {
-		if shared && status.Code(e) == codes.Unauthenticated {
-			ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs(
-				`Authorization`, `Bearer Expired`,
-			))
+		if shared {
+			if status.Code(e) == codes.Unauthenticated {
+				ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs(
+					`Authorization`, `Bearer Expired`,
+				))
+			}
 			e = nil
 		}
 		return
@@ -160,10 +161,8 @@ func (f *Forward) Forward(str string, c *gin.Context) {
 		return
 	}
 	// public api
-	shared := false
-	if c.Request.URL.Path == `/api/forward/v1/fs/` || strings.HasPrefix(c.Request.URL.Path, `/api/forward/v1/fs/`) {
-		shared = true
-	}
+	shared := strings.HasPrefix(c.Request.URL.Path, `/api/forward/v1/fs/`) ||
+		strings.HasPrefix(c.Request.URL.Path, `/api/forward/v1/static/`)
 
 	// userdata
 	userdata, e := f.web.ShouldBindUserdata(c)

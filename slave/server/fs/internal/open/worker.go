@@ -16,6 +16,7 @@ type Worker struct {
 	err    chan error
 	close  chan struct{}
 	file   *os.File
+	root   bool
 }
 
 func New(server grpc_fs.FS_OpenServer) *Worker {
@@ -109,6 +110,9 @@ func (w *Worker) open(ch chan openResult) {
 		w.resultOpen(ch, nil, e)
 		return
 	}
+	if req.Path == `/` {
+		w.root = true
+	}
 	f, e := m.Open(req.Path)
 	w.resultOpen(ch, f, e)
 }
@@ -163,18 +167,31 @@ func (w *Worker) onRequest(req *grpc_fs.OpenRequest) (e error) {
 		if e != nil {
 			return
 		}
-		resp := grpc_fs.OpenResponse{
-			Event:   evt,
-			Readdir: make([]*grpc_fs.FSInfo, len(items)),
+		var infos []*grpc_fs.FSInfo
+		if w.root {
+			infos = make([]*grpc_fs.FSInfo, 0, len(items))
+		} else {
+			infos = make([]*grpc_fs.FSInfo, 1, len(items)+1)
+			infos[0] = &grpc_fs.FSInfo{
+				Name:    `..`,
+				Size:    0,
+				Mode:    0,
+				ModTime: 0,
+				IsDir:   true,
+			}
 		}
-		for i, item := range items {
-			resp.Readdir[i] = &grpc_fs.FSInfo{
+		for _, item := range items {
+			infos = append(infos, &grpc_fs.FSInfo{
 				Name:    item.Name(),
 				Size:    item.Size(),
 				Mode:    uint32(item.Mode()),
 				ModTime: item.ModTime().Unix(),
 				IsDir:   item.IsDir(),
-			}
+			})
+		}
+		resp := grpc_fs.OpenResponse{
+			Event:   evt,
+			Readdir: infos,
 		}
 		e = w.server.Send(&resp)
 	case grpc_fs.FSEvent_Stat:
