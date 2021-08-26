@@ -1,0 +1,15 @@
+# v1.0.x
+
+* fix shared not work
+* fix slave websocket not check group
+* fix some fs api not forward
+
+# v1.0.0
+
+First release
+
+* filesystem
+* filesystem shared 
+* shell
+* vnc
+* logger

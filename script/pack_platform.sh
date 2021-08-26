@@ -124,6 +124,7 @@ if [[ "$os" == "windows" ]];then
         shell-windows.bat shell-bash.bat
         webpc-master.exe webpc-slave.exe webpc-master.xml webpc-slave.xml
         controller.bat
+        nginx_webpc.conf
     )
 else
     source=(
@@ -131,6 +132,7 @@ else
         etc
         useradd.sh run-linux shell-linux
         webpc-master.service webpc-slave.service
+        nginx_webpc.conf
     )
 fi
 exec="${args[@]} ${source[@]}"

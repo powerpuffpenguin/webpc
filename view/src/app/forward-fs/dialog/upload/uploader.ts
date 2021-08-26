@@ -313,11 +313,14 @@ class Task {
     private _merge() {
         const dir = this.dir
         return ServerAPI.forward.v1.fs.child('merge').post(this.httpClient, {
-            slave_id: dir.id,
             root: dir.root,
             path: this.path,
             hash: this.hash,
             count: this.chunks.length,
+        }, {
+            params: {
+                slave_id: dir.id,
+            },
         }).pipe(
             takeUntil(this.closed_.observable)
         ).toPromise()

@@ -37,11 +37,14 @@ export class RenameComponent implements OnInit {
     const data = this.data
     const target = this.data.target
     ServerAPI.forward.v1.fs.child('rename').post(this.httpClient, {
-      slave_id: dir.id,
       root: dir.root,
       dir: dir.dir,
       old: target.name,
       current: this.name,
+    }, {
+      params: {
+        slave_id: dir.id,
+      },
     }).pipe(
       finalize(() => {
         this.disabled = false
