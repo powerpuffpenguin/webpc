@@ -25,6 +25,9 @@ WebPC 主要有下述特色：
 - [設定](#設定)
     - [設定master](#設定master)
     - [設定slave](#設定slave)
+- [編譯](#編譯)
+    - [編譯前端](#編譯前端)
+    - [編譯WebPC](#編譯WebPC)
 
 ## 背景
 
@@ -40,7 +43,7 @@ WebPC 主要有下述特色：
 
 ## 安裝
 
-對於 linux-amd64 和 windows-amd64 已經提供好了與編譯程序，請直接下載安裝，對於其它平臺需要自行編譯，並且參考下文進行安裝。
+對於 linux-amd64 和 windows-amd64 已經提供好了預編譯程序，請直接下載安裝，對於其它平臺需要自行編譯，並且參考下文進行安裝。
 
 ### linux-amd64
 
@@ -233,3 +236,70 @@ system.libsonnet 設置了slave 將提供哪些功能
     ],
 }
 ```
+
+## 編譯
+
+WebPC 後端使用 golang 和 grpc 開發，前端使用 angular 開發需要分別編譯。
+
+### 編譯前端
+
+1. 安裝好必要的開發環境 node typescript yarn
+
+2. 下載項目並且切換工作目錄到 webpc/view
+
+    ```
+    git clone git@github.com:powerpuffpenguin/webpc.git && cd webpc/view
+    ```
+
+3. 安裝項目依賴
+
+    ```
+    yarn install
+    ```
+
+    or
+
+    ```
+    npm install
+    ```
+
+4. 編譯前端代碼
+
+    ```
+    ../build.sh view
+    ```
+
+### 編譯WebPC
+
+1. 安裝好必要的開發環境 gcc golang proto3 grpc protoc-gen-go protoc-gen-grpc-gateway protoc-gen-openapiv2 
+
+2. 安裝 golang 代碼嵌入工具
+
+    ```
+    go install github.com/rakyll/statik
+    ```
+
+3. 下載項目並且切換工作目錄到 webpc
+
+    ```
+    git clone git@github.com:powerpuffpenguin/webpc.git && cd webpc
+    ```
+
+4. 生成 grpc 代碼
+
+    ```
+    ./build.sh grpc
+    ```
+
+5. 將前端代碼和靜態檔案嵌入到 golang 代碼
+
+    ```
+    ./build.sh document
+    ./build.sh view -s
+    ```
+
+6. 編譯 go 代碼
+
+    ```
+    go build -o bin/webpc
+    ```

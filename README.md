@@ -25,7 +25,9 @@ WebPC mainly has the following characteristics:
 - [Set-up](#Set-up)
     - [Set-up-master](#Set-up-master)
     - [Set-up-slave](#Set-up-slave)
-
+- [Build](#Build)
+    - [Build-View](#Build-View)
+    - [Build-WebPC](#Build-WebPC)
 ## Background
 
 The popularity of computer equipment and the rapid development of the network make remote operation of computers more and more necessary and common. ssh and rdp can only control a device with an independent external network ip, and each has its own advantages and disadvantages. Services that provide remote management and control of multiple devices such as TeamViewer are usually not suitable for non-commercial users. And usually only provides remote desktop but remote shell for Linux and other devices is usually more useful and efficient. In addition, it is annoying to install an annoying remote control program. So I sorted out the above needs, and realized all customer functions to the browser is this project WebPC.
@@ -40,7 +42,7 @@ The popularity of computer equipment and the rapid development of the network ma
 
 ## Install
 
-For linux-amd64 and windows-amd64, the compiled programs have been provided, please download and install directly. For other platforms, you need to compile by yourself, and refer to the following for installation.
+For linux-amd64 and windows-amd64, pre-compiled programs have been provided, please download and install directly. For other platforms, you need to compile by yourself, and refer to the following for installation.
 
 ### linux-amd64
 
@@ -233,3 +235,69 @@ system.libsonnet sets what functions the slave will provide
     ],
 }
 ```
+
+## Build
+
+WebPC back-end uses golang and grpc development, front-end uses angular development, and needs to be compiled separately. 
+
+### Build-View
+
+1. Install the necessary development environment node typescript yarn
+
+2. Download the project and switch the working directory to webpc/view
+
+    ```
+    git clone git@github.com:powerpuffpenguin/webpc.git && cd webpc/view
+    ```
+3. Install project dependencies
+
+    ```
+    yarn install
+    ```
+
+    or
+
+    ```
+    npm install
+    ```
+
+4. Compile the front-end code
+
+    ```
+    ../build.sh view
+    ```
+
+### Build-WebPC
+
+1. Install the necessary development environment gcc golang proto3 grpc protoc-gen-go protoc-gen-grpc-gateway protoc-gen-openapiv2 
+
+2. Install golang code embedding tool
+
+    ```
+    go install github.com/rakyll/statik
+    ```
+
+3. Download the project and switch the working directory to webpc
+
+    ```
+    git clone git@github.com:powerpuffpenguin/webpc.git && cd webpc
+    ```
+
+4. Generate grpc code
+
+    ```
+    ./build.sh grpc
+    ```
+
+5. Embed front-end code and static files into golang code
+
+    ```
+    ./build.sh document
+    ./build.sh view -s
+    ```
+
+6. Compile go code
+
+    ```
+    go build -o bin/webpc
+    ```
