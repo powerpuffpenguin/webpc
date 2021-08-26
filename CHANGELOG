@@ -1,4 +1,4 @@
-# v1.0.x
+# v1.0.5
 
 * fix shared not work
 * fix slave websocket not check group
