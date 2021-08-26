@@ -1,5 +1,7 @@
 # v1.0.5-x
 
+* fix view navigation-bar server check auth.Server 
+* fix run-linux not set $HOME
 
 # v1.0.5
 

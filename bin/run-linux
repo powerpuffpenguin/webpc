@@ -1,5 +1,5 @@
 #!/bin/bash
 export TERM=xterm
+export HOME="/home/$1"
 Dir=$(cd "$(dirname $BASH_SOURCE)" && pwd)
-echo "$Dir/shell-linux"
-sudo -u "$1" "$Dir/shell-linux" "$1"
+sudo -u "$1" "$Dir/shell-linux" "$1
