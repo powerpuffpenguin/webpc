@@ -156,7 +156,7 @@ local duration = def.Duration;
 }
 ```
 
-system.libsonnet 定義將 master 本身作爲一個slave 註冊給自己以提供遠程控制，只有 Root 權限的用戶可以控制 master
+system.libsonnet 定義將 master 本身作爲一個slave 註冊給自己以提供遠程控制，只有 Root 或 Server 權限的用戶可以控制 master
 
 ### 設定slave
 

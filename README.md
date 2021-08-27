@@ -156,7 +156,7 @@ local duration = def.Duration;
 }
 ```
 
-system.libsonnet defines the master itself as a slave to register to itself to provide remote control, and only users with root permissions can control the master
+system.libsonnet defines the master itself as a slave to register to itself to provide remote control, and only users with Root or Server permissions can control the master
 
 ### Set-up-slave
 
