@@ -29,6 +29,7 @@ WebPC mainly has the following characteristics:
 - [Build](#Build)
     - [Build-View](#Build-View)
     - [Build-WebPC](#Build-WebPC)
+- [Groups-Permissions](#Groups-Permissions)
 
 ![fs](document/fs.gif)
 ![shell](document/shell.gif)
@@ -307,3 +308,17 @@ WebPC back-end uses golang and grpc development, front-end uses angular developm
     ```
     go build -o bin/webpc
     ```
+
+# Groups-Permissions
+
+All users and controlled terminals in the WebPC exist under the node of a tree group. When the user's group is the ancestor node of the group where the controlled terminal belongs, the user can control the controlled terminal.
+
+The permissions determine the operations that the user can perform include the following definitions:
+
+* Root -> Can perform any operation
+* Server -> When the master is registered as a slave, only users with Server permissions can control it
+* Shell -> Ability to obtain remote shell execution commands
+* Read -> Can read the web file system set by the fs module
+* Write -> You can upload files or modify files through the fs module
+* VNC -> Remote desktop operation can be done through vnc
+* Slave -> You can add, delete, modify the slave list

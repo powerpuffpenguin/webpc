@@ -29,6 +29,7 @@ WebPC 主要有下述特色：
 - [編譯](#編譯)
     - [編譯前端](#編譯前端)
     - [編譯WebPC](#編譯WebPC)
+- [組和權限](#組和權限)
 
 ![fs](document/fs.gif)
 ![shell](document/shell.gif)
@@ -308,3 +309,17 @@ WebPC 後端使用 golang 和 grpc 開發，前端使用 angular 開發需要分
     ```
     go build -o bin/webpc
     ```
+
+# 組和權限
+
+WebPC中所有的用戶和受控端都存在與一個樹形組的節點下，當用戶所在組是受控端所在組的祖先節點時，用戶才能控制此受控端。
+
+權限確定用戶能夠執行的操作包含如下定義：
+
+* Root -> 可以執行任意操作
+* Server -> 將 master 註冊爲 slave 時，擁有 Server 權限的用戶才能對其進行控制
+* Shell -> 能夠獲取 遠程 shell 執行命令
+* Read -> 可以讀取 fs 模塊設定的 網頁檔案系統
+* Write -> 可以通過 fs 模塊上傳檔案 或 修改檔案
+* VNC -> 可以通過 vnc 進行遠程桌面操作
+* Slave -> 可以添加 刪除 修改 slave 列表
