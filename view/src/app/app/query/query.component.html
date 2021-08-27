@@ -57,7 +57,7 @@
             <th mat-header-cell *matHeaderCellDef i18n>Code</th>
             <td mat-cell *matCellDef="let element">
                 {{element.code}}
-                <button mat-icon-button matSuffix matTooltip="content copy"
+                <button mat-icon-button matSuffix i18n-matTooltip matTooltip="copy url" *ngIf="element.code"
                     (click)="onCliCkCopyClipboard(element.code)">
                     <mat-icon>content_copy</mat-icon>
                 </button>

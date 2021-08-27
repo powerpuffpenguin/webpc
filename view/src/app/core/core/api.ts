@@ -39,6 +39,8 @@ export enum Authorization {
     Write = 5,
     // vnc view
     VNC = 6,
+    // add edit delete of slave
+    Slave = 7,
 }
 export const Authorizations = [
     Authorization.Root,
@@ -47,6 +49,7 @@ export const Authorizations = [
     Authorization.Read,
     Authorization.Write,
     Authorization.VNC,
+    Authorization.Slave,
 ]
 export function AuthorizationName(authorization: Authorization): string {
     switch (authorization) {
@@ -62,6 +65,8 @@ export function AuthorizationName(authorization: Authorization): string {
             return 'write'
         case Authorization.VNC:
             return 'vnc'
+        case Authorization.Slave:
+            return 'slave'
         default:
             return `${authorization}`
     }

@@ -13,4 +13,6 @@ const (
 	Write = 5
 	// vnc view
 	VNC = 6
+	// add edit delete of slave
+	Slave = 7
 )

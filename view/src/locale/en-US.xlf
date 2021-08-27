@@ -258,6 +258,14 @@
           <context context-type="linenumber">63</context>
         </context-group>
       </trans-unit>
+      <trans-unit id="f959ff81c4b1074929947df5987d614721b6506f" datatype="html">
+        <source>copied</source>
+        <target>copied</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app.component.html</context>
+          <context context-type="linenumber">65</context>
+        </context-group>
+      </trans-unit>
       <trans-unit id="8a3e5253b801997bb641fd367390cdae7e987656" datatype="html">
         <source>Add Device</source>
         <target>Add Device</target>
@@ -832,6 +840,14 @@
         <context-group purpose="location">
           <context context-type="sourcefile">src/app/app/query/query.component.html</context>
           <context context-type="linenumber">57</context>
+        </context-group>
+      </trans-unit>
+      <trans-unit id="c93ef0b3529579f9dc65f451efc95f944a15fb89" datatype="html">
+        <source>copy url</source>
+        <target>copy url</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/app/query/query.component.html</context>
+          <context context-type="linenumber">60</context>
         </context-group>
       </trans-unit>
       <trans-unit id="3cb410619c186877f1bde944deb7d96513d8609e" datatype="html">

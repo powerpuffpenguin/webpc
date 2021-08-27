@@ -1,7 +1,8 @@
-# v1.0.5-x
+# v1.0.8
 
 * fix view navigation-bar server check auth.Server 
 * fix run-linux not set $HOME
+* auth Slave
 
 # v1.0.5
 
