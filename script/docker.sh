@@ -51,6 +51,7 @@ do
 done
 
 cd "$Dir/docker"
+cp ../bin/webpc_linux_amd64.tar.gz source/webpc.tar.gz
 args=(
     sudo docker build -t "\"$Docker:$Version\"" .
 )

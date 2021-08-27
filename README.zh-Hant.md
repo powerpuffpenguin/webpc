@@ -20,6 +20,7 @@ WebPC 主要有下述特色：
 - [背景](#背景)
 - [如何工作](#如何工作)
 - [安裝](#安裝)
+    - [docker](docker/README.md)
     - [linux-amd64](#linux-amd64)
     - [windows-amd64](#windows-amd64)
 - [設定](#設定)

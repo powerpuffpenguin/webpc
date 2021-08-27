@@ -1,5 +1,5 @@
 Target="webpc"
-Docker="github.com/powerpuffpenguin/webpc"
+Docker="king011/webpc"
 Dir=$(cd "$(dirname $BASH_SOURCE)/.." && pwd)
 Version="v1.0.8"
 View=1

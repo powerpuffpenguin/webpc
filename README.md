@@ -20,6 +20,7 @@ WebPC mainly has the following characteristics:
 - [Background](#Background)
 - [How](#How)
 - [Install](#Install)
+    - [docker](docker/README.md)
     - [linux-amd64](#linux-amd64)
     - [windows-amd64](#windows-amd64)
 - [Set-up](#Set-up)
