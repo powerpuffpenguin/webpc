@@ -1,7 +1,6 @@
 package configure
 
 import (
-	"fmt"
 	"path/filepath"
 	"runtime"
 
@@ -59,7 +58,6 @@ type Mount struct {
 }
 
 func (m *Mount) format(basePath string) (e error) {
-	fmt.Println(m.Root, filepath.IsAbs(m.Root))
 	if filepath.IsAbs(m.Root) {
 		m.Root = filepath.Clean(m.Root)
 	} else {
