@@ -14,10 +14,11 @@ func DefaultSystem() *System {
 }
 
 type System struct {
-	Enable bool
-	Shell  string
-	VNC    string
-	Mount  []Mount
+	Enable      bool
+	Shell       string
+	VNC         string
+	PortForward bool
+	Mount       []Mount
 }
 
 func (s *System) format() (e error) {

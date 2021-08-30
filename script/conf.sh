@@ -21,4 +21,5 @@ Protos=(
     forward/system/system.proto
     forward/shell/shell.proto
     forward/vnc/vnc.proto
+    forward/forward/forward.proto
 )

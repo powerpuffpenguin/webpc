@@ -21,6 +21,7 @@ func (h Helper) Register(cc *grpc.ClientConn, router *gin.RouterGroup) {
 		Logger{},
 		Shell{},
 		VNC{},
+		Forward{},
 	}
 	for _, m := range ms {
 		m.Register(cc, r)

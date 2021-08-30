@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package jsgenerate_webpc.forward.forward;
+option go_package = "github.com/powerpuffpenguin/webpc/protocol/forward/forward";
+
+service Forward {
+    // websocket /api/forward/v1/forward/:id
+    rpc Connect (stream ConnectRequest) returns (stream ConnectResponse);
+}
+enum Event {
+    EventUniversal = 0;
+    Heart  = 1;
+    Connect = 2;
+    Binary = 3;
+};
+message ConnectRequest{
+    Event event = 1;
+
+    bytes binary = 2;
+    // connect
+    string addr = 3;
+}
+message ConnectResponse{
+    Event event = 1;
+
+    bytes binary = 2;
+}

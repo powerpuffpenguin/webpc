@@ -1,11 +1,10 @@
-package vnc
+package forward
 
 import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/powerpuffpenguin/webpc/configure"
 	"github.com/powerpuffpenguin/webpc/logger"
-	grpc_vnc "github.com/powerpuffpenguin/webpc/protocol/forward/vnc"
-	"github.com/powerpuffpenguin/webpc/slave/server/vnc/internal/connect"
+	grpc_forward "github.com/powerpuffpenguin/webpc/protocol/forward/forward"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 )
@@ -13,12 +12,12 @@ import (
 type Module int
 
 func (Module) RegisterGRPC(srv *grpc.Server) {
-	grpc_vnc.RegisterVncServer(srv, server{})
+	grpc_forward.RegisterForwardServer(srv, server{})
 
-	vnc := configure.DefaultSystem().VNC
-	connect.VNC = vnc
-	if ce := logger.Logger.Check(zap.InfoLevel, `vnc`); ce != nil {
-		ce.Write(zap.String(`connect`, vnc))
+	if ce := logger.Logger.Check(zap.InfoLevel, `port forward`); ce != nil {
+		ce.Write(
+			zap.Bool(`enable`, configure.DefaultSystem().PortForward),
+		)
 	}
 }
 func (Module) RegisterGateway(gateway *runtime.ServeMux, cc *grpc.ClientConn) error {

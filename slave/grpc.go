@@ -1,6 +1,7 @@
 package slave
 
 import (
+	m_forward "github.com/powerpuffpenguin/webpc/slave/server/forward"
 	m_fs "github.com/powerpuffpenguin/webpc/slave/server/fs"
 	m_logger "github.com/powerpuffpenguin/webpc/slave/server/logger"
 	m_shell "github.com/powerpuffpenguin/webpc/slave/server/shell"
@@ -17,6 +18,7 @@ var ms = []Module{
 	m_logger.Module(0),
 	m_shell.Module(0),
 	m_vnc.Module(0),
+	m_forward.Module(0),
 }
 
 func GRPC(srv *grpc.Server) {

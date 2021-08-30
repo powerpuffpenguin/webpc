@@ -15,4 +15,6 @@ const (
 	VNC = 6
 	// add edit delete of slave
 	Slave = 7
+	// allow port forwarding
+	PortForward = 8
 )
