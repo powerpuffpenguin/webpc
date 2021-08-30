@@ -77,6 +77,15 @@ WebPC 主要有下述特色：
     sudo systemctl start webpc-master.service
     ```
 
+首次運行後可以從 **./var/logs/master/webpc.log** 中獲取的系統創建的隨機用戶名密碼：
+
+```
+$ cat ./var/logs/master/webpc.log 
+...
+{"level":"info","ts":1630285898.3816726,"msg":"init user","user":"king","password":"08ab28ebb369dc15cc2c95dc972348ee"}
+...
+```
+
 #### slave
 
 1. 下載最新程式並且解壓到 /opt/webpc/webpc
@@ -108,6 +117,15 @@ WebPC 主要有下述特色：
 1. 下載最新程式並且解壓
 2. 以管理員身份運行 controller.bat 後輸入指令 **1** 安裝 master 服務
 3. 在 windows 服務管理器中運行 webpc-master-service 服務
+
+首次運行後可以從 **./var/logs/master/webpc.log** 中獲取的系統創建的隨機用戶名密碼：
+
+```
+$ cat ./var/logs/master/webpc.log 
+...
+{"level":"info","ts":1630285898.3816726,"msg":"init user","user":"king","password":"08ab28ebb369dc15cc2c95dc972348ee"}
+...
+```
 
 #### slave
 

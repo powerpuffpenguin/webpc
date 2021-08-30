@@ -77,6 +77,15 @@ For linux-amd64 and windows-amd64, pre-compiled programs have been provided, ple
     sudo systemctl start webpc-master.service
     ```
 
+The random username and password created by the system can be obtained from **./var/logs/master/webpc.log** after the first run:
+
+```
+$ cat ./var/logs/master/webpc.log 
+...
+{"level":"info","ts":1630285898.3816726,"msg":"init user","user":"king","password":"08ab28ebb369dc15cc2c95dc972348ee"}
+...
+```
+
 #### slave
 
 1. Download the latest program and unzip it to /opt/webpc/webpc
@@ -108,6 +117,15 @@ For linux-amd64 and windows-amd64, pre-compiled programs have been provided, ple
 1. Download the latest program and unzip
 2. Run controller.bat as an administrator and enter the command **1** to install the master service
 3. Run webpc-master-service service in windows service manager
+
+The random username and password created by the system can be obtained from **./var/logs/master/webpc.log** after the first run:
+
+```
+$ cat ./var/logs/master/webpc.log 
+...
+{"level":"info","ts":1630285898.3816726,"msg":"init user","user":"king","password":"08ab28ebb369dc15cc2c95dc972348ee"}
+...
+```
 
 #### slave
 
