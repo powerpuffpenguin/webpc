@@ -107,6 +107,7 @@ interface Store {
     userdata: Userdata
     access: string
     refresh: string
+    deadline?: number
 }
 interface SigninResponse {
     access: string
@@ -135,7 +136,7 @@ export class Manager {
     get observable(): Observable<Session | undefined> {
         return this.subject_
     }
-    private _load(): Session | undefined {
+    private _load(httpClient?: HttpClient): Session | undefined {
         const str = getItem(Key)
         if (typeof str !== "string") {
             return
@@ -150,7 +151,12 @@ export class Manager {
                     && typeof refresh === "string" && refresh.length > 0
                     && userdata !== null && typeof userdata === "object" && userdata.id) {
                     this.remember_ = true
-                    return new Session(access, refresh, userdata)
+                    const session = new Session(access, refresh, userdata)
+                    const deadline = obj.deadline
+                    if (httpClient && typeof deadline == "number" && deadline < Date.now()) {
+                        this._refreshUserdata(httpClient, session)
+                    }
+                    return session
                 }
             }
         } catch (e) {
@@ -158,8 +164,30 @@ export class Manager {
         }
         return
     }
-    load() {
-        this.subject_.next(this._load())
+    private _refreshUserdata(httpClient: HttpClient, session: Session) {
+        ServerAPI.v1.sessions.child('access').get<Userdata>(httpClient,
+            {
+                params: {
+                    at: Date.now().toString(),
+                },
+                headers: {
+                    Interceptor: 'none',
+                    Authorization: `Bearer ${session.access}`,
+                }
+            },
+        ).toPromise().then((_) => {
+        }, (e) => {
+            if (e instanceof NetError) {
+                if (e.grpc == Codes.Unauthenticated) {
+                    this.refresh(httpClient, session, e).catch((e) => { })
+                } else if (e.grpc == Codes.PermissionDenied && e.message == 'token not exists') {
+                    this.clear(session)
+                }
+            }
+        })
+    }
+    load(httpClient: HttpClient) {
+        this.subject_.next(this._load(httpClient))
     }
     private _save(session: Session) {
         try {
@@ -167,6 +195,7 @@ export class Manager {
                 userdata: session.userdata,
                 access: session.access,
                 refresh: session.refresh,
+                deadline: Date.now() + 1000 * 50,
             })
             console.log(`save token`, data)
             setItem(Key, aesEncrypt(data))

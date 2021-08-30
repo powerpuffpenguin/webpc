@@ -41,6 +41,8 @@ export class HeaderInterceptor implements HttpInterceptor {
             const e = resolveError(err)
             if (e.grpc == Codes.Unauthenticated) {
               return this._refreshRetry(req, next, session, e)
+            } else if (e.grpc == Codes.PermissionDenied && e.message == 'token not exists') {
+              Manager.instance.clear(session)
             }
           }
         }

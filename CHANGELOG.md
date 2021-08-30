@@ -1,3 +1,8 @@
+# v1.0.8-x
+
+* web view auto reset session on token not exists 
+
+
 # v1.0.8
 
 * fix view navigation-bar server check auth.Server 
