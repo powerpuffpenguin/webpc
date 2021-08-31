@@ -19,6 +19,7 @@ import { TreeSelectComponent } from 'src/app/shared/tree-select/tree-select.comp
 import { Element } from 'src/app/core/group/tree';
 import { StateManager } from './state';
 import { RequireNet } from 'src/app/core/utils/requirenet';
+import { I18nService } from 'src/app/core/i18n/i18n.service';
 
 @Component({
   selector: 'app-query',
@@ -42,6 +43,7 @@ export class QueryComponent implements OnInit, OnDestroy, AfterViewInit {
     private readonly toasterService: ToasterService,
     private readonly matDialog: MatDialog,
     private readonly keysService: KeysService,
+    private readonly i18nService: I18nService,
   ) {
   }
   private closed_ = new Closed()
@@ -88,11 +90,11 @@ export class QueryComponent implements OnInit, OnDestroy, AfterViewInit {
       }
       this.clipboardjs_ = new ClipboardJS(this.clipboard_?.nativeElement).on('success', () => {
         if (this.closed_.isNotClosed) {
-          this.toasterService.pop('info', '', "copied")
+          this.toasterService.pop('info', '', this.i18nService.get('copied'))
         }
       }).on('error', (evt: any) => {
         if (this.closed_.isNotClosed) {
-          this.toasterService.pop('error', undefined, "copied error")
+          this.toasterService.pop('error', undefined, this.i18nService.get('copied error'))
           console.error('Action:', evt.action)
           console.error('Trigger:', evt.trigger)
         }
@@ -343,7 +345,7 @@ export class QueryComponent implements OnInit, OnDestroy, AfterViewInit {
       item.ready = this.stateManager.isReady(item.id)
     })
   }
-  onCliCkCopyClipboard(code: string) {
+  onCliCkCopyClipboard(code: string, socks5?: boolean) {
     const clipboard = this.clipboard_
     if (!clipboard) {
       return
@@ -354,8 +356,9 @@ export class QueryComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     element.setAttribute(
       'data-clipboard-text',
-      ServerAPI.v1.dialer.websocketURL(code),
+      socks5 ? ServerAPI.forward.v1.forward.websocketURL(code) : ServerAPI.v1.dialer.websocketURL(code) ,
     )
     element.click()
   }
+
 }

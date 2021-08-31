@@ -39,6 +39,9 @@
                         <mat-icon>report_problem</mat-icon>
                     </ng-template>
                 </a>
+                <a mat-icon-button [routerLink]="'/forward/shared/'+element.id" i18n-matTooltip matTooltip="Shared">
+                    <mat-icon>share</mat-icon>
+                </a>
             </td>
         </ng-container>
         <ng-container matColumnDef="name">
@@ -60,6 +63,10 @@
                 <button mat-icon-button matSuffix i18n-matTooltip matTooltip="copy url" *ngIf="element.code"
                     (click)="onCliCkCopyClipboard(element.code)">
                     <mat-icon>content_copy</mat-icon>
+                </button>
+                <button mat-icon-button matSuffix i18n-matTooltip matTooltip="copy port forward url"
+                    *ngIf="element.code" (click)="onCliCkCopyClipboard(element.id,true)">
+                    <mat-icon>vpn_lock</mat-icon>
                 </button>
             </td>
         </ng-container>
