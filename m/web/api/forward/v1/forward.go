@@ -33,6 +33,19 @@ func (h Forward) connect(c *gin.Context) {
 		ws.Error(status.Error(codes.InvalidArgument, e.Error()))
 		return
 	}
+	var req struct {
+		Network string `form:"network" binding:"required"`
+		Address string `form:"address" binding:"required"`
+	}
+	e = c.ShouldBindQuery(&req)
+	if e != nil {
+		ws.Error(status.Error(codes.InvalidArgument, e.Error()))
+		return
+	} else if req.Network != `tcp` {
+		ws.Error(status.Error(codes.InvalidArgument, `network not supported: `+req.Network))
+		return
+	}
+
 	ctx, cc, e := forward.Default().Get(c, obj.ID)
 	if e != nil {
 		ws.Error(e)
@@ -46,6 +59,7 @@ func (h Forward) connect(c *gin.Context) {
 	}
 	e = stream.Send(&grpc_forward.ConnectRequest{
 		Event: grpc_forward.Event_Connect,
+		Addr:  req.Address,
 	})
 	if e != nil {
 		ws.Error(e)

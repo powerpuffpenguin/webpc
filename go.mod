@@ -33,6 +33,7 @@ require (
 	go.uber.org/zap v1.19.0
 	golang.org/x/net v0.0.0-20210805182204-aaa1db679c0d
 	golang.org/x/sys v0.0.0-20210809222454-d867a43fc93e // indirect
+	golang.org/x/term v0.0.0-20210615171337-6886f2dfbf5b // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/genproto v0.0.0-20210811021853-ddbe55d93216
 	google.golang.org/grpc v1.40.0
@@ -42,6 +43,4 @@ require (
 	xorm.io/xorm v1.2.2
 )
 
-replace (
-	github.com/andybalholm/brotli v1.0.3 => github.com/zuiwuchang/brotli v0.0.0-20210825022947-ec682fbe0a16
-)
+replace github.com/andybalholm/brotli v1.0.3 => github.com/zuiwuchang/brotli v0.0.0-20210825022947-ec682fbe0a16

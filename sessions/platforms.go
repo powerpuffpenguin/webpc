@@ -8,6 +8,8 @@ import (
 
 var platforms = []string{
 	`web`,
+	`forward`,
+	`socks5`,
 	`android`,
 	`ios`,
 	`linux`,
