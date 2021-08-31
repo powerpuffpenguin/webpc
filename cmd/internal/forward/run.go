@@ -16,6 +16,7 @@ func Run(insecure bool,
 	url, listen, remote,
 	user, password string,
 	heart int,
+	socks5 bool,
 ) {
 	r := bufio.NewReader(os.Stdin)
 	if !strings.HasPrefix(url, `ws://`) && !strings.HasPrefix(url, `wss://`) {
@@ -24,7 +25,7 @@ func Run(insecure bool,
 	if listen == `` {
 		listen = inputString(r, `local listen address: `)
 	}
-	if remote == `` {
+	if !socks5 && remote == `` {
 		remote = inputString(r, `remote connect address: `)
 	}
 	if user == `` {
@@ -43,9 +44,12 @@ func Run(insecure bool,
 	if e != nil {
 		log.Fatalln(e)
 	}
-	fmt.Println(`listen on `, listen)
-
-	newWorker(dialer).Serve(l, remote)
+	if socks5 {
+		fmt.Println(`socks5 listen on `, listen)
+	} else {
+		fmt.Println(`forward listen on `, listen)
+	}
+	newWorker(dialer).Serve(l, remote, socks5)
 }
 func readString(r *bufio.Reader) string {
 	var result string

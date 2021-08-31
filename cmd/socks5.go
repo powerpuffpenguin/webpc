@@ -9,20 +9,20 @@ import (
 
 func init() {
 	var (
-		insecure                            bool
-		url, listen, remote, user, password string
-		heart                               int
+		insecure                    bool
+		url, listen, user, password string
+		heart                       int
 	)
 
 	cmd := &cobra.Command{
-		Use:   `forward`,
-		Short: `port forwarding`,
+		Use:   `socks5`,
+		Short: `socks5 proxy`,
 		Run: func(cmd *cobra.Command, args []string) {
 			forward.Run(insecure,
 				strings.TrimSpace(url),
-				strings.TrimSpace(listen), strings.TrimSpace(remote),
+				strings.TrimSpace(listen), ``,
 				user, password,
-				heart, false,
+				heart, true,
 			)
 		},
 	}
@@ -45,11 +45,6 @@ func init() {
 		`l`,
 		`:10000`,
 		`local listen address`,
-	)
-	flags.StringVarP(&remote, `remote`,
-		`r`,
-		``,
-		`remote connect address`,
 	)
 	flags.StringVarP(&user, `user`,
 		`u`,

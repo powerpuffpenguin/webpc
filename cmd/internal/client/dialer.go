@@ -72,7 +72,6 @@ func NewDialer(platform, ws string, insecure bool, user, password string, heart 
 			client,
 		},
 		dialer: &websocket.Dialer{
-			Proxy:            http.ProxyFromEnvironment,
 			HandshakeTimeout: 45 * time.Second,
 			TLSClientConfig:  config,
 		},
