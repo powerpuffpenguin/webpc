@@ -7,11 +7,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"regexp"
 	"runtime"
 	"strconv"
 	"time"
 
+	"github.com/inconshreveable/go-update"
 	"github.com/powerpuffpenguin/webpc/logger"
 	"github.com/powerpuffpenguin/webpc/version"
 	"go.uber.org/zap"
@@ -144,6 +146,25 @@ func (u *Upgrade) Do(yes bool) (upgraded bool, newversion string, e error) {
 			zap.String(`filename`, filename),
 		)
 	}
+	e = u.upgrade(filename)
+	if e != nil {
+		if ce := logger.Logger.Check(zap.WarnLevel, `upgrade error`); ce != nil {
+			ce.Write(
+				zap.Error(e),
+				zap.String(`version`, version.Version),
+				zap.String(`new version`, newversion),
+				zap.String(`filename`, filename),
+			)
+		}
+		return
+	}
+	if ce := logger.Logger.Check(zap.DebugLevel, `upgrade success`); ce != nil {
+		ce.Write(
+			zap.String(`version`, version.Version),
+			zap.String(`new version`, newversion),
+			zap.String(`filename`, filename),
+		)
+	}
 
 	upgraded = true
 	u.upgraded = upgraded
@@ -183,8 +204,6 @@ type versionAsset struct {
 }
 
 func (u *Upgrade) requestHash(url string) (hash string, e error) {
-	hash = `b537a3cdcd0b4aa89d77b6bb08939922bd01bacfb6a2a29f7f81c87cae51bec1`
-	return
 	resp, e := http.Get(url)
 	if e != nil {
 		return
@@ -212,6 +231,23 @@ func (u *Upgrade) requestDownload(hash, url string) (filename string, e error) {
 	e = download.Download()
 	if e != nil {
 		return
+	}
+	return
+}
+func (u *Upgrade) upgrade(filename string) (e error) {
+	f, e := os.Open(filename)
+	if e != nil {
+		return
+	}
+
+	// tar gz
+	if false {
+		e = update.Apply(f, update.Options{})
+	}
+	f.Close()
+	if e == nil {
+		os.Remove(filename)
+		os.Remove(filename + `.txt`)
 	}
 	return
 }
