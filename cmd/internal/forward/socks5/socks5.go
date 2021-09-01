@@ -37,13 +37,9 @@ func sendSocks5(c net.Conn, buf []byte, rep, rsv byte) (e error) {
 	buf[2] = rsv
 	buf[3] = 0x1
 
-	buf[4] = 0x0
-	buf[5] = 0x0
-	buf[6] = 0x0
-	buf[7] = 0x0
+	binary.BigEndian.PutUint32(buf[4:], 0)
+	binary.BigEndian.PutUint16(buf[8:], 0)
 
-	buf[8] = 0x0
-	buf[9] = 0x0
 	c.Write(buf[:10])
 	return
 }

@@ -37,7 +37,7 @@ func asyncRecv(ch chan<- asyncResult, c net.Conn) {
 	}
 }
 func doRecv(c net.Conn) (version byte, addr string, e error) {
-	b := make([]byte, math.MaxUint8+6)
+	b := make([]byte, math.MaxUint8*2)
 	_, e = io.ReadAtLeast(c, b[:2], 2)
 	if e != nil {
 		return
@@ -46,8 +46,8 @@ func doRecv(c net.Conn) (version byte, addr string, e error) {
 	switch version {
 	case 0x5:
 		addr, e = recvSocks5(c, b[1], b)
-	// case 0x4:
-	// 	addr, e = recvSocks5(c, b)
+	case 0x4:
+		addr, e = recvSocks4(c, b[1], b)
 	default:
 		e = errors.New(`not support version: ` + strconv.Itoa(int(version)))
 		return
@@ -59,8 +59,8 @@ func Send(c net.Conn, version byte) (e error) {
 	switch version {
 	case 0x5:
 		e = sendSocks5(c, nil, 0x0, 0)
-	// case 0x4:
-	// 	addr, e = recvSocks5(c, b)
+	case 0x4:
+		e = sendSocks4(c, nil, 0x5a)
 	default:
 		e = errors.New(`not support version: ` + strconv.Itoa(int(version)))
 		return
@@ -71,8 +71,8 @@ func SendDialError(c net.Conn, version byte) (e error) {
 	switch version {
 	case 0x5:
 		e = sendSocks5(c, nil, 0x5, 0)
-	// case 0x4:
-	// 	addr, e = recvSocks5(c, b)
+	case 0x4:
+		e = sendSocks4(c, nil, 0x5b)
 	default:
 		e = errors.New(`not support version: ` + strconv.Itoa(int(version)))
 		return
