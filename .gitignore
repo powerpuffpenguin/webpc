@@ -32,6 +32,7 @@
 /bin/webpc
 /bin/webpcd
 /bin/var/logs/
+/bin/upgrade-data/
 
 # grpc code
 /protocol/

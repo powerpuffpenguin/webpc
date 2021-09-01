@@ -11,6 +11,7 @@ import (
 	"github.com/powerpuffpenguin/webpc/logger"
 	"github.com/powerpuffpenguin/webpc/single/logger/db"
 	"github.com/powerpuffpenguin/webpc/single/mount"
+	"github.com/powerpuffpenguin/webpc/single/upgrade"
 	"github.com/powerpuffpenguin/webpc/utils"
 
 	"github.com/spf13/cobra"
@@ -18,9 +19,9 @@ import (
 
 func init() {
 	var (
-		filename              string
-		insecure, debug, test bool
-		basePath              = utils.BasePath()
+		filename                         string
+		insecure, debug, test, noupgrade bool
+		basePath                         = utils.BasePath()
 
 		url, vnc string
 	)
@@ -60,6 +61,9 @@ func init() {
 			if cnf.System.Enable {
 				mount.Init(cnf.System.Mount)
 			}
+			if !noupgrade {
+				go upgrade.DefaultUpgrade().Serve()
+			}
 			slave.Run(&cnf.Connect, &cnf.System, debug)
 		},
 	}
@@ -94,6 +98,10 @@ func init() {
 		`t`,
 		false,
 		`test configure`,
+	)
+	flags.BoolVar(&noupgrade, `no-upgrade`,
+		false,
+		`disable automatic upgrades`,
 	)
 	rootCmd.AddCommand(cmd)
 }

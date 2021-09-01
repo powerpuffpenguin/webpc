@@ -12,6 +12,7 @@ import (
 	"github.com/powerpuffpenguin/webpc/sessions"
 	"github.com/powerpuffpenguin/webpc/single/logger/db"
 	"github.com/powerpuffpenguin/webpc/single/mount"
+	"github.com/powerpuffpenguin/webpc/single/upgrade"
 	"github.com/powerpuffpenguin/webpc/utils"
 	"github.com/spf13/cobra"
 )
@@ -23,6 +24,7 @@ func init() {
 		basePath    = utils.BasePath()
 
 		addr, vnc string
+		noupgrade bool
 	)
 
 	cmd := &cobra.Command{
@@ -58,7 +60,9 @@ func init() {
 			if cnf.System.Enable {
 				mount.Init(cnf.System.Mount)
 			}
-
+			if !noupgrade {
+				go upgrade.DefaultUpgrade().Serve()
+			}
 			master.Run(&cnf.HTTP, &cnf.System, debug)
 		},
 	}
@@ -88,6 +92,10 @@ func init() {
 		`t`,
 		false,
 		`test configure`,
+	)
+	flags.BoolVar(&noupgrade, `no-upgrade`,
+		false,
+		`disable automatic upgrades`,
 	)
 	rootCmd.AddCommand(cmd)
 }
