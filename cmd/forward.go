@@ -4,20 +4,22 @@ import (
 	"strings"
 
 	"github.com/powerpuffpenguin/webpc/cmd/internal/forward"
+	"github.com/powerpuffpenguin/webpc/logger"
 	"github.com/spf13/cobra"
 )
 
 func init() {
 	var (
-		insecure                            bool
-		url, listen, remote, user, password string
-		heart                               int
+		insecure                                 bool
+		url, listen, remote, user, password, log string
+		heart                                    int
 	)
 
 	cmd := &cobra.Command{
 		Use:   `forward`,
 		Short: `port forwarding`,
 		Run: func(cmd *cobra.Command, args []string) {
+			logger.InitConsole(strings.ToLower(strings.TrimSpace(log)))
 			forward.Run(insecure,
 				strings.TrimSpace(url),
 				strings.TrimSpace(listen), strings.TrimSpace(remote),
@@ -61,5 +63,10 @@ func init() {
 		``,
 		`user password`,
 	)
+	flags.StringVar(&log, `log`,
+		`info`,
+		`log level [debug info warn error dpanic panic fatal]`,
+	)
+
 	rootCmd.AddCommand(cmd)
 }

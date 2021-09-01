@@ -12,8 +12,10 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/powerpuffpenguin/webpc/logger"
 	grpc_session "github.com/powerpuffpenguin/webpc/protocol/session"
 	"github.com/powerpuffpenguin/webpc/utils"
+	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -107,6 +109,11 @@ func (d *Dialer) signin() (e error) {
 	}
 	d.access = resp.Access
 	d.refresh = resp.Refresh
+	if ce := logger.Logger.Check(zap.InfoLevel, `signin`); ce != nil {
+		ce.Write(
+			zap.String(`access`, resp.Access),
+		)
+	}
 	return
 }
 func (d *Dialer) refreshToken(access, refresh string) (e error) {
@@ -121,10 +128,21 @@ func (d *Dialer) refreshToken(access, refresh string) (e error) {
 	)
 	cancel()
 	if e != nil {
+		if ce := logger.Logger.Check(zap.ErrorLevel, `refresh token error`); ce != nil {
+			ce.Write(
+				zap.Error(e),
+				zap.String(`access`, resp.Access),
+			)
+		}
 		return
 	}
 	d.access = resp.Access
 	d.refresh = resp.Refresh
+	if ce := logger.Logger.Check(zap.InfoLevel, `refresh token`); ce != nil {
+		ce.Write(
+			zap.String(`access`, resp.Access),
+		)
+	}
 	return
 }
 func (d *Dialer) asyncRefreshToken(ch chan error, access, refresh string) {

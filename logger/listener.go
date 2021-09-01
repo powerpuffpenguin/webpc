@@ -9,30 +9,30 @@ import (
 
 var monitor = &writerMonitor{
 	writer:    os.Stdout,
-	listeners: make(map[Listenerr]bool),
+	listeners: make(map[Listener]bool),
 }
 
 // AddListener .
-func AddListener(l Listenerr) {
+func AddListener(l Listener) {
 	monitor.Lock()
 	monitor.listeners[l] = true
 	monitor.Unlock()
 }
 
 // RemoveListener .
-func RemoveListener(l Listenerr) {
+func RemoveListener(l Listener) {
 	monitor.Lock()
 	delete(monitor.listeners, l)
 	monitor.Unlock()
 }
 
 // Listenerr .
-type Listenerr interface {
+type Listener interface {
 	OnChanged([]byte)
 }
 type writerMonitor struct {
 	writer    zapcore.WriteSyncer
-	listeners map[Listenerr]bool
+	listeners map[Listener]bool
 	sync.Mutex
 }
 

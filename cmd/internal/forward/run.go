@@ -9,6 +9,8 @@ import (
 	"strings"
 
 	"github.com/powerpuffpenguin/webpc/cmd/internal/client"
+	"github.com/powerpuffpenguin/webpc/logger"
+	"go.uber.org/zap"
 	"golang.org/x/term"
 )
 
@@ -37,17 +39,25 @@ func Run(insecure bool,
 
 	dialer, e := client.NewDialer(`forward`, url, insecure, user, password, heart)
 	if e != nil {
-		log.Fatalln(e)
+		logger.Logger.Fatal(`new dialer error`, zap.Error(e))
 	}
 
 	l, e := net.Listen(`tcp`, listen)
 	if e != nil {
-		log.Fatalln(e)
+		logger.Logger.Fatal(`listen error`, zap.Error(e))
 	}
 	if socks5 {
-		fmt.Println(`socks5 listen on `, listen)
+		if ce := logger.Logger.Check(zap.InfoLevel, `socks5 listen`); ce != nil {
+			ce.Write(
+				zap.String(`addr`, listen),
+			)
+		}
 	} else {
-		fmt.Println(`forward listen on `, listen)
+		if ce := logger.Logger.Check(zap.InfoLevel, `forward listen`); ce != nil {
+			ce.Write(
+				zap.String(`addr`, listen),
+			)
+		}
 	}
 	newWorker(dialer).Serve(l, remote, socks5)
 }
