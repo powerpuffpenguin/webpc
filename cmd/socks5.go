@@ -17,7 +17,7 @@ func init() {
 
 	cmd := &cobra.Command{
 		Use:   `socks5`,
-		Short: `socks5 proxy`,
+		Short: `socks5 socks4 socks4a proxy`,
 		Run: func(cmd *cobra.Command, args []string) {
 			logger.InitConsole(strings.ToLower(strings.TrimSpace(log)))
 			forward.Run(insecure,

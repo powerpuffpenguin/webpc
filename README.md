@@ -12,6 +12,7 @@ WebPC mainly has the following characteristics:
 * Execute commands on the controlled end through a remote shell, such as running vim
 * In the browser, noVNC usually realizes the remote desktop function to the controlled end
 * The controlled end can configure the functions provided by itself to prevent WebPC from being used as a Trojan horse program
+* Create port forwarding or socks5 proxy to the controlled end to facilitate access to the internal network of the controlled end
 * Simple user and grouping system to control user access rights and scope
 * Support multiple system platforms(linux windows mac ...)
 
