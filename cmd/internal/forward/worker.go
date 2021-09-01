@@ -79,8 +79,23 @@ func (w *Worker) serve(c0 net.Conn, remote string, socks5 bool) {
 	if socks5 {
 		version, remote, e = socks5_impl.Recv(ctx, c0)
 		if e != nil {
+			if ce := logger.Logger.Check(zap.WarnLevel, `recv socks5 request error`); ce != nil {
+				ce.Write(
+					zap.Error(e),
+					zap.Uint8(`version`, version),
+					zap.String(`from`, fromAddr),
+					zap.String(`to`, remote),
+				)
+			}
 			c0.Close()
 			return
+		}
+		if ce := logger.Logger.Check(zap.DebugLevel, `recv socks5 request success`); ce != nil {
+			ce.Write(
+				zap.Uint8(`version`, version),
+				zap.String(`from`, fromAddr),
+				zap.String(`to`, remote),
+			)
 		}
 	}
 	c1, e = w.dialer.DialContext(ctx, `tcp`, remote)
@@ -91,6 +106,9 @@ func (w *Worker) serve(c0 net.Conn, remote string, socks5 bool) {
 				zap.String(`from`, fromAddr),
 				zap.String(`to`, remote),
 			)
+		}
+		if socks5 {
+			socks5_impl.SendDialError(c0, version)
 		}
 		c0.Close()
 		return
@@ -105,9 +123,26 @@ func (w *Worker) serve(c0 net.Conn, remote string, socks5 bool) {
 	if socks5 {
 		e = socks5_impl.Send(c0, version)
 		if e != nil {
+			if ce := logger.Logger.Check(zap.WarnLevel, `send socks5 response error`); ce != nil {
+				ce.Write(
+					zap.Error(e),
+					zap.Uint8(`version`, version),
+					zap.String(`from`, fromAddr),
+					zap.String(`to`, remote),
+				)
+			}
 			c0.Close()
 			c1.Close()
 			return
+		}
+
+		if ce := logger.Logger.Check(zap.DebugLevel, `send socks5 response success`); ce != nil {
+			ce.Write(
+				zap.Error(e),
+				zap.Uint8(`version`, version),
+				zap.String(`from`, fromAddr),
+				zap.String(`to`, remote),
+			)
 		}
 	}
 	go w.forward(c1, c0)

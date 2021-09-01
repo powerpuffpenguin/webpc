@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"io"
-	"log"
+	"math"
 	"net"
 	"strconv"
 )
@@ -37,59 +37,45 @@ func asyncRecv(ch chan<- asyncResult, c net.Conn) {
 	}
 }
 func doRecv(c net.Conn) (version byte, addr string, e error) {
-	r := reader{
-		r: c,
-	}
-	b, e := r.Get(0, 1)
+	b := make([]byte, math.MaxUint8+6)
+	_, e = io.ReadAtLeast(c, b[:2], 2)
 	if e != nil {
 		return
 	}
 	version = b[0]
 	switch version {
 	case 0x5:
+		addr, e = recvSocks5(c, b[1], b)
 	// case 0x4:
+	// 	addr, e = recvSocks5(c, b)
 	default:
 		e = errors.New(`not support version: ` + strconv.Itoa(int(version)))
-		log.Println(e)
 		return
 	}
 	return
 }
 
 func Send(c net.Conn, version byte) (e error) {
-	return
-}
-
-type reader struct {
-	r      io.Reader
-	buffer []byte
-	offset int
-}
-
-func (r *reader) Pop(end int) (b []byte, e error) {
-	b, e = r.Get(0, end)
-	if e != nil {
+	switch version {
+	case 0x5:
+		e = sendSocks5(c, nil, 0x0, 0)
+	// case 0x4:
+	// 	addr, e = recvSocks5(c, b)
+	default:
+		e = errors.New(`not support version: ` + strconv.Itoa(int(version)))
 		return
 	}
-	r.offset -= len(b)
-	r.buffer = r.buffer[len(b):]
 	return
 }
-func (r *reader) Get(begin, end int) (b []byte, e error) {
-	maxEnd := len(r.buffer)
-	if end > maxEnd {
-		e = ErrBufferOverflow
+func SendDialError(c net.Conn, version byte) (e error) {
+	switch version {
+	case 0x5:
+		e = sendSocks5(c, nil, 0x5, 0)
+	// case 0x4:
+	// 	addr, e = recvSocks5(c, b)
+	default:
+		e = errors.New(`not support version: ` + strconv.Itoa(int(version)))
 		return
 	}
-	if r.offset < end {
-		buf := r.buffer[r.offset:]
-		var n int
-		n, e = io.ReadAtLeast(r.r, buf, end-r.offset)
-		r.offset += n
-		if e != nil {
-			return
-		}
-	}
-	b = r.buffer[begin:end]
 	return
 }

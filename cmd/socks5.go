@@ -4,20 +4,22 @@ import (
 	"strings"
 
 	"github.com/powerpuffpenguin/webpc/cmd/internal/forward"
+	"github.com/powerpuffpenguin/webpc/logger"
 	"github.com/spf13/cobra"
 )
 
 func init() {
 	var (
-		insecure                    bool
-		url, listen, user, password string
-		heart                       int
+		insecure                         bool
+		url, listen, user, password, log string
+		heart                            int
 	)
 
 	cmd := &cobra.Command{
 		Use:   `socks5`,
 		Short: `socks5 proxy`,
 		Run: func(cmd *cobra.Command, args []string) {
+			logger.InitConsole(strings.ToLower(strings.TrimSpace(log)))
 			forward.Run(insecure,
 				strings.TrimSpace(url),
 				strings.TrimSpace(listen), ``,
@@ -43,7 +45,7 @@ func init() {
 	)
 	flags.StringVarP(&listen, `listen`,
 		`l`,
-		`:10000`,
+		`:1080`,
 		`local listen address`,
 	)
 	flags.StringVarP(&user, `user`,
@@ -55,6 +57,10 @@ func init() {
 		`p`,
 		``,
 		`user password`,
+	)
+	flags.StringVar(&log, `log`,
+		`info`,
+		`log level [debug info warn error dpanic panic fatal]`,
 	)
 	rootCmd.AddCommand(cmd)
 }
