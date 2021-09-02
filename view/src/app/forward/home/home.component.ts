@@ -80,4 +80,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     })
     return `/static/noVNC/vnc.html?${params.toString()}`
   }
+  get upgraded(): string {
+    return this.state?.upgraded?.version ?? ''
+  }
 }

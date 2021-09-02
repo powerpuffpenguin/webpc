@@ -1,7 +1,7 @@
 Target="webpc"
 Docker="king011/webpc"
 Dir=$(cd "$(dirname $BASH_SOURCE)/.." && pwd)
-Version="v1.0.8-x"
+Version="v1.1.0"
 View=1
 Platforms=(
     windows/amd64

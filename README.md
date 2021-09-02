@@ -15,6 +15,7 @@ WebPC mainly has the following characteristics:
 * Create port forwarding or socks5 proxy to the controlled end to facilitate access to the internal network of the controlled end
 * Simple user and grouping system to control user access rights and scope
 * Support multiple system platforms(linux windows mac ...)
+* Support to retrieve the latest released program from github and automatically upgrade
 
 ## Table of Contents
 

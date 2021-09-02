@@ -1,9 +1,9 @@
-# v1.0.8-x
+# v1.1.0
 
 * web view auto reset session on token not exists 
 * port forwarding
 * socks5 socks4 socks4a
-
+* automatic upgrades
 
 # v1.0.8
 

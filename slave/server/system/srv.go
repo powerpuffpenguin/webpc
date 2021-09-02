@@ -6,6 +6,7 @@ import (
 
 	"github.com/powerpuffpenguin/webpc/m/helper"
 	grpc_system "github.com/powerpuffpenguin/webpc/protocol/forward/system"
+	"github.com/powerpuffpenguin/webpc/single/upgrade"
 	"github.com/powerpuffpenguin/webpc/version"
 )
 
@@ -54,6 +55,27 @@ func (s server) StartAt(ctx context.Context, req *grpc_system.StartAtRequest) (r
 				resp = &emptyStartAtResponse
 			} else {
 				resp = &startAtResponse
+			}
+			return nil
+		},
+	)
+	return
+}
+
+var emptyUpgradedResponse grpc_system.UpgradedResponse
+
+func (s server) Upgraded(ctx context.Context, req *grpc_system.UpgradedRequest) (resp *grpc_system.UpgradedResponse, e error) {
+	modtime, version, upgraded := upgrade.DefaultUpgrade().Upgraded()
+	s.SetHTTPCacheMaxAge(ctx, 60*60)
+	e = s.ServeMessage(ctx,
+		modtime,
+		func(nobody bool) error {
+			if nobody || !upgraded {
+				resp = &emptyUpgradedResponse
+			} else {
+				resp = &grpc_system.UpgradedResponse{
+					Version: version,
+				}
 			}
 			return nil
 		},

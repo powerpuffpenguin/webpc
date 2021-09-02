@@ -18,6 +18,11 @@ service System {
             get: "/api/forward/v1/system/start_at"
         };
     }
+    rpc Upgraded (UpgradedRequest) returns (UpgradedResponse){
+        option (google.api.http) = {
+            get: "/api/forward/v1/system/upgraded"
+        };
+    }
 }
 message VersionRequest{
 }
@@ -29,4 +34,9 @@ message StartAtRequest{
 }
 message StartAtResponse{
     int64 result = 1;
+}
+message UpgradedRequest{
+}
+message UpgradedResponse{
+    string version = 1;
 }

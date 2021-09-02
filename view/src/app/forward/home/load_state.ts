@@ -17,6 +17,9 @@ export interface StartAtResponse {
     at: any
     started: string
 }
+export interface UpgradedResponse {
+    version: string
+}
 export interface Options {
     readonly target: string
     readonly httpClient: HttpClient
@@ -67,6 +70,23 @@ export class StartAtState extends BasicState<StartAtResponse>  {
         super(
             () => {
                 const observable = ServerAPI.forward.v1.system.child('start_at').get<StartAtResponse>(opts.httpClient, {
+                    params: {
+                        slave_id: opts.target,
+                    },
+                })
+                return firstPromise(observable, opts.cancel)
+            }, onReady, onError)
+    }
+
+}
+export class UpgradedState extends BasicState<UpgradedResponse>  {
+    constructor(readonly opts: Options,
+        onReady?: (data: UpgradedResponse) => void,
+        onError?: (e: any) => void,
+    ) {
+        super(
+            () => {
+                const observable = ServerAPI.forward.v1.system.child('upgraded').get<UpgradedResponse>(opts.httpClient, {
                     params: {
                         slave_id: opts.target,
                     },

@@ -25,9 +25,10 @@ import (
 
 var hashMatch = regexp.MustCompile(`[0-9a-f]{64}`)
 var defaultUpgrade = &Upgrade{
-	version:    ParseVersion(version.Version),
-	upgraded:   true,
-	newversion: `testv`,
+	version: ParseVersion(version.Version),
+	// upgraded:   true,
+	// newversion: `testv`,
+	modtime: time.Now(),
 }
 
 func DefaultUpgrade() *Upgrade {
@@ -40,12 +41,14 @@ type Upgrade struct {
 	newversion string
 	rw         sync.RWMutex
 	m          sync.Mutex
+	modtime    time.Time
 }
 
-func (u *Upgrade) Upgraded() (version string, upgraded bool) {
+func (u *Upgrade) Upgraded() (modtime time.Time, version string, upgraded bool) {
 	u.rw.RLock()
 	version = u.newversion
 	upgraded = u.upgraded
+	modtime = u.modtime
 	u.rw.RUnlock()
 	return
 }
@@ -56,7 +59,7 @@ func (u *Upgrade) Serve() {
 		return
 	}
 	for {
-		time.Sleep(time.Hour * 23)
+		time.Sleep(time.Hour * 13)
 		upgraded, _, _ := u.Do(true)
 		if upgraded {
 			return
@@ -185,6 +188,7 @@ func (u *Upgrade) Do(yes bool) (upgraded bool, newversion string, e error) {
 	u.rw.Lock()
 	u.upgraded = upgraded
 	u.newversion = newversion
+	u.modtime = time.Now()
 	u.rw.Unlock()
 	return
 }

@@ -78,6 +78,11 @@ func (f *Forward) Put(id int64, cc *grpc.ClientConn, gateway *runtime.ServeMux) 
 		gateway: gateway,
 	}
 }
+func (f *Forward) isSharedURL(url string) bool {
+	return strings.HasPrefix(url, `/api/forward/v1/fs/`) ||
+		strings.HasPrefix(url, `/api/forward/v1/system/`) ||
+		strings.HasPrefix(url, `/api/forward/v1/static/`)
+}
 func (f *Forward) Get(c *gin.Context, str string) (ctx context.Context, cc *grpc.ClientConn, e error) {
 	id, e := strconv.ParseInt(str, 10, 64)
 	if e != nil {
@@ -98,8 +103,7 @@ func (f *Forward) Get(c *gin.Context, str string) (ctx context.Context, cc *grpc
 	}
 
 	// public api
-	shared := strings.HasPrefix(c.Request.URL.Path, `/api/forward/v1/fs/`) ||
-		strings.HasPrefix(c.Request.URL.Path, `/api/forward/v1/static/`)
+	shared := f.isSharedURL(c.Request.URL.Path)
 	ctx = c.Request.Context()
 	// userdata
 	userdata, e := f.web.ShouldBindUserdata(c)
@@ -161,8 +165,7 @@ func (f *Forward) Forward(str string, c *gin.Context) {
 		return
 	}
 	// public api
-	shared := strings.HasPrefix(c.Request.URL.Path, `/api/forward/v1/fs/`) ||
-		strings.HasPrefix(c.Request.URL.Path, `/api/forward/v1/static/`)
+	shared := f.isSharedURL(c.Request.URL.Path)
 
 	// userdata
 	userdata, e := f.web.ShouldBindUserdata(c)

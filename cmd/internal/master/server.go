@@ -66,7 +66,7 @@ func newServer(system *configure.System, l net.Listener, swagger, debug bool, cn
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	version, upgraded := upgrade.DefaultUpgrade().Upgraded()
+	_, version, upgraded := upgrade.DefaultUpgrade().Upgraded()
 	if upgraded {
 		w.Header().Set(`app-upgraded`, version)
 	}

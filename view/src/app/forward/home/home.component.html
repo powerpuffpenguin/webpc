@@ -12,6 +12,7 @@
             <p>{{version.platform}}</p>
             <p>{{version.version}}</p>
             <p>start at {{startAt.at.format('YYYY-MM-DD HH:mm:ss')}}, started {{startAt.started}}.</p>
+            <p *ngIf="upgraded">new version "{{upgraded}}" is ready, wait until the server restarts to take effect.</p>
         </mat-card-content>
         <mat-card-actions>
             <a mat-stroked-button [routerLink]="['/forward/fs']" [queryParams]="{id:data.id}" i18n>Filesystem</a>

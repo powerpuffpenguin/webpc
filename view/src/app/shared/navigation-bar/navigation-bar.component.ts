@@ -119,11 +119,4 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
       })
     }
   }
-  get server(): boolean {
-    const session = this.session
-    if (session) {
-      return session.anyAuth(Authorization.Root, Authorization.Server)
-    }
-    return false
-  }
 }

@@ -5,7 +5,7 @@ import { Closed } from "src/app/core/utils/closed"
 import { Loader } from "src/app/core/utils/loader"
 import { RequireState } from "src/app/core/utils/requirenet"
 import { durationString } from "src/app/core/utils/utils"
-import { VersionState, VersionResponse, StartAtState, StartAtResponse, DataState, DataResponse } from './load_state'
+import { VersionState, VersionResponse, StartAtState, StartAtResponse, DataState, DataResponse, UpgradedResponse, UpgradedState } from './load_state'
 export interface Error {
     id: string
     err: any
@@ -18,6 +18,7 @@ export class State {
     data: DataResponse = DefaultValue
     version: VersionResponse = DefaultValue
     startAt: StartAtResponse = DefaultValue
+    upgraded: UpgradedResponse = DefaultValue
     errs: Array<Error> = []
     hasErr = false
     closed = new Closed()
@@ -60,6 +61,14 @@ export class State {
             }, (e) => {
                 this.errs.push({
                     id: 'StartAtState',
+                    err: e,
+                })
+            }),
+            new UpgradedState(opts, (data) => {
+                this.upgraded = data
+            }, (e) => {
+                this.errs.push({
+                    id: 'UpgradedState',
                     err: e,
                 })
             }),
