@@ -26,10 +26,11 @@ import { PasswordComponent } from './password/password.component';
 import { TreeComponent } from './tree/tree.component';
 import { TreeSelectComponent } from './tree-select/tree-select.component';
 import { LoadViewComponent } from './load-view/load-view.component';
+import { UpgradedComponent } from './upgraded/upgraded.component';
 
 
 @NgModule({
-  declarations: [NavigationBarComponent, SignInComponent, PasswordComponent, TreeComponent, TreeSelectComponent, LoadViewComponent],
+  declarations: [NavigationBarComponent, SignInComponent, PasswordComponent, TreeComponent, TreeSelectComponent, LoadViewComponent, UpgradedComponent],
   imports: [
     CommonModule, RouterModule, FormsModule,
 

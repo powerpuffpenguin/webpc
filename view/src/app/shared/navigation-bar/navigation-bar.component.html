@@ -9,6 +9,10 @@
     <a *ngIf="!production" mat-icon-button i18n-matTooltip matTooltip="Dev Tooltip" routerLink="/dev">
         <mat-icon>code</mat-icon>
     </a>
+    <button mat-icon-button i18n-matTooltip matTooltip="Upgraded" *ngIf="version"
+        (click)="onClickVersion(version)">
+        <mat-icon>restart_alt</mat-icon>
+    </button>
     <a mat-icon-button i18n-matTooltip matTooltip="About Tooltip" routerLink="/content/about">
         <mat-icon>info</mat-icon>
     </a>

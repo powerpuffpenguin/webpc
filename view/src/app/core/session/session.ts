@@ -176,6 +176,9 @@ export class Manager {
                 }
             },
         ).toPromise().then((_) => {
+            if (session == this.session) {
+                this._save(session)
+            }
         }, (e) => {
             if (e instanceof NetError) {
                 if (e.grpc == Codes.Unauthenticated) {
@@ -195,7 +198,7 @@ export class Manager {
                 userdata: session.userdata,
                 access: session.access,
                 refresh: session.refresh,
-                deadline: Date.now() + 1000 * 50,
+                deadline: Date.now() + 1000 * 60 * 5,//5 minute
             })
             console.log(`save token`, data)
             setItem(Key, aesEncrypt(data))

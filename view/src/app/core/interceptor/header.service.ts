@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
-import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpErrorResponse, HttpHeaders, HttpClient } from '@angular/common/http'
+import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpErrorResponse, HttpHeaders, HttpClient, HttpResponse } from '@angular/common/http'
 import { from, Observable } from 'rxjs';
-import { catchError, concatAll, map } from 'rxjs/operators';
+import { catchError, concatAll, tap, map } from 'rxjs/operators';
 import { Manager, Session } from '../session/session';
 import { Codes, NetError, resolveError } from '../core/restful';
+import { Upgraded } from './upgraded';
 
 @Injectable()
 export class HeaderInterceptor implements HttpInterceptor {
@@ -33,6 +34,19 @@ export class HeaderInterceptor implements HttpInterceptor {
     return next.handle(req.clone({
       headers: headers,
     })).pipe(
+      tap((evt: any) => {
+        if (evt.type === 0) {
+          return
+        }
+        if (evt instanceof HttpResponse) {
+          const version = evt.headers.get('App-Upgraded')
+          if (typeof version === `string`) {
+            Upgraded.instance.nextVersion(version)
+          } else {
+            Upgraded.instance.nextVersion('')
+          }
+        }
+      }),
       catchError((err, caught) => {
         if (first) {
           // only refresh once

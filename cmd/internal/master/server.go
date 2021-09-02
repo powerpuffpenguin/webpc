@@ -9,6 +9,7 @@ import (
 	"github.com/powerpuffpenguin/webpc/configure"
 	"github.com/powerpuffpenguin/webpc/logger"
 	"github.com/powerpuffpenguin/webpc/m/register"
+	"github.com/powerpuffpenguin/webpc/single/upgrade"
 	"github.com/powerpuffpenguin/webpc/utils"
 
 	"github.com/gin-gonic/gin"
@@ -65,6 +66,10 @@ func newServer(system *configure.System, l net.Listener, swagger, debug bool, cn
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	version, upgraded := upgrade.DefaultUpgrade().Upgraded()
+	if upgraded {
+		w.Header().Set(`app-upgraded`, version)
+	}
 	contextType := r.Header.Get(`Content-Type`)
 	if r.ProtoMajor == 2 && strings.Contains(contextType, `application/grpc`) {
 		s.gtcp.ServeHTTP(w, r)

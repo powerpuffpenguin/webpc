@@ -10,6 +10,8 @@ import { Session } from 'src/app/core/session/session';
 import { PasswordComponent } from '../password/password.component';
 import { NavigationService } from 'src/app/core/navigation/navigation.service';
 import { Authorization } from 'src/app/core/core/api';
+import { Upgraded } from 'src/app/core/interceptor/upgraded';
+import { UpgradedComponent } from '../upgraded/upgraded.component';
 interface Data {
   id: Theme,
   name: string
@@ -40,6 +42,7 @@ const Themes: Array<Data> = [
 export class NavigationBarComponent implements OnInit, OnDestroy {
   fullscreen = false
   target = ''
+  version = ''
   constructor(private readonly settingsService: SettingsService,
     private readonly matDialog: MatDialog,
     private readonly sessionService: SessionService,
@@ -77,6 +80,11 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
     ).subscribe((val) => {
       this.target = val
     })
+    Upgraded.instance.versionObservable.pipe(
+      takeUntil(this.closed_.observable),
+    ).subscribe((val) => {
+      this.version = val
+    })
   }
   ngOnDestroy() {
     this.closed_.close()
@@ -103,6 +111,13 @@ export class NavigationBarComponent implements OnInit, OnDestroy {
     this.matDialog.open(PasswordComponent, {
       disableClose: true,
     })
+  }
+  onClickVersion(version: string) {
+    if (version) {
+      this.matDialog.open(UpgradedComponent, {
+        data: version,
+      })
+    }
   }
   get server(): boolean {
     const session = this.session

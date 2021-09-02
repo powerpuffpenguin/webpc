@@ -14,6 +14,7 @@ import (
 	"regexp"
 	"runtime"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/inconshreveable/go-update"
@@ -24,7 +25,9 @@ import (
 
 var hashMatch = regexp.MustCompile(`[0-9a-f]{64}`)
 var defaultUpgrade = &Upgrade{
-	version: ParseVersion(version.Version),
+	version:    ParseVersion(version.Version),
+	upgraded:   true,
+	newversion: `testv`,
 }
 
 func DefaultUpgrade() *Upgrade {
@@ -32,12 +35,19 @@ func DefaultUpgrade() *Upgrade {
 }
 
 type Upgrade struct {
-	version  Version
-	upgraded bool
+	version    Version
+	upgraded   bool
+	newversion string
+	rw         sync.RWMutex
+	m          sync.Mutex
 }
 
-func (u *Upgrade) Upgraded() bool {
-	return u.upgraded
+func (u *Upgrade) Upgraded() (version string, upgraded bool) {
+	u.rw.RLock()
+	version = u.newversion
+	upgraded = u.upgraded
+	u.rw.RUnlock()
+	return
 }
 func (u *Upgrade) Serve() {
 	time.Sleep(time.Minute * 5)
@@ -46,7 +56,7 @@ func (u *Upgrade) Serve() {
 		return
 	}
 	for {
-		time.After(time.Hour * 23)
+		time.Sleep(time.Hour * 23)
 		upgraded, _, _ := u.Do(true)
 		if upgraded {
 			return
@@ -54,6 +64,9 @@ func (u *Upgrade) Serve() {
 	}
 }
 func (u *Upgrade) Do(yes bool) (upgraded bool, newversion string, e error) {
+	u.m.Lock()
+	defer u.m.Unlock()
+
 	response, ver, e := u.requestVersion()
 	if e != nil {
 		if ce := logger.Logger.Check(zap.WarnLevel, `request version`); ce != nil {
@@ -168,9 +181,11 @@ func (u *Upgrade) Do(yes bool) (upgraded bool, newversion string, e error) {
 			zap.String(`filename`, filename),
 		)
 	}
-
 	upgraded = true
+	u.rw.Lock()
 	u.upgraded = upgraded
+	u.newversion = newversion
+	u.rw.Unlock()
 	return
 }
 func (u *Upgrade) requestVersion() (response versionResponse, version Version, e error) {
