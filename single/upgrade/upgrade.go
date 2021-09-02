@@ -1,10 +1,13 @@
 package upgrade
 
 import (
+	"archive/tar"
+	"compress/gzip"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -21,7 +24,7 @@ import (
 
 var hashMatch = regexp.MustCompile(`[0-9a-f]{64}`)
 var defaultUpgrade = &Upgrade{
-	version: ParseVersion(`0.1.1`),
+	version: ParseVersion(version.Version),
 }
 
 func DefaultUpgrade() *Upgrade {
@@ -239,15 +242,45 @@ func (u *Upgrade) upgrade(filename string) (e error) {
 	if e != nil {
 		return
 	}
-
-	// tar gz
-	if false {
-		e = update.Apply(f, update.Options{})
-	}
+	e = u.upgradeApply(f)
 	f.Close()
-	if e == nil {
-		os.Remove(filename)
-		os.Remove(filename + `.txt`)
+	if e != nil {
+		return
+	}
+	os.Remove(filename)
+	os.Remove(filename + `.txt`)
+	return
+}
+func (u *Upgrade) upgradeApply(r io.Reader) (e error) {
+	gz, e := gzip.NewReader(r)
+	if e != nil {
+		return
+	}
+	defer gz.Close()
+	var (
+		tr     = tar.NewReader(gz)
+		header *tar.Header
+		name   = `webpc`
+	)
+	if runtime.GOOS == `windows` {
+		name += `.exe`
+	}
+
+	for {
+		header, e = tr.Next()
+		if e != nil {
+			if e == io.EOF {
+				e = errors.New(`not found ` + name)
+			}
+			break
+		}
+		if header.Typeflag != tar.TypeReg {
+			continue
+		}
+		if header.Name == name {
+			e = update.Apply(tr, update.Options{})
+			break
+		}
 	}
 	return
 }
