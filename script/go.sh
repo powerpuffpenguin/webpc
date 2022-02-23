@@ -103,11 +103,31 @@ target="$Target"
 if [[ "$debug" == 1 ]];then
     target="$target"d
 fi
-if [[ "$os" == "windows" ]];then
-    export CC="x86_64-w64-mingw32-gcc-posix"
-    export CXX="x86_64-w64-mingw32-g++-posix"
-    target="$target.exe"
-fi
+flags=""
+case "$os" in
+    windows)
+        export CGO_ENABLED=1
+        export CC="x86_64-w64-mingw32-gcc-posix"
+        export CXX="x86_64-w64-mingw32-g++-posix"
+        target="$target.exe"
+    ;;
+    darwin)
+        export CGO_ENABLED=1
+        export CC="o64-clang"
+        export CXX="o64-clang++"
+        flags=" -linkmode external"
+    ;;
+    linux)
+        case "$arch" in
+            arm)
+                export CGO_ENABLED=1
+                export CC="arm-linux-gnueabihf-gcc"
+                export CXX="arm-linux-gnueabihf-g++"
+                flags=" -linkmode external -extldflags -static"
+            ;;
+        esac
+    ;;
+esac
 if [[ "$debug" == 1 ]];then
     args=(
         go build 
@@ -116,7 +136,7 @@ if [[ "$debug" == 1 ]];then
 else
     args=(
         go build 
-        -ldflags '"-s -w"'
+        -ldflags "\"-s -w$flags\""
         -o "bin/$target"
     )
 fi

@@ -298,35 +298,29 @@ WebPC back-end uses golang and grpc development, front-end uses angular developm
 
 1. Install the necessary development environment gcc golang proto3 grpc protoc-gen-go protoc-gen-grpc-gateway protoc-gen-openapiv2 
 
-2. Install golang code embedding tool
-
-    ```
-    go install github.com/rakyll/statik
-    ```
-
-3. Download the project and switch the working directory to webpc
+2. Download the project and switch the working directory to webpc
 
     ```
     git clone git@github.com:powerpuffpenguin/webpc.git && cd webpc
     ```
 
-4. Generate grpc code
+3. Generate grpc code
 
     ```
     ./build.sh grpc
     ```
 
-5. Embed front-end code and static files into golang code
+4. Embed front-end code and static files into golang code
 
     ```
-    ./build.sh document
     ./build.sh view -s
     ```
 
-6. Compile go code
+
+4. Compile go code
 
     ```
-    go build -o bin/webpc
+    ./build.sh go
     ```
 
 # Groups-Permissions

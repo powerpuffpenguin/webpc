@@ -13,7 +13,7 @@ import { FitAddon } from 'xterm-addon-fit';
 import { WebLinksAddon } from 'xterm-addon-web-links';
 import { SettingsComponent } from '../dialog/settings/settings.component';
 import { Info, Shell, Target } from './state';
-const DefaultFontFamily = "Lucida Console"
+const DefaultFontFamily = "monospace"
 @Component({
   selector: 'app-view',
   templateUrl: './view.component.html',

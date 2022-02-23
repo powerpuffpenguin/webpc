@@ -5,7 +5,8 @@ Version="v1.1.1"
 View=1
 Platforms=(
     windows/amd64
-    linux/amd64
+    darwin/amd64
+    linux/arm
 )
 UUID="81dd3b50-f343-11eb-8332-dfc4915441d6"
 Protos=(
