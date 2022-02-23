@@ -1,3 +1,10 @@
+# v1.1.x
+
+* Use 'embed' added in golang 1.6 instead of 'statik'
+* Upgrade golang to 1.17
+* GRPC download not use chunked,used context-length
+
+
 # v1.1.0
 
 * web view auto reset session on token not exists 

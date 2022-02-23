@@ -2,11 +2,7 @@ package main
 
 import (
 	"log"
-	_ "github.com/powerpuffpenguin/webpc/assets/document/statik"
-	_ "github.com/powerpuffpenguin/webpc/assets/en-US/statik"
-	_ "github.com/powerpuffpenguin/webpc/assets/public/statik"
-	_ "github.com/powerpuffpenguin/webpc/assets/zh-Hans/statik"
-	_ "github.com/powerpuffpenguin/webpc/assets/zh-Hant/statik"
+
 	"github.com/powerpuffpenguin/webpc/cmd"
 
 	_ "github.com/denisenkom/go-mssqldb"

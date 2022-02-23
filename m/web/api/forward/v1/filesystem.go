@@ -25,7 +25,8 @@ func (h Filesystem) Register(cc *grpc.ClientConn, router *gin.RouterGroup) {
 	r.GET(`:id/uncompress`, h.uncompress)
 	r.GET(`:id/copy`, h.copy)
 	r.POST(`upload/:id/:root/:chunk/*path`, h.upload)
-
+	r.HEAD(`download`, h.download)
+	r.GET(`download`, h.download)
 }
 
 func (h Filesystem) put(c *gin.Context) {
@@ -272,4 +273,30 @@ func (h Filesystem) upload(c *gin.Context) {
 		h.Error(c, e)
 		return
 	}
+}
+func (h Filesystem) download(c *gin.Context) {
+	var obj struct {
+		ID          string `form:"slave_id" binding:"required"`
+		Root        string `form:"root" binding:"required"`
+		Path        string `form:"path" binding:"required"`
+		AccessToken string `form:"access_token" binding:"required"`
+	}
+	e := h.BindQuery(c, &obj)
+	if e != nil {
+		return
+	}
+	c.Request.Header.Set(`Authorization`, `Bearer `+obj.AccessToken)
+	ctx, cc, e := forward.Default().Get(c, obj.ID)
+	if e != nil {
+		h.Error(c, e)
+		return
+	}
+	root := &filesystem{
+		client: grpc_fs.NewFSClient(cc),
+		ctx:    ctx,
+		root:   obj.Root,
+	}
+	c.Request.URL.Path = obj.Path
+	c.Header(`Cache-Control`, `max-age=0`)
+	http.FileServer(root).ServeHTTP(c.Writer, c.Request)
 }

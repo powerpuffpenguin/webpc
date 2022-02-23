@@ -23,7 +23,6 @@
 *.sha256
 *.sha256.txt
 
-/assets/
 /static/3rdpartylicenses.txt
 
 /.tmp/
@@ -38,3 +37,4 @@
 /protocol/
 /bin/protocol/
 /static/document/api/
+/static/view/

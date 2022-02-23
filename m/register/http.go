@@ -6,14 +6,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/powerpuffpenguin/webpc/logger"
 	"github.com/powerpuffpenguin/webpc/m/forward"
 	"github.com/powerpuffpenguin/webpc/m/helper"
 	"github.com/powerpuffpenguin/webpc/m/web"
 	"github.com/powerpuffpenguin/webpc/m/web/api"
 	"github.com/powerpuffpenguin/webpc/m/web/view"
-	"github.com/rakyll/statik/fs"
-	"go.uber.org/zap"
+	"github.com/powerpuffpenguin/webpc/static"
 	"google.golang.org/grpc"
 )
 
@@ -52,48 +50,17 @@ func HTTP(cc *grpc.ClientConn, engine *gin.Engine, gateway *runtime.ServeMux, sw
 		}
 	})
 	if swagger {
-		document, e := fs.NewWithNamespace(`document`)
-		if e != nil {
-			logger.Logger.Panic(`statik document error`,
-				zap.Error(e),
-			)
-		}
 		r := engine.Group(`document`)
 		r.Use(w.Compression())
-		r.StaticFS(``, document)
+		r.StaticFS(``, static.Document())
 	}
-	makeStatic(engine)
+	engine.Group(`static`).Use(w.Compression()).StaticFS(``, static.Static())
 	var views view.Helper
 	views.Register(&engine.RouterGroup)
+	// favicon.ico
+	engine.GET(`favicon.ico`, static.Favicon)
+	engine.HEAD(`favicon.ico`, static.Favicon)
 	// other gin route
 	var apis api.Helper
 	apis.Register(cc, &engine.RouterGroup)
-}
-
-type Static struct {
-	web.Helper
-	fileSystem http.FileSystem
-}
-
-func makeStatic(engine *gin.Engine) {
-	fileSystem, e := fs.NewWithNamespace(`static`)
-	if e != nil {
-		logger.Logger.Panic(`statik static error`,
-			zap.Error(e),
-		)
-	}
-	h := Static{
-		fileSystem: fileSystem,
-	}
-	// engine.GET(`favicon.ico`, h.favicon)
-	// engine.HEAD(`favicon.ico`, h.favicon)
-	// engine.Group(`static`).StaticFS(``, fileSystem)
-
-	compression := h.Compression()
-	engine.GET(`favicon.ico`, compression, h.favicon)
-	engine.HEAD(`favicon.ico`, compression, h.favicon)
-	engine.Group(`static`).Use(compression).StaticFS(``, fileSystem)
-}
-func (h Static) favicon(c *gin.Context) {
-	h.NegotiateFilesystem(c, h.fileSystem, `/favicon.ico`, false)
 }

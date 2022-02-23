@@ -50,10 +50,11 @@ func (h Static) get(c *gin.Context) {
 		h.Error(c, e)
 		return
 	}
-	root := filesystem{
+	root := &filesystem{
 		client: grpc_fs.NewFSClient(cc),
 		ctx:    c.Request.Context(),
 		root:   obj.Root,
+		shared: true,
 	}
 	c.Request.URL.Path = obj.Path
 	c.Header(`Cache-Control`, `max-age=0`)
@@ -64,6 +65,7 @@ type filesystem struct {
 	client grpc_fs.FSClient
 	ctx    context.Context
 	root   string
+	shared bool
 }
 
 func toSystemError(e error) error {
@@ -80,8 +82,13 @@ func toSystemError(e error) error {
 	return e
 }
 
-func (fs filesystem) Open(name string) (f http.File, e error) {
-	client, e := fs.client.Open(fs.ctx)
+func (fs *filesystem) Open(name string) (f http.File, e error) {
+	var client grpc_fs.FS_OpenClient
+	if fs.shared {
+		client, e = fs.client.Open(fs.ctx)
+	} else {
+		client, e = fs.client.OpenRead(fs.ctx)
+	}
 	if e != nil {
 		if ce := logger.Logger.Check(zap.WarnLevel, `fs open err`); ce != nil {
 			ce.Write(

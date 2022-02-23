@@ -84,8 +84,10 @@ service FS {
         };
     }
 
-    // http filesystem
+    // http filesystem for shared
     rpc Open (stream OpenRequest) returns (stream OpenResponse);
+    // http filesystem for readable
+    rpc OpenRead (stream OpenRequest) returns (stream OpenResponse);
 }
 message MountRequest{
 }

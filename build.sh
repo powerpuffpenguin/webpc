@@ -1,3 +1,5 @@
+
+  
 #!/usr/bin/env bash
 
 set -e
@@ -18,7 +20,6 @@ function help(){
     echo "Available Commands:"
     echo "  help              help for $0"
     echo "  clear             clear output"
-    echo "  document          static build document"
     echo "  go                go build helper"
     if [[ $View == 1 ]];then
         echo "  view              view build helper"
@@ -50,11 +51,6 @@ case "$1" in
         shift
         export Command="$0 go"
         "$BashDir/script/go.sh" "$@"
-    ;;
-    document)
-        shift
-        export Command="$0 document"
-        "$BashDir/script/document.sh" "$@"
     ;;
     view)
         if [[ $View == 1 ]];then

@@ -127,16 +127,10 @@ function build_static(){
     exec="${args[@]}"
     echo $exec
     eval "$exec"
-
-    args=(
-        statik
-        -src=static/public
-        -dest=assets/public
-        -ns static -f
-    )
-    exec="${args[@]}"
-    echo $exec
-    eval "$exec"
+    if [ ! -d "static/view" ];then
+        echo mkdir static/view
+        mkdir static/view
+    fi
     
     local items=(
         en-US
@@ -145,12 +139,13 @@ function build_static(){
     )
     for i in ${!items[@]};do
         item=${items[i]}
-        args=(
-            statik -src="view/dist/view/$item" -dest "assets/$item"  -ns "$item" -f
-        )
-        exec="${args[@]}"
-        echo $exec
-        eval "$exec"
+        local dst="static/view/$item"
+        if [ -d "$dst" ];then
+            rm "$dst" -rf
+        fi
+        local src="view/dist/view/$item"
+        echo cp "\"$src\"" "\"$dst\"" -r
+        cp "$src" "$dst" -r
     done
 }
 

@@ -30,19 +30,23 @@
 
 <body>
   <div id="swagger-ui"></div>
-
+  <script src="./api/urls.js" charset="UTF-8"> </script>
   <script src="./swagger-ui-bundle.js" charset="UTF-8"> </script>
   <script src="./swagger-ui-standalone-preset.js" charset="UTF-8"> </script>
   <script>
     window.onload = function () {
+      var urls = [];
+      for (var i = 0; i < URLS.length; i++) {
+        var name = URLS[i];
+        name = name.substring(0, name.length - ".proto".length);
+        urls.push({
+          name: name,
+          url: 'api/docs/' + name + '.swagger.json',
+        })
+      }
       // Begin Swagger UI call region
       const ui = SwaggerUIBundle({
-        urls: [
-          {
-            name: 'apidocs',
-            url: 'api/apidocs.swagger.json',
-          },
-        ],
+        urls: urls,
         dom_id: '#swagger-ui',
         deepLinking: true,
         presets: [

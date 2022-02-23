@@ -658,5 +658,19 @@ func (s server) Merge(ctx context.Context, req *grpc_fs.MergeRequest) (resp *grp
 }
 func (s server) Open(server grpc_fs.FS_OpenServer) error {
 	w := open.New(server)
-	return w.Serve()
+	return w.Serve(true)
+}
+func (s server) OpenRead(server grpc_fs.FS_OpenReadServer) error {
+	ctx := server.Context()
+	_, userdata, e := s.JSONUserdata(ctx)
+	if e != nil {
+		return e
+	}
+
+	if !userdata.AuthAny(db.Root, db.Read) {
+		e = s.Error(codes.PermissionDenied, `no read permission`)
+		return e
+	}
+	w := open.New(server)
+	return w.Serve(false)
 }

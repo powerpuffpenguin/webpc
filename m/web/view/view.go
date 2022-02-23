@@ -2,26 +2,22 @@ package view
 
 import (
 	"net/http"
-	"os"
 	"strings"
 
-	"github.com/powerpuffpenguin/webpc/logger"
 	"github.com/powerpuffpenguin/webpc/m/web"
+	"github.com/powerpuffpenguin/webpc/static"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	"github.com/gin-gonic/gin"
-	"github.com/rakyll/statik/fs"
-	"go.uber.org/zap"
 )
 
 const BaseURL = `view`
 
-var locales = make(map[string]http.FileSystem)
-var supported = []string{
-	`zh-Hant`,
-	`zh-Hans`,
-	`en-US`,
+var locales = map[string]http.FileSystem{
+	`zh-Hant`: static.ZhHant(),
+	`zh-Hans`: static.ZhHans(),
+	`en-US`:   static.EnglishUS(),
 }
 
 func localeResolution(accept string) string {
@@ -60,20 +56,6 @@ type Helper struct {
 }
 
 func (h Helper) Register(router *gin.RouterGroup) {
-	for _, key := range supported {
-		locale, e := fs.NewWithNamespace(key)
-		if e != nil {
-			if ce := logger.Logger.Check(zap.FatalLevel, `New FileSystem error`); ce != nil {
-				ce.Write(
-					zap.Error(e),
-					zap.String(`namespace`, key),
-				)
-			}
-			os.Exit(1)
-		}
-		locales[key] = locale
-	}
-
 	router.GET(``, h.redirect)
 	router.HEAD(``, h.redirect)
 	router.GET(`index`, h.redirect)

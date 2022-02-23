@@ -54,9 +54,11 @@ function buildGo(){
     if [[ -d "$UUID" ]];then
         rm "$UUID" -rf
     fi
+
     local document="static/document/api"
     if [[ -d "$document" ]];then
-        rm "$document/*" -rf
+        rm "$document" -rf
+        mkdir "$document"
     else
         mkdir "$document"
     fi
@@ -74,15 +76,26 @@ function buildGo(){
         --go_out="'.'" --go_opt=paths=source_relative
         --go-grpc_out="'.'" --go-grpc_opt=paths=source_relative
         --grpc-gateway_out="'.'" --grpc-gateway_opt=paths=source_relative
-        --openapiv2_out="'$document'" --openapiv2_opt logtostderr=true --openapiv2_opt use_go_templates=true --openapiv2_opt allow_merge=true
+        --openapiv2_out="'$document'" --openapiv2_opt logtostderr=true --openapiv2_opt use_go_templates=true --openapiv2_opt allow_merge=false
     )
     local exec="${command[@]} ${opts[@]} ${protos[@]}"
     echo $exec
     eval "$exec"
 
+    # urls
+    mv "$document/$UUID" "$document/docs"
+
+    local url="$document/urls.js"
+    echo "var URLS=[" > "$url"
+    for i in ${!Protos[@]};do
+        echo  "'${Protos[i]}'," >> "$url"
+    done
+    echo "];" >> "$url"
+
     echo mv $UUID protocol
     mv "$UUID" "protocol"
 }
+
 case "$lang" in
     go)
         buildGo

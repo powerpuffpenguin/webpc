@@ -39,6 +39,19 @@ func (w *Worker) mountShared(name string) (m *mount.Mount, e error) {
 	}
 	return
 }
+func (w *Worker) mountRead(name string) (m *mount.Mount, e error) {
+	fs := mount.Default()
+	m = fs.Root(name)
+	if m == nil {
+		e = status.Error(codes.NotFound, `root not found: `+name)
+		return
+	}
+	if !m.Read() {
+		e = status.Error(codes.PermissionDenied, `filesystem is not readable`)
+		return
+	}
+	return
+}
 func (w *Worker) recv(evt grpc_fs.FSEvent) (req *grpc_fs.OpenRequest, e error) {
 	req, e = w.server.Recv()
 	if e != nil {
@@ -56,9 +69,9 @@ type openResult struct {
 	Err  error
 }
 
-func (w *Worker) Serve() (e error) {
+func (w *Worker) Serve(shared bool) (e error) {
 	ch := make(chan openResult)
-	go w.open(ch)
+	go w.open(ch, shared)
 
 	// recv init event
 	t := time.NewTimer(time.Second * 30)
@@ -98,14 +111,19 @@ func (w *Worker) resultOpen(ch chan openResult, f *os.File, e error) {
 	}:
 	}
 }
-func (w *Worker) open(ch chan openResult) {
+func (w *Worker) open(ch chan openResult, shared bool) {
 	req, e := w.recv(grpc_fs.FSEvent_Open)
 	if e != nil {
 		w.resultOpen(ch, nil, e)
 		return
 	}
 	// check args
-	m, e := w.mountShared(req.Root)
+	var m *mount.Mount
+	if shared {
+		m, e = w.mountShared(req.Root)
+	} else {
+		m, e = w.mountRead(req.Root)
+	}
 	if e != nil {
 		w.resultOpen(ch, nil, e)
 		return
