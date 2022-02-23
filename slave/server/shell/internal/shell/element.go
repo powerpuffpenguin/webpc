@@ -36,7 +36,7 @@ func (element *Element) Attach(conn Conn, username string, shellid int64, cols, 
 			name:     time.Unix(shellid, 0).Local().Format(`2006/01/02 15:04:05`),
 		}
 		fontSize := int32(15)
-		fontFamily := `Lucida Console`
+		fontFamily := `monospace`
 		shell.SetFontSize(fontSize)
 		shell.SetFontFamily(fontFamily)
 		e = shell.Run(conn, cols, rows)

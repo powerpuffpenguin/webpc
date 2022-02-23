@@ -1,10 +1,12 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { ToasterService } from 'angular2-toaster';
 import { takeUntil } from 'rxjs/operators';
 import { ServerAPI } from 'src/app/core/core/api';
 import { SessionService } from 'src/app/core/session/session.service';
 import { Closed } from 'src/app/core/utils/closed';
+import { RequireNet } from 'src/app/core/utils/requirenet';
 import { State } from './state';
 
 @Component({
@@ -18,6 +20,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   constructor(private readonly activatedRoute: ActivatedRoute,
     private readonly httpClient: HttpClient,
     private readonly sessionService: SessionService,
+    private readonly toasterService: ToasterService,
   ) {
   }
   private accessToken_ = ''
@@ -36,11 +39,37 @@ export class HomeComponent implements OnInit, OnDestroy {
       const state = new State(this.httpClient, id)
       this.state = state
       state.refresh()
+      this.url = ServerAPI.forward.v1.forward.websocketURL(id)
+    })
+  }
+  @ViewChild("clipboard")
+  private readonly clipboard_: ElementRef | undefined
+  private clipboardjs_: any
+  ngAfterViewInit() {
+    RequireNet('clipboard').then((ClipboardJS) => {
+      if (this.closed_.isClosed) {
+        return
+      }
+      this.clipboardjs_ = new ClipboardJS(this.clipboard_?.nativeElement).on('success', () => {
+        if (this.closed_.isNotClosed) {
+          this.toasterService.pop('info', '', "copied")
+        }
+      }).on('error', (evt: any) => {
+        if (this.closed_.isNotClosed) {
+          this.toasterService.pop('error', undefined, "copied error")
+          console.error('Action:', evt.action)
+          console.error('Trigger:', evt.trigger)
+        }
+      })
     })
   }
   ngOnDestroy() {
     this.state.closed.close()
     this.closed_.close()
+    if (this.clipboardjs_) {
+      this.clipboardjs_.destroy()
+      this.clipboardjs_ = null
+    }
   }
   onClickRefresh() {
     this.state.refresh()
@@ -82,5 +111,21 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
   get upgraded(): string {
     return this.state?.upgraded?.version ?? ''
+  }
+  url = ""
+  onCliCkCopyClipboard() {
+    const clipboard = this.clipboard_
+    if (!clipboard) {
+      return
+    }
+    const element = clipboard.nativeElement
+    if (!element) {
+      return
+    }
+    element.setAttribute(
+      'data-clipboard-text',
+      this.url ,
+    )
+    element.click()
   }
 }

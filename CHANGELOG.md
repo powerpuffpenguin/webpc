@@ -1,9 +1,8 @@
-# v1.1.x
+# v1.1.1
 
 * Use 'embed' added in golang 1.6 instead of 'statik'
 * Upgrade golang to 1.17
 * GRPC download not use chunked,used context-length
-
 
 # v1.1.0
 

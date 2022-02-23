@@ -104,6 +104,10 @@ export class QueryComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnDestroy() {
     this.stateManager.close()
     this.closed_.close()
+    if (this.clipboardjs_) {
+      this.clipboardjs_.destroy()
+      this.clipboardjs_ = null
+    }
   }
   private sets_ = new Set<GroupData>()
   private _updateAll() {

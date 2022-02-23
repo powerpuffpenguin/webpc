@@ -41,6 +41,7 @@ export class State {
                 })
             }),
             new DataState(opts, (data) => {
+                console.log(data)
                 this.data = data
             }, (e) => {
                 this.errs.push({

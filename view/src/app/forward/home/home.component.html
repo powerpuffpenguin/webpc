@@ -1,4 +1,5 @@
 <div class="view">
+    <button #clipboard class="hide" data-clipboard-text="">copy</button>
     <ng-container *ngIf="ready;then readyView;else loadView"></ng-container>
 </div>
 
@@ -13,6 +14,13 @@
             <p>{{version.version}}</p>
             <p>start at {{startAt.at.format('YYYY-MM-DD HH:mm:ss')}}, started {{startAt.started}}.</p>
             <p *ngIf="upgraded">new version "{{upgraded}}" is ready, wait until the server restarts to take effect.</p>
+            <p *ngIf="url">
+                {{url}}
+                <button mat-icon-button i18n-matTooltip matTooltip="copy port forward url"
+                    (click)="onCliCkCopyClipboard()">
+                    <mat-icon>vpn_lock</mat-icon>
+                </button>
+            </p>
         </mat-card-content>
         <mat-card-actions>
             <a mat-stroked-button [routerLink]="['/forward/fs']" [queryParams]="{id:data.id}" i18n>Filesystem</a>
@@ -41,6 +49,13 @@
             <div *ngFor="let err of errs; ">
                 {{err.id}} -> {{err.err}}
             </div>
+            <p *ngIf="url">
+                {{url}}
+                <button mat-icon-button i18n-matTooltip matTooltip="copy port forward url"
+                    (click)="onCliCkCopyClipboard()">
+                    <mat-icon>vpn_lock</mat-icon>
+                </button>
+            </p>
         </mat-card-content>
         <mat-card-actions>
             <a mat-stroked-button [routerLink]="['/forward/fs']" [queryParams]="{id:data.id}" i18n>Filesystem</a>

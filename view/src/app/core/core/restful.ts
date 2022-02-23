@@ -195,15 +195,15 @@ export class RESTful {
         // console.log(location.protocol)
         if (location.protocol == "https:") {
             addr = `wss://${location.hostname}`
-            if (location.port == "") {
-                addr += ":443"
+            if (location.port == "" || location.port == "443") {
+                // addr += ":443"
             } else {
                 addr += `:${location.port}`
             }
         } else {
             addr = `ws://${location.hostname}`
-            if (location.port == "") {
-                addr += ":80"
+            if (location.port == "" || location.port == "80") {
+                // addr += ":80"
             } else {
                 addr += `:${location.port}`
             }
