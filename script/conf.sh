@@ -7,6 +7,7 @@ Platforms=(
     windows/amd64
     darwin/amd64
     linux/arm
+    linux/amd64
 )
 UUID="81dd3b50-f343-11eb-8332-dfc4915441d6"
 Protos=(
