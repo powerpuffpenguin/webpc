@@ -1,3 +1,7 @@
+# v1.1.2
+
+* fix fs module download not set header Content-Disposition for filename
+
 # v1.1.1
 
 * Use 'embed' added in golang 1.6 instead of 'statik'

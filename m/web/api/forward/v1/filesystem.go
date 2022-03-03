@@ -4,6 +4,9 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net/url"
+	"path"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/powerpuffpenguin/webpc/m/forward"
@@ -279,13 +282,15 @@ func (h Filesystem) download(c *gin.Context) {
 		ID          string `form:"slave_id" binding:"required"`
 		Root        string `form:"root" binding:"required"`
 		Path        string `form:"path" binding:"required"`
-		AccessToken string `form:"access_token" binding:"required"`
+		AccessToken string `form:"access_token"`
 	}
 	e := h.BindQuery(c, &obj)
 	if e != nil {
 		return
 	}
-	c.Request.Header.Set(`Authorization`, `Bearer `+obj.AccessToken)
+	if obj.AccessToken != `` && !strings.HasPrefix(c.Request.Header.Get(`Authorization`), `Bearer `) {
+		c.Request.Header.Set(`Authorization`, `Bearer `+obj.AccessToken)
+	}
 	ctx, cc, e := forward.Default().Get(c, obj.ID)
 	if e != nil {
 		h.Error(c, e)
@@ -297,6 +302,8 @@ func (h Filesystem) download(c *gin.Context) {
 		root:   obj.Root,
 	}
 	c.Request.URL.Path = obj.Path
+	name := path.Base(obj.Path)
 	c.Header(`Cache-Control`, `max-age=0`)
+	c.Header(`Content-Disposition`, `attachment;filename=`+url.QueryEscape(name))
 	http.FileServer(root).ServeHTTP(c.Writer, c.Request)
 }
