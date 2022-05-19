@@ -47,6 +47,7 @@ const texts = new Set();
     '.bat', '.cmd', '.vbs',
     '.go', '.dart', '.py', '.py3', '.js', '.ts', '.c', '.cc', '.h', '.hpp', '.cpp',
     '.java', '.php', '.lua', '.jsonnet', '.libsonnet',
+    '.vtt', '.ass',
 ]).forEach(function (str: string) {
     texts.add(str)
 });
@@ -136,6 +137,13 @@ export class FileInfo {
         }
         return rv - lv
     }
+    get basename(): string {
+        const index = this.name.lastIndexOf('.')
+        if (index == -1) {
+            return ''
+        }
+        return this.name.substring(0, index)
+    }
     get ext(): string {
         const index = this.name.lastIndexOf('.')
         if (index == -1) {
@@ -145,6 +153,12 @@ export class FileInfo {
     }
     get filetype(): FileType {
         return this._filetype
+    }
+    get isVideo(): boolean {
+        return this._filetype == FileType.Video
+    }
+    get isText(): boolean {
+        return this._filetype == FileType.Text
     }
     get isSupportUncompress(): boolean {
         if (this.isDir) {

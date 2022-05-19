@@ -14,7 +14,7 @@ const routes: Routes = [
   {
     path: 'fs',
     loadChildren: () => import('../forward-fs/forward-fs.module').then(m => m.ForwardFsModule),
-    canActivate: [FsGuard],
+    // canActivate: [FsGuard],
   },
   {
     path: 'logger',

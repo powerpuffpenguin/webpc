@@ -570,4 +570,13 @@ export class ManagerComponent implements OnInit, OnDestroy {
       }
     })
   }
+  get movieParams(): any {
+    const dir = this.folder
+    return {
+      id:dir.id,
+      root:dir.root,
+      path:dir.dir,
+    }
+  }
+
 }

@@ -1,6 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 @import "xterm/css/xterm.css";
 @import "angular2-toaster/toaster.min.css";
+@import "video.js/dist/video-js.min.css";
 
 .terminal{
     padding-left: 4px;
@@ -36,4 +37,10 @@
 }
 .left8{
     margin-left: 8px;
+}
+
+.videojs-player {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16/9;
 }

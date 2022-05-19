@@ -46,6 +46,7 @@ import { UncompressComponent } from './dialog/uncompress/uncompress.component';
 import { ExistsChoiceComponent } from './dialog/exists-choice/exists-choice.component';
 import { CopyComponent } from './dialog/copy/copy.component';
 import { UploadComponent } from './dialog/upload/upload.component';
+import { MovieComponent } from './movie/movie.component';
 
 
 @NgModule({
@@ -70,7 +71,8 @@ import { UploadComponent } from './dialog/upload/upload.component';
     UncompressComponent,
     ExistsChoiceComponent,
     CopyComponent,
-    UploadComponent
+    UploadComponent,
+    MovieComponent
   ],
   imports: [
     CommonModule,

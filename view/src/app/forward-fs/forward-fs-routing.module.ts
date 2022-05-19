@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { ListComponent } from './list/list.component';
+import { MovieComponent } from './movie/movie.component';
 import { RootComponent } from './root/root.component';
 import { AudioComponent } from './view/audio/audio.component';
 import { ImageComponent } from './view/image/image.component';
@@ -16,6 +17,10 @@ const routes: Routes = [
   {
     path: 'list',
     component: ListComponent,
+  },
+  {
+    path: 'movie',
+    component: MovieComponent,
   },
   {
     path: 'view/video',
