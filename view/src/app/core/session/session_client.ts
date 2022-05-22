@@ -72,7 +72,7 @@ export class SessionClient extends Client {
 
         const session = await this.sessionService.observable.pipe(
             filter((data) => {
-                if (data && data.userdata && data.userdata.id && data.access) {
+                if (data && data.userdata && data.userdata.id && data.token.access) {
                     return true
                 }
                 return false
@@ -80,7 +80,7 @@ export class SessionClient extends Client {
             first(),
             takeUntil(this.observable),
         ).toPromise()
-        const token = session?.access ?? ''
+        const token = session?.token.access ?? ''
         const baseURL = this.baseURL
         const url = baseURL + '?' + new HttpParams({
             fromObject: {

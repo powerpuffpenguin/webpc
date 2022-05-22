@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/powerpuffpenguin/sessionstore/cryptoer"
 	"github.com/powerpuffpenguin/webpc/db"
 	"github.com/powerpuffpenguin/webpc/m/web"
 	"github.com/powerpuffpenguin/webpc/sessionid"
@@ -170,7 +171,12 @@ func (f *Forward) Forward(str string, c *gin.Context) {
 	userdata, e := f.web.ShouldBindUserdata(c)
 	if e != nil {
 		if shared {
-			f.forwardShared(ele.gateway, c, status.Code(e) == codes.Unauthenticated)
+			f.forwardShared(
+				ele.gateway,
+				c,
+				status.Code(e) == codes.Unauthenticated &&
+					e.Error() == cryptoer.ErrExpired.Error(),
+			)
 		} else {
 			f.web.Error(c, e)
 		}
@@ -190,7 +196,7 @@ func (f *Forward) Forward(str string, c *gin.Context) {
 		}
 	} else {
 		if shared {
-			f.forwardShared(ele.gateway, c, status.Code(e) == codes.Unavailable)
+			f.forwardShared(ele.gateway, c, false)
 		} else {
 			f.web.Error(c, e)
 		}

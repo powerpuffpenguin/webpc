@@ -49,7 +49,7 @@ func (d *Session) Unmarshal(b []byte) (e error) {
 	d.Nickname = s.Nickname
 	d.Authorization = s.Authorization
 	d.Parent = s.Parent
-	
+
 	d.Token = sessionstore.NewToken(
 		t.Access, t.Refresh,
 		t.AccessDeadline, t.RefreshDeadline,
@@ -142,7 +142,7 @@ func (Coder) Unmarshal(b []byte) (session interface{}, e error) {
 	if e != nil {
 		return
 	}
-	session = Session{
+	session = &Session{
 		ID:            m.Id,
 		Name:          m.Name,
 		Nickname:      m.Nickname,
