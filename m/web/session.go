@@ -1,17 +1,15 @@
 package web
 
 import (
-	"errors"
 	"strings"
 
 	"github.com/powerpuffpenguin/webpc/db"
 	"github.com/powerpuffpenguin/webpc/m/helper"
-	"github.com/powerpuffpenguin/webpc/sessions"
+	"github.com/powerpuffpenguin/webpc/sessionid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	"github.com/gin-gonic/gin"
-	"github.com/powerpuffpenguin/sessionid"
 )
 
 type sessionValue struct {
@@ -19,15 +17,6 @@ type sessionValue struct {
 	e       error
 }
 
-func (h Helper) tokenError(e error) error {
-	if sessionid.IsTokenExpired(e) {
-		return status.Error(codes.Unauthenticated, e.Error())
-	} else if errors.Is(e, sessionid.ErrTokenNotExists) {
-		return status.Error(codes.PermissionDenied, e.Error())
-	} else {
-		return e
-	}
-}
 func (h Helper) GetToken(c *gin.Context) string {
 	return h.getToken(c)
 }
@@ -57,7 +46,7 @@ func (h Helper) accessSession(c *gin.Context) (session *sessionid.Session, e err
 	token := h.getToken(c)
 	if strings.HasPrefix(token, `Bearer `) {
 		access := token[7:]
-		session, e = sessions.DefaultManager().Get(c.Request.Context(), access)
+		session, e = sessionid.DefaultManager().Get(c.Request.Context(), access)
 	}
 	return
 }
@@ -71,51 +60,25 @@ func (h Helper) ShouldBindSession(c *gin.Context) (session *sessionid.Session, e
 		}
 	}
 	session, e = h.accessSession(c)
-	if e == nil {
-		if session == nil {
-			e = status.Error(codes.PermissionDenied, `token not exists`)
-		}
-	} else {
-		e = h.tokenError(e)
-	}
 	c.Set(`session`, sessionValue{
 		session: session,
 		e:       e,
 	})
 	return
 }
-func (h Helper) BindSession(c *gin.Context) (session *sessionid.Session) {
-	session, e := h.ShouldBindSession(c)
+func (h Helper) BindSession(c *gin.Context) (session *sessionid.Session, e error) {
+	session, e = h.ShouldBindSession(c)
 	if e != nil {
 		h.Error(c, e)
 		return
 	}
 	return
 }
-func (h Helper) ShouldBindUserdata(c *gin.Context) (userdata sessions.Userdata, e error) {
-	session, e := h.ShouldBindSession(c)
-	if e != nil {
-		return
-	}
-	e = session.Get(c.Request.Context(), sessions.KeyUserdata, &userdata)
-	if e != nil {
-		e = h.tokenError(e)
-	}
-	return
+func (h Helper) ShouldBindUserdata(c *gin.Context) (userdata *sessionid.Session, e error) {
+	return h.ShouldBindSession(c)
 }
-func (h Helper) BindUserdata(c *gin.Context) (userdata sessions.Userdata, e error) {
-	session, e := h.ShouldBindSession(c)
-	if e != nil {
-		h.Error(c, e)
-		return
-	}
-	e = session.Get(c.Request.Context(), sessions.KeyUserdata, &userdata)
-	if e != nil {
-		e = h.tokenError(e)
-		h.Error(c, e)
-		return
-	}
-	return
+func (h Helper) BindUserdata(c *gin.Context) (userdata *sessionid.Session, e error) {
+	return h.BindSession(c)
 }
 
 func (h Helper) CheckRoot(c *gin.Context) {

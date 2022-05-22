@@ -8,29 +8,17 @@ import (
 )
 
 type Session struct {
-	Backend string
-	Coder   string
-	Client  SessionClient
-	Memory  SessionMemory
+	Memory SessionMemory
 }
 
 func (s *Session) format() (e error) {
-	s.Backend = strings.ToLower(strings.TrimSpace(s.Backend))
-	if s.Backend == "memory" {
-		e = s.Memory.format()
-		if e != nil {
-			return
-		}
+	e = s.Memory.format()
+	if e != nil {
+		return
 	}
-	s.Coder = strings.ToUpper(strings.TrimSpace(s.Coder))
 	return
 }
 
-type SessionClient struct {
-	Protocol string
-	Addr     string
-	Token    string
-}
 type SessionMemory struct {
 	Manager  SessionManager
 	Provider SessionProvider
@@ -58,29 +46,24 @@ type SessionProvider struct {
 	Bolt    SessionProviderBolt
 }
 type SessionProviderMemory struct {
-	Access  time.Duration
-	Refresh time.Duration
-	MaxSize int
-	Batch   int
-	Clear   time.Duration
+	Access   time.Duration
+	Refresh  time.Duration
+	Deadline time.Duration
+	MaxSize  int
 }
 type SessionProviderRedis struct {
-	URL     string
-	Access  time.Duration
-	Refresh time.Duration
-
-	Batch       int
-	KeyPrefix   string
-	MetadataKey string
+	URL      string
+	Access   time.Duration
+	Refresh  time.Duration
+	Deadline time.Duration
 }
 type SessionProviderBolt struct {
 	Filename string
 
-	Access  time.Duration
-	Refresh time.Duration
-	MaxSize int
-	Batch   int
-	Clear   time.Duration
+	Access   time.Duration
+	Refresh  time.Duration
+	Deadline time.Duration
+	MaxSize  int64
 }
 
 func (s *SessionProviderBolt) format() (e error) {

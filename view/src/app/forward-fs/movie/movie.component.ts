@@ -23,6 +23,20 @@ export class MovieComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngOnInit(): void {
 
+    // const v: any = videojs
+    // v.xhr = (url: string, options: videojs.XhrOptions, callback: videojs.XhrCallback) => {
+    //   console.log("ok")
+    // }
+
+    // setInterval(() => {
+    //   i++
+    //   (videojs as any).Hls.xhr.beforeRequest = (options: any) => {
+    //     options.headers = options.headers || {}
+    //     options.headers.Authorization1 = 'Bearer ' + i.toString()
+
+    //     return options
+    //   };
+    // }, 1000)
   }
   ngOnDestroy(): void {
     this.closed_.close()

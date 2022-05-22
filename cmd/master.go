@@ -9,7 +9,7 @@ import (
 	"github.com/powerpuffpenguin/webpc/configure"
 	"github.com/powerpuffpenguin/webpc/db/manipulator"
 	"github.com/powerpuffpenguin/webpc/logger"
-	"github.com/powerpuffpenguin/webpc/sessions"
+	"github.com/powerpuffpenguin/webpc/sessionid"
 	"github.com/powerpuffpenguin/webpc/single/logger/db"
 	"github.com/powerpuffpenguin/webpc/single/mount"
 	"github.com/powerpuffpenguin/webpc/single/upgrade"
@@ -56,7 +56,7 @@ func init() {
 
 			// init db
 			manipulator.Init(&cnf.DB)
-			sessions.Init(&cnf.Session)
+			sessionid.Init(&cnf.Session)
 			if cnf.System.Enable {
 				mount.Init(cnf.System.Mount)
 			}

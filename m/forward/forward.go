@@ -3,7 +3,6 @@ package forward
 import (
 	"context"
 	"encoding/base64"
-	"encoding/json"
 	"strconv"
 	"strings"
 	"sync"
@@ -12,7 +11,7 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/powerpuffpenguin/webpc/db"
 	"github.com/powerpuffpenguin/webpc/m/web"
-	"github.com/powerpuffpenguin/webpc/sessions"
+	"github.com/powerpuffpenguin/webpc/sessionid"
 	signal_group "github.com/powerpuffpenguin/webpc/signal/group"
 	signal_slave "github.com/powerpuffpenguin/webpc/signal/slave"
 	"google.golang.org/grpc"
@@ -120,7 +119,7 @@ func (f *Forward) Get(c *gin.Context, str string) (ctx context.Context, cc *grpc
 	}
 
 	// check group
-	e = f.checkGroup(c, id, &userdata)
+	e = f.checkGroup(c, id, userdata)
 	if e != nil {
 		if shared {
 			if status.Code(e) == codes.Unauthenticated {
@@ -134,7 +133,7 @@ func (f *Forward) Get(c *gin.Context, str string) (ctx context.Context, cc *grpc
 	}
 
 	// token
-	b, e := json.Marshal(userdata)
+	b, e := userdata.Marshal()
 	if e == nil {
 		ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs(
 			`Authorization`, `Bearer `+base64.RawURLEncoding.EncodeToString(b),
@@ -179,10 +178,10 @@ func (f *Forward) Forward(str string, c *gin.Context) {
 	}
 
 	// check group
-	e = f.checkGroup(c, id, &userdata)
+	e = f.checkGroup(c, id, userdata)
 	if e == nil {
 		// token
-		b, e := json.Marshal(userdata)
+		b, e := userdata.Marshal()
 		if e == nil {
 			c.Request.Header.Set(`Authorization`, `Bearer `+base64.RawURLEncoding.EncodeToString(b))
 		} else {
@@ -202,7 +201,7 @@ func (f *Forward) Forward(str string, c *gin.Context) {
 	ele.gateway.ServeHTTP(c.Writer, c.Request)
 }
 
-func (f *Forward) checkGroup(c *gin.Context, id int64, userdata *sessions.Userdata) (e error) {
+func (f *Forward) checkGroup(c *gin.Context, id int64, userdata *sessionid.Session) (e error) {
 	if id == 0 {
 		if !userdata.AuthAny(db.Root, db.Server) {
 			e = status.Error(codes.PermissionDenied, `permission denied`)

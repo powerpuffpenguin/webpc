@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -31,6 +32,9 @@ func (Helper) SetHTTPCookie(ctx context.Context, cookie ...*http.Cookie) error {
 }
 func (Helper) SetHTTPCacheMaxAge(ctx context.Context, maxAge int) error {
 	return grpc.SetHeader(ctx, metadata.Pairs(`Cache-Control`, `max-age=`+strconv.Itoa(maxAge)))
+}
+func (Helper) SetHTTPCacheExpress(ctx context.Context, express time.Time) error {
+	return grpc.SetHeader(ctx, metadata.Pairs(`Express`, express.Format(http.TimeFormat)))
 }
 
 func (Helper) SetHTTPCode(ctx context.Context, code int) error {

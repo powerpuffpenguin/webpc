@@ -13,7 +13,7 @@ import (
 	"github.com/powerpuffpenguin/webpc/logger"
 	"github.com/powerpuffpenguin/webpc/m/helper"
 	grpc_fs "github.com/powerpuffpenguin/webpc/protocol/forward/fs"
-	"github.com/powerpuffpenguin/webpc/sessions"
+	"github.com/powerpuffpenguin/webpc/sessionid"
 	"github.com/powerpuffpenguin/webpc/single/mount"
 	"github.com/powerpuffpenguin/webpc/slave/server/fs/internal/compress"
 	"github.com/powerpuffpenguin/webpc/slave/server/fs/internal/copied"
@@ -33,7 +33,7 @@ type server struct {
 	helper.Helper
 }
 
-func (s server) mountUserdataWrite(ctx context.Context, name string) (userdata sessions.Userdata, m *mount.Mount, e error) {
+func (s server) mountUserdataWrite(ctx context.Context, name string) (userdata *sessionid.Session, m *mount.Mount, e error) {
 	m, e = s.mount(name)
 	if e != nil {
 		return
@@ -57,7 +57,7 @@ func (s server) mountUserdataWrite(ctx context.Context, name string) (userdata s
 	e = s.Error(codes.PermissionDenied, `no write permission`)
 	return
 }
-func (s server) checkUserdataWrite(userdata *sessions.Userdata, m *mount.Mount) (e error) {
+func (s server) checkUserdataWrite(userdata *sessionid.Session, m *mount.Mount) (e error) {
 	// can read
 	if !m.Write() {
 		e = s.Error(codes.PermissionDenied, `filesystem is not writable`)
@@ -224,7 +224,7 @@ func (s server) Download(req *grpc_fs.DownloadRequest, server grpc_fs.FS_Downloa
 	)
 	return
 }
-func (s server) putFirst(userdata *sessions.Userdata, root, path string) (f *os.File, e error) {
+func (s server) putFirst(userdata *sessionid.Session, root, path string) (f *os.File, e error) {
 	fs := mount.Default()
 	m := fs.Root(root)
 	if m == nil {
@@ -288,7 +288,7 @@ func (s server) Put(server grpc_fs.FS_PutServer) (e error) {
 			first = false
 			root = req.Root
 			path = req.Path
-			f, e = s.putFirst(&userdata, req.Root, req.Path)
+			f, e = s.putFirst(userdata, req.Root, req.Path)
 			if e != nil {
 				break
 			}

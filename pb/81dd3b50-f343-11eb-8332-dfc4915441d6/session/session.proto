@@ -50,18 +50,17 @@ message SigninRequest{
     // cookie mode only for debug
     bool cookie = 5;
 }
-message SigninResponse{
-    // access token
-    string access = 1;
-    // refresh token
-    string refresh = 2;
-
-    int64 id = 3;
+message Data{
+    int64 id = 2;
     // [a-zA-Z][a-zA-Z0-9]{4,}
-    string name = 4;   
-    string nickname = 5;
-    repeated int32 authorization = 6;
-    int64 parent = 7;
+    string name = 3;   
+    string nickname = 4;
+    repeated int32 authorization = 5;
+    int64 parent = 6;
+}
+message SigninResponse{
+    Token token = 1;
+    Data data = 2;
 }
 message SignoutRequest{
     // cookie mode only for debug
@@ -76,10 +75,7 @@ message RefreshRequest{
     string refresh = 2;
 }
 message RefreshResponse{
-    // new access token
-    string access = 1;
-    // new refresh token
-    string refresh = 2;
+    Token token = 1;
 }
 message PasswordRequest{
     // old password
@@ -99,4 +95,23 @@ message UserResponse{
     string nickname = 3;
     repeated int32 authorization = 4;
     int64 parent = 7;
+}
+message Token {
+    // 訪問 token
+    // token 編碼規則爲爲 
+    // var playdata=RawUrlBase64(id)+'.'+RawUrlBase64(platform)+'.'+RawUrlBase64(random_uuid)
+    // var access=playdata + '.' + sign(playdata)
+    string access = 1;
+    // 刷新 token
+    string refresh = 2;
+    // 訪問 token 過期時間 unix
+    int64 accessDeadline = 3;
+    // 刷新 token 過期時間 unix
+    int64 refreshDeadline = 4;
+    // 會話最長維持時間 unix 如果爲 0 不限制
+    int64 deadline = 5;
+}
+message Raw{
+    Data data=1;
+    Token token=2;
 }
