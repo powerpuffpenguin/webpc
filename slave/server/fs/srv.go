@@ -224,6 +224,11 @@ func (s server) Download(req *grpc_fs.DownloadRequest, server grpc_fs.FS_Downloa
 	)
 	return
 }
+func (s server) DownloadAccess(req *grpc_fs.DownloadRequest, server grpc_fs.FS_DownloadAccessServer) (e error) {
+	e = s.Download(req, server)
+	return
+}
+
 func (s server) putFirst(userdata *sessionid.Session, root, path string) (f *os.File, e error) {
 	fs := mount.Default()
 	m := fs.Root(root)

@@ -3,7 +3,6 @@ import { ServerAPI } from "src/app/core/core/api"
 import { Channel } from "src/app/core/utils/completer"
 import { FileInfo, Dir } from '../fs';
 import { VideoJsPlayer } from "video.js"
-import { SessionService } from "src/app/core/session/session.service";
 export class Path {
     constructor(public readonly id: string,
         public readonly root: string,
@@ -36,8 +35,8 @@ mimeExt.set('.rm', 'audio/x-pn-realaudio')
 mimeExt.set('.rmvb', undefined)
 class Source {
     public readonly textTracks = new Array<FileUrl>()
-    constructor(private sessionService: SessionService,
-        private path: Path,
+    constructor(private readonly access: string,
+        private readonly path: Path,
         public readonly source: FileInfo) {
     }
     addTrack(url: FileUrl) {
@@ -50,10 +49,10 @@ class Source {
                 slave_id: path.id,
                 root: path.root,
                 path: this.source.filename,
-                access_token: this.sessionService.session?.access ?? '',
+                access_token: this.access,
             }
         })
-        return ServerAPI.forward.v1.fs.httpURL('download') + '?' + params.toString()
+        return ServerAPI.forward.v1.fs.httpURL('download_access') + '?' + params.toString()
     }
     get mime(): string | undefined {
         const ext = this.source.ext.toLowerCase()
@@ -61,7 +60,8 @@ class Source {
     }
 }
 class FileUrl {
-    constructor(private sessionService: SessionService,
+    constructor(
+        private readonly access: string,
         public readonly label: string,
         public readonly id: string, public readonly root: string,
         public readonly filepath: string,
@@ -73,17 +73,17 @@ class FileUrl {
                 slave_id: this.id,
                 root: this.root,
                 path: this.filepath,
-                access_token: this.sessionService.session?.access ?? '',
+                access_token: this.access,
             }
         })
-        return ServerAPI.forward.v1.fs.httpURL('download') + '?' + params.toString()
+        return ServerAPI.forward.v1.fs.httpURL('download_access') + '?' + params.toString()
     }
 }
 export class Manager {
     private items_ = new Array<Source>()
     private ch_ = new Channel<string>(1)
     constructor(private player: VideoJsPlayer,
-        private sessionService: SessionService,
+        private readonly access: string,
         private readonly httpClient: HttpClient,
         public readonly path: Path,
     ) { }
@@ -108,7 +108,7 @@ export class Manager {
         for (let i = 0; i < items.length; i++) {
             const fileinfo = items[i]
             if (fileinfo.isVideo) {
-                const source = new Source(this.sessionService, path, fileinfo)
+                const source = new Source(this.access, path, fileinfo)
                 this.items_.push(source)
             }
         }
@@ -127,7 +127,7 @@ export class Manager {
                     if (label.startsWith('.')) {
                         label = label.substring(1)
                     }
-                    element.addTrack(new FileUrl(this.sessionService, label, path.id, path.root, fileinfo.filename))
+                    element.addTrack(new FileUrl(this.access, label, path.id, path.root, fileinfo.filename))
                 }
             }
         }

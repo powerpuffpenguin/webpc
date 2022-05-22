@@ -2,9 +2,11 @@ package session
 
 import (
 	"context"
+	"encoding/base64"
 	"net/http"
 	"time"
 
+	"github.com/powerpuffpenguin/sessionstore"
 	"github.com/powerpuffpenguin/webpc/logger"
 	"github.com/powerpuffpenguin/webpc/m/helper"
 	grpc_session "github.com/powerpuffpenguin/webpc/protocol/session"
@@ -258,5 +260,32 @@ func (s server) User(ctx context.Context, req *grpc_session.UserRequest) (resp *
 		}
 		return nil
 	})
+	return
+}
+func (s server) Download(ctx context.Context, req *grpc_session.DownloadRequest) (resp *grpc_session.DownloadResponse, e error) {
+	_, session, _ := s.Session(ctx)
+	if session == nil {
+		session = &sessionid.Session{}
+	}
+	unix := time.Now().Unix()
+	session.Token = &sessionstore.Token{
+		Access:          `temporary`,
+		Refresh:         `temporary`,
+		AccessDeadline:  unix,
+		RefreshDeadline: unix,
+		Deadline:        unix,
+	}
+	b, e := session.Marshal()
+	if e != nil {
+		return
+	}
+	playdata := base64.RawURLEncoding.EncodeToString(b)
+	access, e := sessionid.DefaultManager().Sin(playdata)
+	if e != nil {
+		return
+	}
+	resp = &grpc_session.DownloadResponse{
+		Access: access,
+	}
 	return
 }

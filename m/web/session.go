@@ -1,6 +1,7 @@
 package web
 
 import (
+	"encoding/base64"
 	"strings"
 
 	"github.com/powerpuffpenguin/webpc/db"
@@ -42,11 +43,31 @@ func (h Helper) getToken(c *gin.Context) string {
 	}
 	return ``
 }
+
 func (h Helper) accessSession(c *gin.Context) (session *sessionid.Session, e error) {
 	token := h.getToken(c)
 	if strings.HasPrefix(token, `Bearer `) {
 		access := token[7:]
-		session, e = sessionid.DefaultManager().Get(c.Request.Context(), access)
+		if c.Request.URL.Path == `/api/forward/v1/fs/download_access` {
+			var playdata string
+			playdata, e = sessionid.DefaultManager().Verify(token)
+			if e != nil {
+				return
+			}
+			var b []byte
+			b, e = base64.RawURLEncoding.DecodeString(playdata)
+			if e != nil {
+				return
+			}
+			var result sessionid.Session
+			e = result.Unmarshal(b)
+			if e != nil {
+				return
+			}
+			session=&result
+		} else {
+			session, e = sessionid.DefaultManager().Get(c.Request.Context(), access)
+		}
 	}
 	return
 }

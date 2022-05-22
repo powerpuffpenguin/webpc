@@ -74,3 +74,9 @@ func (m *Manager) Refresh(ctx context.Context, access, refresh string) (token *s
 	}
 	return
 }
+func (m *Manager) Sin(playdata string) (string, error) {
+	return m.m.Sin(playdata)
+}
+func (m *Manager) Verify(token string) (string, error) {
+	return m.m.Verify(token)
+}

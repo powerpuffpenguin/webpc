@@ -39,6 +39,13 @@ service Session {
             get: "/api/v1/sessions/access"
         };
     }
+
+    // Create a one-day temporary voucher for file download or movie playback
+    rpc Download (DownloadRequest) returns (DownloadResponse){
+        option (google.api.http) = {
+            post: "/api/v1/sessions/download_access"
+        };
+    }
 }
 message SigninRequest{
     string platform = 1;
@@ -114,4 +121,9 @@ message Token {
 message Raw{
     Data data=1;
     Token token=2;
+}
+message DownloadRequest{
+}
+message DownloadResponse{
+    string access = 1;
 }

@@ -3,11 +3,15 @@ import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, ViewChild } fr
 import { ActivatedRoute } from '@angular/router';
 import { ToasterService } from 'angular2-toaster';
 import { takeUntil } from 'rxjs/operators';
+import { ServerAPI } from 'src/app/core/core/api';
 import { SessionService } from 'src/app/core/session/session.service';
 import { Closed } from 'src/app/core/utils/closed';
 import videojs, { VideoJsPlayer } from "video.js"
 
 import { Manager, Path } from './manager'
+interface DownloadAccessResponse {
+  access: string
+}
 @Component({
   selector: 'app-movie',
   templateUrl: './movie.component.html',
@@ -18,25 +22,9 @@ export class MovieComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(private readonly activatedRoute: ActivatedRoute,
     private readonly httpClient: HttpClient,
     private toasterService: ToasterService,
-    private sessionService: SessionService,
   ) { }
 
   ngOnInit(): void {
-
-    // const v: any = videojs
-    // v.xhr = (url: string, options: videojs.XhrOptions, callback: videojs.XhrCallback) => {
-    //   console.log("ok")
-    // }
-
-    // setInterval(() => {
-    //   i++
-    //   (videojs as any).Hls.xhr.beforeRequest = (options: any) => {
-    //     options.headers = options.headers || {}
-    //     options.headers.Authorization1 = 'Bearer ' + i.toString()
-
-    //     return options
-    //   };
-    // }, 1000)
   }
   ngOnDestroy(): void {
     this.closed_.close()
@@ -46,6 +34,14 @@ export class MovieComponent implements OnInit, OnDestroy, AfterViewInit {
   readonly playerRef: ElementRef | undefined
   private manager_: Manager | undefined
   ngAfterViewInit() {
+    ServerAPI.v1.sessions.child('download_access').post<DownloadAccessResponse>(this.httpClient, undefined)
+      .pipe(takeUntil(this.closed_.observable)).subscribe((resp) => {
+        this._videojs(resp.access)
+      }, (e) => {
+        this.toasterService.pop('error', undefined, e)
+      })
+  }
+  private _videojs(access: string) {
     const ctx = this
     videojs(this.playerRef?.nativeElement,
       {
@@ -54,14 +50,14 @@ export class MovieComponent implements OnInit, OnDestroy, AfterViewInit {
         autoplay: true,
       },
       function () {
-        ctx._subscribe(this)
+        ctx._subscribe(this, access)
         this.on('ended', () => {
           ctx.manager_?.next()
         })
       },
     )
   }
-  private _subscribe(player: VideoJsPlayer) {
+  private _subscribe(player: VideoJsPlayer, access: string) {
     this.activatedRoute.queryParams.pipe(
       takeUntil(this.closed_.observable)
     ).subscribe((params) => {
@@ -71,11 +67,19 @@ export class MovieComponent implements OnInit, OnDestroy, AfterViewInit {
       )
       let manager = this.manager_
       if (!manager) {
-        manager = new Manager(player, this.sessionService, this.httpClient, path)
+        manager = new Manager(player,
+          access,
+          this.httpClient,
+          path,
+        )
         this._run(manager)
       } else if (!manager.path.equal(path)) {
         manager.close()
-        manager = new Manager(player, this.sessionService, this.httpClient, path)
+        manager = new Manager(player,
+          access,
+          this.httpClient,
+          path,
+        )
         this._run(manager)
       }
       manager.push(params['name'] ?? '')
