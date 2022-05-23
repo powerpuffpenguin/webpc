@@ -1,0 +1,14 @@
+.videoview{
+    display: flex;
+    justify-content: center;
+}
+.btns{
+    padding: 8px;
+}
+button:not(:first-child){
+    margin-left: 8px;
+}
+.path{
+    padding-top: 8px;
+    padding-bottom: 8px;
+}

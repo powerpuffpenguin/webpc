@@ -1,7 +1,35 @@
-<video #player class="video-js vjs-default-skin vjs-big-play-centered videojs-player">
-    <p class="vjs-no-js">
-        To view this video please enable JavaScript, and consider upgrading to a
-        web browser that
-        <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
-    </p>
-</video>
+<div class="view">
+    <mat-card>
+        <mat-card-content>
+            <div *ngIf="path" class="path">
+                <div>
+                    <fs-navigation [target]="path.id" [root]="path.root"></fs-navigation>
+                </div>
+                <div>
+                    <a mat-button routerLink="/forward/fs/list"
+                        [queryParams]="{id:path.id,root:path.root,path:node.path}" *ngFor="let node of path.dirs">
+                        {{node.name}}
+                    </a>
+                </div>
+            </div>
+
+            <div class="videoview">
+                <video #player class="video-js vjs-default-skin vjs-big-play-centered videojs-player">
+                    <p class="vjs-no-js">
+                        To view this video please enable JavaScript, and consider upgrading to a
+                        web browser that
+                        <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+                    </p>
+                </video>
+
+            </div>
+
+            <div class="btns">
+                <button [disabled]="isPlay(node.source.name)" (click)="onClick(node.source.name)" mat-stroked-button
+                    *ngFor="let node of source; trackBy: trackById">
+                    {{node.source.name}}
+                </button>
+            </div>
+        </mat-card-content>
+    </mat-card>
+</div>

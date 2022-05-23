@@ -9,7 +9,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/powerpuffpenguin/sessionstore/cryptoer"
 	"github.com/powerpuffpenguin/webpc/db"
 	"github.com/powerpuffpenguin/webpc/m/web"
 	"github.com/powerpuffpenguin/webpc/sessionid"
@@ -109,7 +108,7 @@ func (f *Forward) Get(c *gin.Context, str string) (ctx context.Context, cc *grpc
 	userdata, e := f.web.ShouldBindUserdata(c)
 	if e != nil {
 		if shared {
-			if status.Code(e) == codes.Unauthenticated {
+			if sessionid.IsErrExpired(e) {
 				ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs(
 					`Authorization`, `Bearer Expired`,
 				))
@@ -123,7 +122,7 @@ func (f *Forward) Get(c *gin.Context, str string) (ctx context.Context, cc *grpc
 	e = f.checkGroup(c, id, userdata)
 	if e != nil {
 		if shared {
-			if status.Code(e) == codes.Unauthenticated {
+			if sessionid.IsErrExpired(e) {
 				ctx = metadata.NewOutgoingContext(ctx, metadata.Pairs(
 					`Authorization`, `Bearer Expired`,
 				))
@@ -174,8 +173,7 @@ func (f *Forward) Forward(str string, c *gin.Context) {
 			f.forwardShared(
 				ele.gateway,
 				c,
-				status.Code(e) == codes.Unauthenticated &&
-					e.Error() == cryptoer.ErrExpired.Error(),
+				sessionid.IsErrExpired(e),
 			)
 		} else {
 			f.web.Error(c, e)

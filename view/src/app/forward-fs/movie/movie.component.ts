@@ -4,11 +4,13 @@ import { ActivatedRoute } from '@angular/router';
 import { ToasterService } from 'angular2-toaster';
 import { takeUntil } from 'rxjs/operators';
 import { ServerAPI } from 'src/app/core/core/api';
-import { SessionService } from 'src/app/core/session/session.service';
 import { Closed } from 'src/app/core/utils/closed';
 import videojs, { VideoJsPlayer } from "video.js"
 
-import { Manager, Path } from './manager'
+import { Manager, Path, Source } from './manager'
+var emptySource = new Array<Source>()
+
+
 interface DownloadAccessResponse {
   access: string
 }
@@ -50,6 +52,15 @@ export class MovieComponent implements OnInit, OnDestroy, AfterViewInit {
         autoplay: true,
       },
       function () {
+        // 更新字幕設定
+        const settings = (this as any).textTrackSettings
+        settings.setValues({
+          "backgroundColor": "#000",
+          "backgroundOpacity": "0",
+          "edgeStyle": "uniform",
+        })
+        settings.updateDisplay()
+
         ctx._subscribe(this, access)
         this.on('ended', () => {
           ctx.manager_?.next()
@@ -57,6 +68,7 @@ export class MovieComponent implements OnInit, OnDestroy, AfterViewInit {
       },
     )
   }
+  path: Path | undefined
   private _subscribe(player: VideoJsPlayer, access: string) {
     this.activatedRoute.queryParams.pipe(
       takeUntil(this.closed_.observable)
@@ -65,6 +77,7 @@ export class MovieComponent implements OnInit, OnDestroy, AfterViewInit {
         params['root'],
         params['path'] ?? '/',
       )
+      this.path = path
       let manager = this.manager_
       if (!manager) {
         manager = new Manager(player,
@@ -101,5 +114,23 @@ export class MovieComponent implements OnInit, OnDestroy, AfterViewInit {
       }
     })
   }
+  get source(): Array<Source> {
+    const items = this.manager_?.items
+    if (items) {
+      return items
+    }
+    return emptySource
+  }
 
+  trackById(_: number, source: Source): string { return source.source.name; }
+  onClick(name: string) {
+    this.manager_?.push(name)
+  }
+  isPlay(name: string): boolean {
+    const manager = this.manager_
+    if (!manager) {
+      return false
+    }
+    return manager.current == name
+  }
 }

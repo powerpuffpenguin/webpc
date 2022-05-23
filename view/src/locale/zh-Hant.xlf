@@ -2030,6 +2030,14 @@
           <context context-type="linenumber">43</context>
         </context-group>
       </trans-unit>
+        <trans-unit id="ecc073864d5bc442ee81bc5a6862b6eedc39c788" datatype="html">
+        <source>Movie List</source>
+        <target>電影列表</target>
+        <context-group purpose="location">
+          <context context-type="sourcefile">src/app/forward-fs/manager/manager.component.html</context>
+          <context context-type="linenumber">4</context>
+        </context-group>
+      </trans-unit>
     </body>
   </file>
 </xliff>

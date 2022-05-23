@@ -3,16 +3,39 @@ import { ServerAPI } from "src/app/core/core/api"
 import { Channel } from "src/app/core/utils/completer"
 import { FileInfo, Dir } from '../fs';
 import { VideoJsPlayer } from "video.js"
+export interface Pair {
+    name: string
+    path: string
+}
 export class Path {
+    public readonly dirs: Array<Pair>
     constructor(public readonly id: string,
         public readonly root: string,
         public readonly path: string,
-    ) { }
+    ) {
+
+        const strs = path.split('/')
+        const dirs = new Array<Pair>()
+        let dir = ''
+        for (let i = 0; i < strs.length; i++) {
+            const str = strs[i]
+            if (str != "") {
+                dir += '/' + str
+                dirs.push({
+                    name: str,
+                    path: dir,
+                })
+            }
+        }
+        this.dirs = dirs
+    }
+
     equal(other: Path): boolean {
         return this.id == other.id &&
             this.root == other.root &&
             this.path == other.path
     }
+
 }
 export interface ListResponse {
     dir: Dir
@@ -33,7 +56,7 @@ mimeExt.set('.vob', undefined)
 mimeExt.set('.mkv', 'video/x-matroska')
 mimeExt.set('.rm', 'audio/x-pn-realaudio')
 mimeExt.set('.rmvb', undefined)
-class Source {
+export class Source {
     public readonly textTracks = new Array<FileUrl>()
     constructor(private readonly access: string,
         private readonly path: Path,
@@ -81,6 +104,9 @@ class FileUrl {
 }
 export class Manager {
     private items_ = new Array<Source>()
+    get items(): Array<Source> {
+        return this.items_
+    }
     private ch_ = new Channel<string>(1)
     constructor(private player: VideoJsPlayer,
         private readonly access: string,
@@ -189,8 +215,9 @@ export class Manager {
                 break
             }
         }
-        if (found == items.length) {
-            found = 0
+        if (found == items.length) { // list end
+            // found = 0
+            return
         }
         this.push(items[found].source.name)
     }
@@ -219,4 +246,7 @@ export class Manager {
         }
     }
     private current_ = ''
+    get current(): string {
+        return this.current_
+    }
 }

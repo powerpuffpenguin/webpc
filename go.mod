@@ -20,7 +20,7 @@ require (
 	github.com/powerpuffpenguin/sessionid v0.0.0-20210526073144-ca6285fc8dec
 	github.com/powerpuffpenguin/sessionid_server v1.0.1
 	github.com/powerpuffpenguin/vnet v0.0.0-20210802025916-207c679e83b8
-	github.com/spf13/cobra v1.2.1
+	github.com/spf13/cobra v1.4.0
 	github.com/stretchr/testify v1.7.0
 	go.uber.org/zap v1.19.0
 	golang.org/x/net v0.0.0-20210805182204-aaa1db679c0d
@@ -57,6 +57,8 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/syndtr/goleveldb v1.0.0 // indirect
 	github.com/ugorji/go/codec v1.2.6 // indirect
+	github.com/zuiwuchang/ng-xi18n v0.0.1 // indirect
+	gitlab.com/king011/ng-xi18n v0.0.1 // indirect
 	go.etcd.io/bbolt v1.3.6 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect

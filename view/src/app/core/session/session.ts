@@ -194,9 +194,9 @@ export class Manager {
                     && userdata !== null && typeof userdata === "object" && userdata.id) {
                     this.remember_ = true
                     const session = new Session(token, userdata)
-                    if (httpClient && token.expired && token.canRefresh) {
-                        this._refreshUserdata(httpClient, session)
-                    }
+                    // if (httpClient && token.expired && token.canRefresh) {
+                    //     this._refreshUserdata(httpClient, session)
+                    // }
                     return session
                 }
             }
@@ -235,7 +235,7 @@ export class Manager {
         })
     }
     load(httpClient: HttpClient) {
-        this.subject_.next(this._load(httpClient))
+        this.subject_.next(this._load())
     }
     private _save(session: Session) {
         try {
