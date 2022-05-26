@@ -267,7 +267,7 @@ func (s server) Download(ctx context.Context, req *grpc_session.DownloadRequest)
 	if session == nil {
 		session = &sessionid.Session{}
 	}
-	unix := time.Now().Unix()
+	unix := time.Now().Add(time.Hour * 24).Unix()
 	session.Token = &sessionstore.Token{
 		Access:          `temporary`,
 		Refresh:         `temporary`,
