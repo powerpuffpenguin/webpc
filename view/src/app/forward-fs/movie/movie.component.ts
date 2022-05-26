@@ -6,8 +6,9 @@ import { takeUntil } from 'rxjs/operators';
 import { ServerAPI } from 'src/app/core/core/api';
 import { Closed } from 'src/app/core/utils/closed';
 import videojs, { VideoJsPlayer } from "video.js"
+import { DB } from "./db"
 
-import { Manager, Path, Source } from './manager'
+import { Manager, Path, Source, Current } from './manager'
 var emptySource = new Array<Source>()
 
 
@@ -31,6 +32,7 @@ export class MovieComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnDestroy(): void {
     this.closed_.close()
     this.manager_?.close()
+    this.player_?.dispose()
   }
   @ViewChild("player")
   readonly playerRef: ElementRef | undefined
@@ -43,9 +45,10 @@ export class MovieComponent implements OnInit, OnDestroy, AfterViewInit {
         this.toasterService.pop('error', undefined, e)
       })
   }
+  private player_: VideoJsPlayer | undefined
   private _videojs(access: string) {
     const ctx = this
-    videojs(this.playerRef?.nativeElement,
+    this.player_ = videojs(this.playerRef?.nativeElement,
       {
         controls: true,
         preload: 'auto',
@@ -62,8 +65,19 @@ export class MovieComponent implements OnInit, OnDestroy, AfterViewInit {
         settings.updateDisplay()
 
         ctx._subscribe(this, access)
+        if (DB.isSupported) {
+          this.on('timeupdate', () => {
+            ctx.manager_?.save(this.src(), this.currentTime())
+          })
+        }
         this.on('ended', () => {
           ctx.manager_?.next()
+        })
+        this.on('seeking', () => {
+          const current = ctx.manager_?.current
+          if (current && current.skipTo != 0) {
+            current.skipTo = 0
+          }
         })
       },
     )
@@ -131,6 +145,45 @@ export class MovieComponent implements OnInit, OnDestroy, AfterViewInit {
     if (!manager) {
       return false
     }
-    return manager.current == name
+    return manager.currentName == name
+  }
+  get skipTo(): number {
+    return this.manager_?.current?.skipTo ?? 0
+  }
+  get skipToString(): string {
+    const strs = new Array<string>()
+    let v = Math.floor(this.skipTo)
+    const h = Math.floor(v / 3600)
+    if (h > 0) {
+      strs.push(h.toString())
+      v -= h * 3600
+    }
+    const m = Math.floor(v / 60)
+    if (m > 0) {
+      let s = m.toString()
+      if (s.length == 1) {
+        s = '0' + s
+      }
+      strs.push(s)
+      v -= m * 60
+    } else {
+      strs.push('00')
+    }
+    let s = v.toString()
+    if (s.length == 1) {
+      s = '0' + s
+    }
+    strs.push(s)
+    return strs.join(':')
+  }
+  onClickSkipTo() {
+    const manager = this.manager_
+    if (!manager) {
+      return
+    }
+    const current = manager.current
+    if (current) {
+      manager.skipTo(current)
+    }
   }
 }

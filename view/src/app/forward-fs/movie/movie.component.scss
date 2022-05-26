@@ -12,3 +12,12 @@ button:not(:first-child){
     padding-top: 8px;
     padding-bottom: 8px;
 }
+.parent{
+    position: relative;
+}
+.skipto{
+    position: absolute;
+    bottom: 40px;
+    left: 8px;
+    color: white;
+}

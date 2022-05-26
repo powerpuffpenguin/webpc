@@ -14,14 +14,17 @@
             </div>
 
             <div class="videoview">
-                <video #player class="video-js vjs-default-skin vjs-big-play-centered videojs-player">
-                    <p class="vjs-no-js">
-                        To view this video please enable JavaScript, and consider upgrading to a
-                        web browser that
-                        <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
-                    </p>
-                </video>
+                <div class="parent">
+                    <video #player class="video-js vjs-default-skin vjs-big-play-centered videojs-player">
 
+                        <p class="vjs-no-js">
+                            To view this video please enable JavaScript, and consider upgrading to a
+                            web browser that
+                            <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+                        </p>
+                    </video>
+                    <a *ngIf="skipTo>0" class="skipto" mat-button (click)="onClickSkipTo()">skip to {{skipToString}}</a>
+                </div>
             </div>
 
             <div class="btns">

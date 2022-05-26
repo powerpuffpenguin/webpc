@@ -3,6 +3,7 @@ import { ServerAPI } from "src/app/core/core/api"
 import { Channel } from "src/app/core/utils/completer"
 import { FileInfo, Dir } from '../fs';
 import { VideoJsPlayer } from "video.js"
+import { DB } from "./db";
 export interface Pair {
     name: string
     path: string
@@ -77,6 +78,17 @@ export class Source {
         })
         return ServerAPI.forward.v1.fs.httpURL('download_access') + '?' + params.toString()
     }
+    get id(): string {
+        const path = this.path
+        const params = new HttpParams({
+            fromObject: {
+                slave_id: path.id,
+                root: path.root,
+                path: this.source.filename,
+            }
+        })
+        return params.toString()
+    }
     get mime(): string | undefined {
         const ext = this.source.ext.toLowerCase()
         return mimeExt.get(ext)
@@ -101,6 +113,23 @@ class FileUrl {
         })
         return ServerAPI.forward.v1.fs.httpURL('download_access') + '?' + params.toString()
     }
+}
+export class Current {
+    currentTime = 0
+    skipTo = 0
+    first = true
+    save = false
+    constructor(public readonly source: Source) { }
+    get name(): string {
+        return this.source.source.name
+    }
+    get url(): string {
+        return this.source.url
+    }
+    get id(): string {
+        return this.source.id
+    }
+
 }
 export class Manager {
     private items_ = new Array<Source>()
@@ -206,7 +235,7 @@ export class Manager {
         if (items.length == 0) {
             return
         }
-        const name = this.current_
+        const name = this.currentName
         let found = 0
         for (let i = 0; i < items.length; i++) {
             const item = items[i]
@@ -238,15 +267,89 @@ export class Manager {
             }, false)
         }
         console.log('play', source.source.name)
-        this.current_ = source.source.name
+        const current = new Current(source)
+        this._clearTimer()
+        this.current_ = current
         try {
+            if (DB.isSupported) {
+                try {
+                    current.currentTime = await DB.instance.getCurrentTime(source.id)
+                } catch (e) {
+                    console.log(e)
+                }
+            }
+
             await player.play()
         } catch (e) {
             console.log(e)
         }
     }
-    private current_ = ''
-    get current(): string {
+    private current_: Current | undefined
+    get current(): Current | undefined {
         return this.current_
+    }
+    get currentName(): string {
+        return this.current_?.name ?? ''
+    }
+    async save(src: string, currentTime: number) {
+
+        const current = this.current_
+        if (!current || current.url != src) {
+            return
+        }
+        if (current.first) {
+            current.first = false
+            if (current.currentTime > 0) {
+                this._currentTime(current)
+                return
+            }
+        }
+
+        // write
+        if (currentTime < 10) {
+            return
+        }
+        if (current.save) {
+            return
+        }
+        current.save = true
+        const id = current.id
+        try {
+            await DB.instance.putCurrentTime(id, currentTime)
+        } catch (e) {
+            console.log(e)
+        } finally {
+            current.save = false
+        }
+    }
+    private _currentTime(current: Current) {
+        const player = this.player
+        if (current.currentTime + 5 <= player.currentTime()) {
+            return
+        }
+        current.skipTo = current.currentTime
+        this._clearTimer()
+        this.timer_ = setTimeout(() => {
+            current.skipTo = 0
+        }, 1000 * 10)
+    }
+    private _clearTimer() {
+        const timer = this.timer_
+        if (timer) {
+            this.timer_ = undefined
+            clearTimeout(timer)
+        }
+    }
+    private timer_: any
+    skipTo(current: Current) {
+        if (this.current_ != current) {
+            return
+        }
+        const player = this.player
+        const skipTo = current.skipTo
+        if (skipTo > player.currentTime() + 1) {
+            current.skipTo = 0
+            player.currentTime(skipTo)
+        }
     }
 }
