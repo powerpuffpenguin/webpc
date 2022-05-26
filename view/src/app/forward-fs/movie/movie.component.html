@@ -23,7 +23,10 @@
                             <a href="https://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
                         </p>
                     </video>
-                    <a *ngIf="skipTo>0" class="skipto" mat-button (click)="onClickSkipTo()">skip to {{skipToString}}</a>
+                    <a *ngIf="skipTo>0" class="skipto" mat-button (click)="onClickSkipTo()">
+                        <ng-container i18n>skip to</ng-container>
+                        {{skipToString}}
+                    </a>
                 </div>
             </div>
 
