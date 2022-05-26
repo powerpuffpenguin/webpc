@@ -1,3 +1,7 @@
+# v1.1.2-x
+
+* fix forward/socks5 RefreshToken error
+
 # v1.1.2
 
 * fix fs module download not set header Content-Disposition for filename

@@ -120,7 +120,7 @@ func (d *Dialer) refreshToken(access, refresh string) (e error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*30)
 	var resp grpc_session.RefreshResponse
 	e = d.client.Post(ctx,
-		d.signinURL, &grpc_session.RefreshRequest{
+		d.refreshURL, &grpc_session.RefreshRequest{
 			Access:  access,
 			Refresh: refresh,
 		},

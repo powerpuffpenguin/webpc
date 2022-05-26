@@ -36,8 +36,13 @@ func Run(insecure bool,
 	if password == `` {
 		password = inputPassword(r, `user password: `)
 	}
-
-	dialer, e := client.NewDialer(`forward`, url, insecure, user, password, heart)
+	var platform string
+	if socks5 {
+		platform = `socks5`
+	} else {
+		platform = `forward`
+	}
+	dialer, e := client.NewDialer(platform, url, insecure, user, password, heart)
 	if e != nil {
 		logger.Logger.Fatal(`new dialer error`, zap.Error(e))
 	}
