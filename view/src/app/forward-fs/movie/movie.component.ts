@@ -7,8 +7,9 @@ import { ServerAPI } from 'src/app/core/core/api';
 import { Closed } from 'src/app/core/utils/closed';
 import videojs, { VideoJsPlayer } from "video.js"
 import { DB } from "./db"
-
-import { Manager, Path, Source, Current } from './manager'
+import { LOCALE_ID, Inject } from '@angular/core';
+import { Manager, Path, Source } from './manager'
+import { RequireNet } from 'src/app/core/utils/requirenet';
 var emptySource = new Array<Source>()
 
 
@@ -25,6 +26,7 @@ export class MovieComponent implements OnInit, OnDestroy, AfterViewInit {
   constructor(private readonly activatedRoute: ActivatedRoute,
     private readonly httpClient: HttpClient,
     private toasterService: ToasterService,
+    @Inject(LOCALE_ID) private locale: string,
   ) { }
 
   ngOnInit(): void {
@@ -46,13 +48,39 @@ export class MovieComponent implements OnInit, OnDestroy, AfterViewInit {
       })
   }
   private player_: VideoJsPlayer | undefined
-  private _videojs(access: string) {
+  private async _videojs(access: string) {
+    let locale = this.locale
+    let languages: any
+    try {
+      let url = ''
+      if (locale == 'zh-Hant') {
+        url = '/static/js/videojs/zh-Hant.json'
+      } else if (locale == 'zh-Hans') {
+        url = '/static/js/videojs/zh-Hans.json'
+      }
+      if (url != '') {
+        const result: any = {}
+        result[locale] = await this.httpClient.get('/static/js/videojs/zh-Hant.json', {
+          headers: {
+            'Interceptor': 'none',
+          }
+        }).toPromise()
+        languages = result
+      }
+    } catch (e) {
+      console.log(e)
+    }
+    this._videojsLanges(access, languages)
+  }
+  private _videojsLanges(access: string, languages: any) {
+    console.log(languages)
     const ctx = this
     this.player_ = videojs(this.playerRef?.nativeElement,
       {
         controls: true,
         preload: 'auto',
         autoplay: true,
+        languages: languages,
       },
       function () {
         // 更新字幕設定
