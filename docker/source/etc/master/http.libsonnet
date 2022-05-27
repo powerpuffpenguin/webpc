@@ -3,7 +3,7 @@ local size = def.Size;
 local duration = def.Duration;
 {
     // http addr
-    Addr: ':8000',
+    Addr: ':9000',
     // if not empty use https
     CertFile: '',
     KeyFile: '',

@@ -1,12 +1,5 @@
 local def = import "def.libsonnet";
 {
-    Backend: def.Session.Memory,
-    Coder: def.Coder.GOB,
-    Client: {
-        Protocol: def.Protocol.H2C,
-        Addr: 'sessionid_server:80',
-        Token: '',
-    },
     Memory: {
         Manager: {
             // Token signature algorithm
@@ -18,32 +11,28 @@ local def = import "def.libsonnet";
             local provider = def.Provider,
             local access = def.Duration.Hour*1,
             local refresh = def.Duration.Hour*12*3,
-            local clear = def.Duration.Minute*30,
+            local deadline = def.Duration.Day*28,
 
             Backend: provider.Bolt,
             Memory: {
                     Access: access,
                     Refresh: refresh,
-                    MaxSize: 1000,
-                    Batch: 128,
-                    Clear: clear,
+                    Deadline: deadline,
+                    MaxSize: 1000*100,
             },
             Redis: {
                     URL: 'redis://redis:6379/0',
                     Access: access,
                     Refresh: refresh,
-                    Batch: 128,
-                    KeyPrefix: 'sessionid.provider.redis.',
-                    MetadataKey: '__private_provider_redis',
+                    Deadline: deadline,
             },
             Bolt: {
                 Filename: 'var/sessionid.db',
 
                 Access: access,
                 Refresh: refresh,
-                MaxSize: 10000,
-                Batch: 128,
-                Clear: clear,
+                Deadline: deadline,
+                MaxSize: 1000*1000*10,
             },
         },
     },
