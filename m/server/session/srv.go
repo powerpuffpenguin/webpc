@@ -176,7 +176,7 @@ func (s server) Refresh(ctx context.Context, req *grpc_session.RefreshRequest) (
 	resp = &grpc_session.RefreshResponse{
 		Token: &grpc_session.Token{
 			Access:          token.Access,
-			Refresh:         token.Access,
+			Refresh:         token.Refresh,
 			AccessDeadline:  token.AccessDeadline,
 			RefreshDeadline: token.RefreshDeadline,
 			Deadline:        token.Deadline,
