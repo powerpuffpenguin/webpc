@@ -60,7 +60,7 @@ mimeExt.set('.rmvb', undefined)
 export class Source {
     public readonly textTracks = new Array<FileUrl>()
     constructor(private readonly access: string,
-        private readonly path: Path,
+        public readonly path: Path,
         public readonly source: FileInfo) {
     }
     addTrack(url: FileUrl) {
@@ -251,6 +251,9 @@ export class Manager {
         this.push(items[found].source.name)
     }
     private async _playSource(source: Source) {
+        if (source == this.current_?.source) {
+            return
+        }
         const player = this.player
         player.src({
             src: source.url,

@@ -167,6 +167,7 @@ export class MovieComponent implements OnInit, OnDestroy, AfterViewInit {
   trackById(_: number, source: Source): string { return source.source.name; }
   onClick(name: string) {
     this.manager_?.push(name)
+    this.source[0].path.id
   }
   isPlay(name: string): boolean {
     const manager = this.manager_

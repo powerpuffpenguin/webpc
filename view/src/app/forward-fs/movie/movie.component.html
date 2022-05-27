@@ -31,10 +31,11 @@
             </div>
 
             <div class="btns">
-                <button [disabled]="isPlay(node.source.name)" (click)="onClick(node.source.name)" mat-stroked-button
+                <a [disabled]="isPlay(node.source.name)" mat-stroked-button routerLink="."
+                    [queryParams]="{id:node.path.id,root:node.path.root,path:node.path.path,name:node.source.name}"
                     *ngFor="let node of source; trackBy: trackById">
                     {{node.source.name}}
-                </button>
+                </a>
             </div>
         </mat-card-content>
     </mat-card>
