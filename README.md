@@ -9,6 +9,7 @@ WebPC mainly has the following characteristics:
 
 * No client software required for all operations through the browser
 * All controlled terminals provide file operations imitating the local system on the browser
+* Create a playlist from the video in the folder and play it on the browser using video.js
 * Execute commands on the controlled end through a remote shell, such as running vim
 * Remote desktop function to the controlled end via noVNC on the browser
 * The controlled end can configure the functions provided by itself to prevent WebPC from being used as a Trojan horse program
