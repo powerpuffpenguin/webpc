@@ -114,7 +114,7 @@ export class FileUrl {
 }
 export class Current {
     currentTime = 0
-    skipTo = 0
+
     first = true
     save = false
     constructor(public readonly source: Source) { }
@@ -127,7 +127,10 @@ export class Current {
     get id(): string {
         return this.source.id
     }
-
+}
+interface Write {
+    id: string
+    currentTime: number
 }
 export class Manager {
     private items_ = new Array<Source>()
@@ -135,6 +138,7 @@ export class Manager {
         return this.items_
     }
     private ch_ = new Channel<string>(1)
+    private chWrite_ = new Channel<Write>(1)
     constructor(
         private readonly video: HTMLVideoElement,
         private readonly access: string,
@@ -143,6 +147,7 @@ export class Manager {
     ) { }
     close() {
         this.ch_.close()
+        this.chWrite_.close()
     }
     async run(): Promise<void> {
         const path = this.path
@@ -189,6 +194,9 @@ export class Manager {
             }
         }
         this._run()
+        if (DB.isSupported) {
+            this._runWrite()
+        }
     }
     push(id: string) {
         const ch = this.ch_
@@ -282,15 +290,12 @@ export class Manager {
         }
         return items[found].source.name
     }
-    private first_ = true
-    private name_ = ''
     private async _playSource(source: Source) {
         if (source == this.current_?.source) {
             return
         }
         console.log('play', source.source.name)
         const current = new Current(source)
-        this._clearTimer()
         this.current_ = current
         try {
             if (DB.isSupported) {
@@ -298,26 +303,11 @@ export class Manager {
                     const currentTime = await DB.instance.getCurrentTime(source.id)
                     if (this.current_ == current) {
                         current.currentTime = currentTime
+                        console.log('last time', currentTime)
                     }
                 } catch (e) {
                     console.log(e)
                 }
-            }
-            if (this.first_) {
-                this.first_ = false
-                const name = await DB.instance.getCurrentName(this.path.key)
-                if (name != source.source.name) {
-                    const items = this.items_
-                    for (let i = 0; i < items.length; i++) {
-                        const item = items[i]
-                        if (item.source.name == name) {
-                            this.name_ = name
-                            break
-                        }
-                    }
-                }
-            } else {
-                this.name_ = ''
             }
         } catch (e) {
             console.log(e)
@@ -327,34 +317,58 @@ export class Manager {
     get current(): Current | undefined {
         return this.current_
     }
-    async save(currentTime: number) {
+    async timeupdate() {
         const current = this.current_
         if (!current) {
             return
         }
-        if (current.first) {
+        // restore progress
+        if (current.currentTime > 0 && current.first) {
             current.first = false
             if (current.currentTime > 0) {
-                this._currentTime(current)
+                this._skipTo(current)
                 return
             }
         }
-
-        // write
-        if (currentTime < 60) {
+        if (DB.isSupported) {
+            const player = this.video
+            // 進度提前 2 秒，以播放一段觀看過的內容以便 銜接喚醒 用戶觀看記憶
+            const wait = 2
+            const currentTime = player.currentTime - wait
+            if (currentTime > 2 && currentTime + 2 + wait < player.duration) {
+                // 每 2 秒 記錄進度
+                const last = this.last_
+                if (currentTime < last || currentTime > last + wait) {
+                    this.last_ = currentTime
+                    this.chWrite_.trySend({
+                        id: current.id,
+                        currentTime: currentTime,
+                    })
+                }
+            }
+        }
+    }
+    private last_ = 0
+    private async _runWrite() {
+        const ch = this.chWrite_
+        if (ch.isClosed) {
             return
         }
-        if (current.save) {
-            return
+        while (true) {
+            const value = await ch.recv()
+            if (value.done) {
+                await this._write(value.value)
+            } else {
+                break
+            }
         }
-        current.save = true
-        const id = current.id
+    }
+    private async _write(w: Write) {
+        const id = w.id
         try {
-            await DB.instance.putCurrentTime(id, currentTime)
+            await DB.instance.putCurrentTime(id, w.currentTime)
         } catch (e) {
             console.log(e)
-        } finally {
-            current.save = false
         }
     }
     private save_ = false
@@ -375,37 +389,18 @@ export class Manager {
             this.save_ = false
         }
     }
-    private _currentTime(current: Current) {
-        const player = this.video
-        if (current.currentTime + 5 <= player.currentTime) {
-            return
-        }
-        current.skipTo = current.currentTime
-        this._clearTimer()
-        this.timer_ = setTimeout(() => {
-            current.skipTo = 0
-        }, 1000 * 10)
-    }
-    private _clearTimer() {
-        const timer = this.timer_
-        if (timer) {
-            this.timer_ = undefined
-            clearTimeout(timer)
-        }
-    }
-    private timer_: any
-    skipTo(current: Current) {
+    private _skipTo(current: Current) {
         if (this.current_ != current) {
             return
         }
         const player = this.video
-        const skipTo = current.skipTo
-        if (skipTo > player.currentTime + 1) {
-            current.skipTo = 0
-            player.fastSeek(skipTo)
+        const skipTo = current.currentTime
+        if (skipTo > player.currentTime + 1 && skipTo + 1 < player.duration) {
+            if (player.fastSeek) {
+                player.fastSeek(skipTo)
+            } else {
+                player.currentTime = skipTo
+            }
         }
-    }
-    get skipName(): string {
-        return this.name_
     }
 }

@@ -89,7 +89,10 @@ export class MovieComponent implements OnInit, OnDestroy, AfterViewInit {
       })
     }
     video.ontimeupdate = (evt) => {
-      this.manager_?.save(video.currentTime)
+      const manager = this.manager_
+      if (manager) {
+        manager.timeupdate()
+      }
     }
     ServerAPI.v1.sessions.child('download_access').post<DownloadAccessResponse>(this.httpClient, undefined)
       .pipe(takeUntil(this.closed_.observable)).subscribe((resp) => {
@@ -191,66 +194,4 @@ export class MovieComponent implements OnInit, OnDestroy, AfterViewInit {
     return manager.current?.name == name
   }
   trackById(_: number, source: Source): string { return source.source.name; }
-
-  get skipTo(): number {
-    return this.manager_?.current?.skipTo ?? 0
-  }
-  get skipName(): string | undefined {
-    return this.manager_?.skipName
-  }
-  get skipToString(): string {
-    const strs = new Array<string>()
-    let v = Math.floor(this.skipTo)
-    const h = Math.floor(v / 3600)
-    if (h > 0) {
-      strs.push(h.toString())
-      v -= h * 3600
-    }
-    const m = Math.floor(v / 60)
-    if (m > 0) {
-      let s = m.toString()
-      if (s.length == 1) {
-        s = '0' + s
-      }
-      strs.push(s)
-      v -= m * 60
-    } else {
-      strs.push('00')
-    }
-    let s = v.toString()
-    if (s.length == 1) {
-      s = '0' + s
-    }
-    strs.push(s)
-    return strs.join(':')
-  }
-  onClickSkipTo() {
-    const manager = this.manager_
-    if (!manager) {
-      return
-    }
-    const current = manager.current
-    if (current) {
-      manager.skipTo(current)
-    }
-  }
-  onClickSkipName() {
-    const manager = this.manager_
-    if (!manager) {
-      return
-    }
-    const name = manager.skipName
-    if (name === undefined) {
-      return
-    }
-    const path = manager.path
-    this.router.navigate(['forward', 'fs', 'movie'], {
-      queryParams: {
-        id: path.id,
-        root: path.root,
-        path: path.path,
-        name: name,
-      },
-    })
-  }
 }

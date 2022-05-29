@@ -13,16 +13,6 @@
                     </a>
                 </div>
             </div>
-            <div class="skipto">
-                <a *ngIf="skipTo>0" mat-stroked-button (click)="onClickSkipTo()">
-                    <ng-container i18n>skip to</ng-container>
-                    {{skipToString}}
-                </a>
-                <a *ngIf="skipName" mat-stroked-button (click)="onClickSkipName()">
-                    <ng-container i18n>skip to</ng-container>
-                    {{skipName}}
-                </a>
-            </div>
 
             <div class="videoview">
                 <video #player [src]="url" preload="auto" controls="controls" autoplay controlsList="nodownload">
