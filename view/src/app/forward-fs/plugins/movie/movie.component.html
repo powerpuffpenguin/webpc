@@ -1,6 +1,7 @@
 <div class="view">
     <mat-card>
         <mat-card-content>
+
             <div *ngIf="path" class="path">
                 <div>
                     <fs-navigation [target]="path.id" [root]="path.root"></fs-navigation>
@@ -12,22 +13,23 @@
                     </a>
                 </div>
             </div>
+            <div class="skipto">
+                <a *ngIf="skipTo>0" mat-stroked-button (click)="onClickSkipTo()">
+                    <ng-container i18n>skip to</ng-container>
+                    {{skipToString}}
+                </a>
+                <a *ngIf="skipName" mat-stroked-button (click)="onClickSkipName()">
+                    <ng-container i18n>skip to</ng-container>
+                    {{skipName}}
+                </a>
+            </div>
+
             <div class="videoview">
-                <div class="parent">
-                    <video #player [src]="url" preload="auto" controls="controls" autoplay controlsList="nodownload">
-                        Not support video tag,Please use a modern browser.
-                        <track kind="subtitles" [src]="track.url" [label]="track.label" [default]="track.isDefault"
-                            *ngFor="let track of textTracks">
-                    </video>
-                    <a *ngIf="skipTo>0" class="skipto" mat-button (click)="onClickSkipTo()">
-                        <ng-container i18n>skip to</ng-container>
-                        {{skipToString}}
-                    </a>
-                    <a *ngIf="skipName" class="skipName" mat-button (click)="onClickSkipName()">
-                        <ng-container i18n>skip to</ng-container>
-                        {{skipName}}
-                    </a>
-                </div>
+                <video #player [src]="url" preload="auto" controls="controls" autoplay controlsList="nodownload">
+                    Not support video tag,Please use a modern browser.
+                    <track kind="subtitles" [src]="track.url" [label]="track.label" [default]="track.isDefault"
+                        *ngFor="let track of textTracks">
+                </video>
             </div>
 
             <div class="btns">

@@ -16,15 +16,12 @@ a{
 ::cue {
     background-color: transparent;
 }
-.parent{
-    position: relative;
-}
+
 .skipto{
-    position: absolute;
-    bottom: 48px;
-    left: 8px;
-    color: white;
-    z-index: 100;
+    display: flex;
+    justify-content: center;
+    padding-right: 8px;
+    padding-bottom: 8px;
 }
 .skipName{
     position: absolute;

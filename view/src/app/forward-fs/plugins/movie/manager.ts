@@ -341,7 +341,7 @@ export class Manager {
         }
 
         // write
-        if (currentTime < 10) {
+        if (currentTime < 60) {
             return
         }
         if (current.save) {
