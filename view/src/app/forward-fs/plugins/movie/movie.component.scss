@@ -2,8 +2,10 @@
     display: flex;
     justify-content: center;
 }
+video{
+    max-width: 100%;
+}
 .btns{
-    padding-top: 8px;
     padding-right: 8px;
     padding-bottom: 8px;
 }
@@ -11,16 +13,22 @@ a{
     margin-top: 8px;
     margin-left: 8px;
 }
-.path{
-    padding-top: 8px;
-    padding-bottom: 8px;
+::cue {
+    background-color: transparent;
 }
 .parent{
     position: relative;
 }
 .skipto{
     position: absolute;
-    bottom: 40px;
+    bottom: 48px;
+    left: 8px;
+    color: white;
+    z-index: 100;
+}
+.skipName{
+    position: absolute;
+    bottom: 80px;
     left: 8px;
     color: white;
 }

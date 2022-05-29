@@ -1,9 +1,9 @@
 import { HttpClient, HttpParams } from "@angular/common/http"
 import { ServerAPI } from "src/app/core/core/api"
-import { Channel } from "src/app/core/utils/completer"
-import { FileInfo, Dir } from '../fs';
-import { VideoJsPlayer } from "video.js"
+import { Channel, Completer } from "src/app/core/utils/completer"
+import { FileInfo, Dir } from '../../fs';
 import { DB } from "./db";
+
 export interface Pair {
     name: string
     path: string
@@ -37,26 +37,21 @@ export class Path {
             this.path == other.path
     }
 
+    get key(): string {
+        const params = new HttpParams({
+            fromObject: {
+                slave_id: this.id,
+                root: this.root,
+                path: this.path,
+            }
+        })
+        return params.toString()
+    }
 }
 export interface ListResponse {
     dir: Dir
     items: Array<FileInfo>
 }
-const mimeExt = new Map<string, string | undefined>()
-mimeExt.set('.webm', 'video/webm')
-mimeExt.set('.mp4', 'video/mp4')
-mimeExt.set('.m4v', undefined)
-mimeExt.set('.mov', 'video/quicktime')
-mimeExt.set('.avi', 'video/x-msvideo')
-mimeExt.set('.flv', 'video/x-flv')
-mimeExt.set('.wmv', 'video/x-ms-wmv')
-mimeExt.set('.asf', 'video/x-ms-asf')
-mimeExt.set('.mpeg', 'video/mpeg')
-mimeExt.set('.mpg', 'video/mpeg')
-mimeExt.set('.vob', undefined)
-mimeExt.set('.mkv', 'video/x-matroska')
-mimeExt.set('.rm', 'audio/x-pn-realaudio')
-mimeExt.set('.rmvb', undefined)
 export class Source {
     public readonly textTracks = new Array<FileUrl>()
     constructor(private readonly access: string,
@@ -66,17 +61,23 @@ export class Source {
     addTrack(url: FileUrl) {
         this.textTracks.push(url)
     }
+    private url_: string | undefined
     get url(): string {
-        const path = this.path
-        const params = new HttpParams({
-            fromObject: {
-                slave_id: path.id,
-                root: path.root,
-                path: this.source.filename,
-                access_token: this.access,
-            }
-        })
-        return ServerAPI.forward.v1.fs.httpURL('download_access') + '?' + params.toString()
+        let url = this.url_
+        if (url === undefined) {
+            const path = this.path
+            const params = new HttpParams({
+                fromObject: {
+                    slave_id: path.id,
+                    root: path.root,
+                    path: this.source.filename,
+                    access_token: this.access,
+                }
+            })
+            url = ServerAPI.forward.v1.fs.httpURL('download_access') + '?' + params.toString()
+            this.url_ = url
+        }
+        return url
     }
     get id(): string {
         const path = this.path
@@ -89,17 +90,14 @@ export class Source {
         })
         return params.toString()
     }
-    get mime(): string | undefined {
-        const ext = this.source.ext.toLowerCase()
-        return mimeExt.get(ext)
-    }
 }
-class FileUrl {
+export class FileUrl {
     constructor(
         private readonly access: string,
         public readonly label: string,
         public readonly id: string, public readonly root: string,
         public readonly filepath: string,
+        public readonly isDefault: boolean,
     ) { }
 
     get url(): string {
@@ -137,7 +135,8 @@ export class Manager {
         return this.items_
     }
     private ch_ = new Channel<string>(1)
-    constructor(private player: VideoJsPlayer,
+    constructor(
+        private readonly video: HTMLVideoElement,
         private readonly access: string,
         private readonly httpClient: HttpClient,
         public readonly path: Path,
@@ -182,7 +181,10 @@ export class Manager {
                     if (label.startsWith('.')) {
                         label = label.substring(1)
                     }
-                    element.addTrack(new FileUrl(this.access, label, path.id, path.root, fileinfo.filename))
+                    if (label == '') {
+                        label = (element.textTracks.length + 1).toString()
+                    }
+                    element.addTrack(new FileUrl(this.access, label, path.id, path.root, fileinfo.filename, element.textTracks.length == 0))
                 }
             }
         }
@@ -208,34 +210,64 @@ export class Manager {
             }
         }
     }
+    private completer_: Completer<string> | undefined
+    private async _getLastDBName(): Promise<string> {
+        let completer = this.completer_
+        if (completer) {
+            return completer.promise
+        }
+        completer = new Completer<string>()
+        try {
+            let name = ''
+            if (DB.isSupported) {
+                name = await DB.instance.getCurrentName(this.path.key)
+            }
+            completer.resolve(name)
+        } catch (e) {
+            this.completer_ = undefined
+            completer.reject(e)
+        }
+        return completer.promise
+    }
     private async _play(name: string) {
         const items = this.items_
         let source: Source | undefined
+        let start = 0
         if (name == '') {
-            if (items.length == 0) {
-                return
+            try {
+                name = await this._getLastDBName()
+            } catch (e) {
+                console.log(e)
             }
-            source = items[0]
-        } else {
-            for (let i = 0; i < items.length; i++) {
-                const element = items[i]
-                if (element.source.name == name) {
-                    source = element
-                    break
-                }
+            if (items.length != 0) {
+                source = items[0]
+                start = 1
             }
         }
+
+        for (let i = start; i < items.length; i++) {
+            const element = items[i]
+            if (element.source.name == name) {
+                source = element
+                break
+            }
+        }
+
         if (source) {
             await this._playSource(source)
         }
     }
 
-    next() {
+    next(): string | undefined {
         const items = this.items_
         if (items.length == 0) {
             return
         }
-        const name = this.currentName
+        const current = this.current
+        if (!current) {
+            return
+        }
+        const name = current.name
         let found = 0
         for (let i = 0; i < items.length; i++) {
             const item = items[i]
@@ -248,26 +280,13 @@ export class Manager {
             // found = 0
             return
         }
-        this.push(items[found].source.name)
+        return items[found].source.name
     }
+    private first_ = true
+    private name_ = ''
     private async _playSource(source: Source) {
         if (source == this.current_?.source) {
             return
-        }
-        const player = this.player
-        player.src({
-            src: source.url,
-            type: source.mime,
-        })
-        const add = source.textTracks
-        for (let i = 0; i < add.length; i++) {
-            const element = add[i]
-            player.addRemoteTextTrack({
-                kind: 'captions',
-                src: element.url,
-                default: i == 0,
-                label: element.label == "" ? (i + 1).toString() : element.label,
-            }, false)
         }
         console.log('play', source.source.name)
         const current = new Current(source)
@@ -276,13 +295,30 @@ export class Manager {
         try {
             if (DB.isSupported) {
                 try {
-                    current.currentTime = await DB.instance.getCurrentTime(source.id)
+                    const currentTime = await DB.instance.getCurrentTime(source.id)
+                    if (this.current_ == current) {
+                        current.currentTime = currentTime
+                    }
                 } catch (e) {
                     console.log(e)
                 }
             }
-
-            await player.play()
+            if (this.first_) {
+                this.first_ = false
+                const name = await DB.instance.getCurrentName(this.path.key)
+                if (name != source.source.name) {
+                    const items = this.items_
+                    for (let i = 0; i < items.length; i++) {
+                        const item = items[i]
+                        if (item.source.name == name) {
+                            this.name_ = name
+                            break
+                        }
+                    }
+                }
+            } else {
+                this.name_ = ''
+            }
         } catch (e) {
             console.log(e)
         }
@@ -291,13 +327,9 @@ export class Manager {
     get current(): Current | undefined {
         return this.current_
     }
-    get currentName(): string {
-        return this.current_?.name ?? ''
-    }
-    async save(src: string, currentTime: number) {
-
+    async save(currentTime: number) {
         const current = this.current_
-        if (!current || current.url != src) {
+        if (!current) {
             return
         }
         if (current.first) {
@@ -325,9 +357,27 @@ export class Manager {
             current.save = false
         }
     }
+    private save_ = false
+    async saveName() {
+        const current = this.current_
+        if (!current || this.save_) {
+            return
+        }
+        this.save_ = true
+
+        const path = this.path
+        const key = path.key
+        try {
+            await DB.instance.putCurrentName(key, current.name)
+        } catch (e) {
+            console.log(e)
+        } finally {
+            this.save_ = false
+        }
+    }
     private _currentTime(current: Current) {
-        const player = this.player
-        if (current.currentTime + 5 <= player.currentTime()) {
+        const player = this.video
+        if (current.currentTime + 5 <= player.currentTime) {
             return
         }
         current.skipTo = current.currentTime
@@ -348,11 +398,14 @@ export class Manager {
         if (this.current_ != current) {
             return
         }
-        const player = this.player
+        const player = this.video
         const skipTo = current.skipTo
-        if (skipTo > player.currentTime() + 1) {
+        if (skipTo > player.currentTime + 1) {
             current.skipTo = 0
-            player.currentTime(skipTo)
+            player.fastSeek(skipTo)
         }
+    }
+    get skipName(): string {
+        return this.name_
     }
 }

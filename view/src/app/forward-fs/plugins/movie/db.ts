@@ -1,5 +1,5 @@
 import { Completer } from "src/app/core/utils/completer"
-const version = 1
+const version = 2
 export class DB {
     static readonly instance = new DB()
     static get isSupported(): boolean {
@@ -29,7 +29,15 @@ export class DB {
                         }
                     )
                 }
-
+                if (!db.objectStoreNames.contains('currentName')) {
+                    db.createObjectStore(
+                        'currentName',
+                        {
+                            keyPath: 'id',
+                            autoIncrement: false,
+                        }
+                    )
+                }
             };
             request.onsuccess = (_) => {
                 completer.resolve(request.result)
@@ -79,6 +87,51 @@ export class DB {
                         resolve(request.result.val)
                     } else {
                         resolve(0)
+                    }
+                }
+                request.onerror = (e) => {
+                    reject(e)
+                }
+            } catch (e) {
+                reject(e)
+            }
+        })
+    }
+    async putCurrentName(id: string, name: string) {
+        const db = await this.getDB()
+        await new Promise<void>((resolve, reject) => {
+            try {
+                // 增加數據
+                const request = db.transaction(['currentName'], 'readwrite')
+                    .objectStore('currentName')
+                    .put({
+                        id: id,
+                        name: name,
+                    });
+                request.onsuccess = (evt) => {
+                    resolve()
+                }
+                request.onerror = (e) => {
+                    reject(e)
+                }
+            } catch (e) {
+                reject(e)
+            }
+        })
+    }
+    async getCurrentName(id: string): Promise<string> {
+        const db = await this.getDB()
+        return new Promise<string>((resolve, reject) => {
+            try {
+                // 增加數據
+                const request = db.transaction(['currentName'], 'readonly')
+                    .objectStore('currentName')
+                    .get(id)
+                request.onsuccess = (evt) => {
+                    if (request.result && typeof request.result.name === "string") {
+                        resolve(request.result.name)
+                    } else {
+                        resolve("")
                     }
                 }
                 request.onerror = (e) => {
