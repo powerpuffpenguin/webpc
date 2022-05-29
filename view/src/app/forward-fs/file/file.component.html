@@ -1,6 +1,6 @@
 <div matRipple class="wrapper" (contextmenu)="onContextmenu($event)" (click)="onClick($event)" (dblclick)="onDbclick()">
     <mat-icon [color]="source.checked?'accent':''" matTooltip="{{source.name}}">{{icon}}</mat-icon>
-    <div class="content">
+    <div class="content" [matTooltip]="source.name">
         {{source.name}}
     </div>
 </div>
