@@ -1,4 +1,4 @@
-# v1.2.x
+# v1.2.6
 
 * fix forward/socks5 RefreshToken error
 * new session module
