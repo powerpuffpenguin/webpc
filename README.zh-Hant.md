@@ -17,6 +17,7 @@ WebPC 主要有下述特色：
 * 簡易的用戶和分組系統，以控制用戶訪問權限和範圍
 * 支持多種系統平臺(linux windows mac ...)
 * 支持從 github 檢索最新發佈的程式並自動升級
+* 使用 [webpctv](https://github.com/powerpuffpenguin/webpctv) 客戶端在電視上播放 webpc 上的視頻
 
 ## 內容列表
 

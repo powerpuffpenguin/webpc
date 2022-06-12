@@ -17,6 +17,7 @@ WebPC mainly has the following characteristics:
 * Simple user and grouping system to control user access rights and scope
 * Support multiple system platforms(linux windows mac ...)
 * Support to retrieve the latest released program from github and automatically upgrade
+* Use [webpctv](https://github.com/powerpuffpenguin/webpctv) client to play video from webpc on TV
 
 ## Table of Contents
 
