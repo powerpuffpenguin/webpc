@@ -1,3 +1,6 @@
+# v1.2.7
+* fix shared
+
 # v1.2.6
 
 * fix forward/socks5 RefreshToken error
