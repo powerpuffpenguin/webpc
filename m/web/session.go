@@ -81,6 +81,9 @@ func (h Helper) ShouldBindSession(c *gin.Context) (session *sessionid.Session, e
 		}
 	}
 	session, e = h.accessSession(c)
+	if e == nil && session == nil {
+		e = status.Error(codes.PermissionDenied, `token not exists`)
+	}
 	c.Set(`session`, sessionValue{
 		session: session,
 		e:       e,
