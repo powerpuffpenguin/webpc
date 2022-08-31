@@ -15,7 +15,7 @@ export class SessionService {
   }
   constructor(private readonly httpClient: HttpClient,
   ) {
-    Manager.instance.load(httpClient)
+    Manager.instance.load()
   }
   get signining(): Observable<boolean> {
     return Manager.instance.signining

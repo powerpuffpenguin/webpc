@@ -9,6 +9,7 @@ import { md5String } from '../utils/md5';
 import { aesDecrypt, aesEncrypt } from '../utils/aes';
 import { Codes, NetError } from '../core/restful';
 const Key = 'session'
+const KeyLast = 'last.session'
 const Platform = 'web'
 export interface Userdata {
     readonly id: string
@@ -175,8 +176,8 @@ export class Manager {
     get observable(): Observable<Session | undefined> {
         return this.subject_
     }
-    private _load(httpClient?: HttpClient): Session | undefined {
-        const str = getItem(Key)
+    private _load(key: string): Session | undefined {
+        const str = getItem(key)
         if (typeof str !== "string") {
             return
         }
@@ -194,9 +195,6 @@ export class Manager {
                     && userdata !== null && typeof userdata === "object" && userdata.id) {
                     this.remember_ = true
                     const session = new Session(token, userdata)
-                    // if (httpClient && token.expired && token.canRefresh) {
-                    //     this._refreshUserdata(httpClient, session)
-                    // }
                     return session
                 }
             }
@@ -205,46 +203,26 @@ export class Manager {
         }
         return
     }
-    private _refreshUserdata(httpClient: HttpClient, session: Session) {
-        ServerAPI.v1.sessions.child('access').get<Userdata>(httpClient,
-            {
-                params: {
-                    at: Date.now().toString(),
-                },
-                headers: {
-                    Interceptor: 'none',
-                    Authorization: `Bearer ${session.token.access}`,
-                }
-            },
-        ).toPromise().then((_) => {
-            if (session == this.session) {
-                this._save(session)
-            }
-        }, (e) => {
-            if (e instanceof NetError) {
-                if (e.grpc == Codes.Unauthenticated) {
-                    if (e.message == 'token not exists') {
-                        this.clear(session)
-                    } else if (e.message == 'token expired') {
-                        this.refresh(httpClient, session, e).catch((e) => { })
-                    }
-                } else if (e.grpc == Codes.PermissionDenied && e.message == 'token not exists') {
-                    this.clear(session)
-                }
-            }
-        })
+    load() {
+        this.subject_.next(this._load(Key))
     }
-    load(httpClient: HttpClient) {
-        this.subject_.next(this._load())
-    }
-    private _save(session: Session) {
+    private _save(session: Session, remember: boolean, last = true) {
+        if (!remember && !last) {
+            return
+        }
         try {
             const data = JSON.stringify({
                 userdata: session.userdata,
                 token: session.token,
             })
             console.log(`save token`, data)
-            setItem(Key, aesEncrypt(data))
+            const val = aesEncrypt(data)
+            if (remember) {
+                setItem(Key, val)
+            }
+            if (last) {
+                setItem(KeyLast, val)
+            }
         } catch (e) {
             console.log('save token error', e)
         }
@@ -303,9 +281,7 @@ export class Manager {
                     token.deadline,
                 ),
                 response.data)
-            if (remember) {
-                this._save(session)
-            }
+            this._save(session, remember)
             this.subject_.next(session)
         } finally {
             if (completer) {
@@ -348,8 +324,32 @@ export class Manager {
         } else if (session != current) { // already refresh
             return current
         }
-        if (err && err.grpc != Codes.Unauthenticated) {
-            throw err
+
+        let token = session.token
+        const last = this._load(KeyLast)
+        if (last && last.access != session.access && last.userdata.id && last.userdata.id == session.userdata.id) {
+            const lt = last.token
+            if (!lt.deleted) {
+                if (!lt.expired) {
+                    this.subject_.next(last)
+                    this._save(last, this.remember_, false)
+                    return last
+                }
+                if (lt.canRefresh) {
+                    token = lt
+                }
+            }
+        }
+
+        if (err) {
+            if (err.grpc != Codes.Unauthenticated) {
+                throw err
+            } else if (err.message == 'token not exists') {
+                throw err
+            }
+        }
+        if (!token.canRefresh) {
+            throw "can't refresh token"
         }
 
         // refresh
@@ -375,9 +375,7 @@ export class Manager {
                 ),
                 session.userdata,
             )
-            if (this.remember_) {
-                this._save(s)
-            }
+            this._save(s, this.remember_)
             this.subject_.next(s)
             completer.resolve(s)
         }, (e) => {
@@ -391,10 +389,14 @@ export class Manager {
         if (session == this.subject_.value) {
             this.subject_.next(undefined)
             if (this.remember_) {
-                const current = this._load()
+                const current = this._load(Key)
                 if (current && current.token.access == session.token.access) {
                     removeItem(Key)
                 }
+            }
+            const current = this._load(KeyLast)
+            if (current && current.access == session.access) {
+                removeItem(KeyLast)
             }
         }
     }

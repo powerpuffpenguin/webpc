@@ -30,7 +30,6 @@ export class HeaderInterceptor implements HttpInterceptor {
         headers = headers.set('Authorization', `Bearer ${session.access}`)
       }
     }
-    let first = true
     return next.handle(req.clone({
       headers: headers,
     })).pipe(
@@ -48,9 +47,6 @@ export class HeaderInterceptor implements HttpInterceptor {
         }
       }),
       catchError((err, caught) => {
-        if (first) {
-          // only refresh once
-          first = false
           if (session && err instanceof HttpErrorResponse) {
             const e = resolveError(err)
             if (e.grpc == Codes.Unauthenticated) {
@@ -59,7 +55,6 @@ export class HeaderInterceptor implements HttpInterceptor {
               Manager.instance.clear(session)
             }
           }
-        }
         throw err
       }),
     )
