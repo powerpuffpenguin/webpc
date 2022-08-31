@@ -231,8 +231,12 @@ func (s server) Group(ctx context.Context, req *grpc_user.GroupRequest) (resp *g
 	return
 }
 func (s server) Remove(ctx context.Context, req *grpc_user.RemoveRequest) (resp *grpc_user.RemoveResponse, e error) {
+	if len(req.Id) != 0 {
+		resp = &grpc_user.RemoveResponse{}
+		return
+	}
 	TAG := `user Remove`
-	_, userdata, e := s.Userdata(ctx)
+	_, session, e := s.Session(ctx)
 	if e != nil {
 		return
 	}
@@ -241,11 +245,26 @@ func (s server) Remove(ctx context.Context, req *grpc_user.RemoveRequest) (resp 
 		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
 			ce.Write(
 				zap.Error(e),
-				zap.String(`who`, userdata.Who()),
+				zap.String(`who`, session.Who()),
 				zap.Int64s(`id`, req.Id),
 			)
 		}
 		return
+	}
+	if rowsAffected != 0 {
+		ctx := context.Background()
+		for _, id := range req.Id {
+			err := sessionid.DefaultManager().DeleteID(ctx, id)
+			if err != nil {
+				if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
+					ce.Write(
+						zap.Error(err),
+						zap.String(`who`, session.Who()),
+						zap.Int64(`id`, id),
+					)
+				}
+			}
+		}
 	}
 	resp = &grpc_user.RemoveResponse{
 		RowsAffected: rowsAffected,
@@ -253,7 +272,7 @@ func (s server) Remove(ctx context.Context, req *grpc_user.RemoveRequest) (resp 
 	if ce := logger.Logger.Check(zap.InfoLevel, TAG); ce != nil {
 		ce.Write(
 			zap.Error(e),
-			zap.String(`who`, userdata.Who()),
+			zap.String(`who`, session.Who()),
 			zap.Int64s(`id`, req.Id),
 			zap.Int64(`rowsAffected`, rowsAffected),
 		)
