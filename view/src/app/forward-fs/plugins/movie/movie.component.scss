@@ -1,0 +1,21 @@
+.videoview{
+    display: flex;
+    justify-content: center;
+}
+video{
+    max-width: 100%;
+}
+.btns{
+    padding-right: 8px;
+    padding-bottom: 8px;
+}
+a{
+    margin-top: 8px;
+    margin-left: 8px;
+}
+::cue {
+    background: none;
+    color: #fff; 
+    text-shadow: 0 1px #000, 1px 0 #000, -1px 0 #000, 0 -1px #000;
+
+}

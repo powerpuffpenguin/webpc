@@ -6,7 +6,7 @@ import (
 
 	"github.com/powerpuffpenguin/webpc/logger"
 	"github.com/powerpuffpenguin/webpc/m/helper"
-	"github.com/powerpuffpenguin/webpc/sessions"
+	"github.com/powerpuffpenguin/webpc/sessionid"
 	"github.com/powerpuffpenguin/webpc/utils"
 
 	"github.com/powerpuffpenguin/webpc/m/server/user/internal/db"
@@ -126,11 +126,11 @@ func (s server) Password(ctx context.Context, req *grpc_user.PasswordRequest) (r
 			)
 		}
 
-		ed := sessions.DestroyID(req.Id)
-		if ed != nil {
+		err := sessionid.DefaultManager().DeleteID(context.Background(), req.Id)
+		if err != nil {
 			if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
 				ce.Write(
-					zap.Error(ed),
+					zap.Error(err),
 					zap.String(`who`, userdata.Who()),
 					zap.Int64(`id`, req.Id),
 				)
@@ -175,6 +175,17 @@ func (s server) Change(ctx context.Context, req *grpc_user.ChangeRequest) (resp 
 				zap.String(`nickname`, req.Nickname),
 				zap.Int32s(`authorization`, req.Authorization),
 			)
+		}
+
+		err := sessionid.DefaultManager().DeleteID(context.Background(), req.Id)
+		if err != nil {
+			if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
+				ce.Write(
+					zap.Error(err),
+					zap.String(`who`, userdata.Who()),
+					zap.Int64(`id`, req.Id),
+				)
+			}
 		}
 	} else {
 		resp = &notChangedChangeResponse

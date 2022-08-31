@@ -107,11 +107,11 @@ func (d *Dialer) signin() (e error) {
 	if e != nil {
 		return
 	}
-	d.access = resp.Access
-	d.refresh = resp.Refresh
+	d.access = resp.Token.Access
+	d.refresh = resp.Token.Refresh
 	if ce := logger.Logger.Check(zap.InfoLevel, `signin`); ce != nil {
 		ce.Write(
-			zap.String(`access`, resp.Access),
+			zap.String(`access`, resp.Token.Access),
 		)
 	}
 	return
@@ -131,16 +131,16 @@ func (d *Dialer) refreshToken(access, refresh string) (e error) {
 		if ce := logger.Logger.Check(zap.ErrorLevel, `refresh token error`); ce != nil {
 			ce.Write(
 				zap.Error(e),
-				zap.String(`access`, resp.Access),
+				zap.String(`access`, resp.Token.Access),
 			)
 		}
 		return
 	}
-	d.access = resp.Access
-	d.refresh = resp.Refresh
+	d.access = resp.Token.Access
+	d.refresh = resp.Token.Refresh
 	if ce := logger.Logger.Check(zap.InfoLevel, `refresh token`); ce != nil {
 		ce.Write(
-			zap.String(`access`, resp.Access),
+			zap.String(`access`, resp.Token.Access),
 		)
 	}
 	return

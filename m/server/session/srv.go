@@ -2,16 +2,17 @@ package session
 
 import (
 	"context"
+	"encoding/base64"
 	"net/http"
 	"time"
 
+	"github.com/powerpuffpenguin/sessionstore"
 	"github.com/powerpuffpenguin/webpc/logger"
 	"github.com/powerpuffpenguin/webpc/m/helper"
 	grpc_session "github.com/powerpuffpenguin/webpc/protocol/session"
-	"github.com/powerpuffpenguin/webpc/sessions"
+	"github.com/powerpuffpenguin/webpc/sessionid"
 	signal_session "github.com/powerpuffpenguin/webpc/signal/session"
 
-	"github.com/powerpuffpenguin/sessionid"
 	"go.uber.org/zap"
 	"google.golang.org/grpc/codes"
 )
@@ -55,42 +56,14 @@ func (s server) Signin(ctx context.Context, req *grpc_session.SigninRequest) (re
 		e = s.Error(codes.NotFound, `name or password not match`)
 		return
 	}
-	id, e := sessions.PlatformID(req.Platform, result.ID)
-	if e != nil {
-		e = s.Error(codes.InvalidArgument, e.Error())
-		return
+	session := &sessionid.Session{
+		ID:            result.ID,
+		Name:          result.Name,
+		Nickname:      result.Nickname,
+		Authorization: result.Authorization,
+		Parent:        result.Parent,
 	}
-	m := sessions.DefaultManager()
-	e = m.Destroy(ctx, id)
-	if e != nil {
-		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
-			ce.Write(
-				zap.Error(e),
-				zap.String(`name`, req.Name),
-				zap.String(`password`, req.Password),
-				zap.Int64(`unix`, req.Unix),
-				zap.String(`at`, at.Local().String()),
-			)
-		}
-		return
-	}
-	session, refresh, e := m.Create(ctx,
-		id,
-		sessionid.Pair{
-			Key: sessions.KeyUserdata,
-			Value: &sessions.Userdata{
-				ID:            result.ID,
-				Parent:        result.Parent,
-				Name:          result.Name,
-				Nickname:      result.Nickname,
-				Authorization: result.Authorization,
-			},
-		},
-		sessionid.Pair{
-			Key:   sessions.KeyModtime,
-			Value: time.Now(),
-		},
-	)
+	token, e := sessionid.DefaultManager().Put(ctx, session.ID, req.Platform, session)
 	if e != nil {
 		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
 			ce.Write(
@@ -103,12 +76,10 @@ func (s server) Signin(ctx context.Context, req *grpc_session.SigninRequest) (re
 		}
 		return
 	}
-
-	access := session.Token()
 	if req.Cookie {
 		s.SetHTTPCookie(ctx, &http.Cookie{
 			Name:     s.CookieName(),
-			Value:    access,
+			Value:    token.Access,
 			Path:     `/`,
 			HttpOnly: true,
 		})
@@ -117,8 +88,8 @@ func (s server) Signin(ctx context.Context, req *grpc_session.SigninRequest) (re
 	if ce := logger.Logger.Check(zap.InfoLevel, TAG); ce != nil {
 		ce.Write(
 			zap.Error(e),
-			zap.String(`access`, access),
-			zap.String(`refresh`, refresh),
+			zap.String(`access`, token.Access),
+			zap.String(`refresh`, token.Refresh),
 			zap.Int64(`id`, result.ID),
 			zap.String(`name`, req.Name),
 			zap.String(`password`, req.Password),
@@ -127,13 +98,20 @@ func (s server) Signin(ctx context.Context, req *grpc_session.SigninRequest) (re
 		)
 	}
 	resp = &grpc_session.SigninResponse{
-		Access:  access,
-		Refresh: refresh,
-
-		Id:            result.ID,
-		Name:          result.Name,
-		Nickname:      result.Nickname,
-		Authorization: result.Authorization,
+		Token: &grpc_session.Token{
+			Access:          token.Access,
+			Refresh:         token.Refresh,
+			AccessDeadline:  token.AccessDeadline,
+			RefreshDeadline: token.RefreshDeadline,
+			Deadline:        token.Deadline,
+		},
+		Data: &grpc_session.Data{
+			Id:            session.ID,
+			Name:          session.Name,
+			Nickname:      session.Nickname,
+			Authorization: session.Authorization,
+			Parent:        session.Parent,
+		},
 	}
 	return
 }
@@ -147,7 +125,7 @@ func (s server) Signout(ctx context.Context, req *grpc_session.SignoutRequest) (
 		resp = &emptySignoutResponse
 		return
 	}
-	e = sessions.DefaultManager().DestroyByToken(ctx, access)
+	e = sessionid.DefaultManager().Delete(ctx, access)
 	if e != nil {
 		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
 			ce.Write(
@@ -176,7 +154,7 @@ func (s server) Signout(ctx context.Context, req *grpc_session.SignoutRequest) (
 }
 func (s server) Refresh(ctx context.Context, req *grpc_session.RefreshRequest) (resp *grpc_session.RefreshResponse, e error) {
 	TAG := `session Refresh`
-	access, refresh, e := sessions.DefaultManager().Refresh(ctx, req.Access, req.Refresh)
+	token, e := sessionid.DefaultManager().Refresh(ctx, req.Access, req.Refresh)
 	if e != nil {
 		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
 			ce.Write(
@@ -191,13 +169,18 @@ func (s server) Refresh(ctx context.Context, req *grpc_session.RefreshRequest) (
 		ce.Write(
 			zap.String(`access`, req.Access),
 			zap.String(`refresh`, req.Refresh),
-			zap.String(`new access`, access),
-			zap.String(`new refresh`, refresh),
+			zap.String(`new access`, token.Access),
+			zap.String(`new refresh`, token.Refresh),
 		)
 	}
 	resp = &grpc_session.RefreshResponse{
-		Access:  access,
-		Refresh: refresh,
+		Token: &grpc_session.Token{
+			Access:          token.Access,
+			Refresh:         token.Refresh,
+			AccessDeadline:  token.AccessDeadline,
+			RefreshDeadline: token.RefreshDeadline,
+			Deadline:        token.Deadline,
+		},
 	}
 	return
 }
@@ -231,11 +214,11 @@ func (s server) Password(ctx context.Context, req *grpc_session.PasswordRequest)
 	}
 	if changed {
 		resp = &truePasswordResponse
-		ed := sessions.DestroyID(userdata.ID)
-		if ed != nil {
+		err := sessionid.DefaultManager().DeleteID(context.Background(), userdata.ID)
+		if err != nil {
 			if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
 				ce.Write(
-					zap.Error(ed),
+					zap.Error(err),
 					zap.Int64(`id`, userdata.ID),
 					zap.String(`name`, userdata.Name),
 				)
@@ -260,51 +243,49 @@ func (s server) User(ctx context.Context, req *grpc_session.UserRequest) (resp *
 		}
 		return
 	}
-	e = session.Prepare(ctx, sessions.KeyModtime, sessions.KeyUserdata)
-	if e != nil {
-		e = s.ToTokenError(e)
-		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
-			ce.Write(
-				zap.Error(e),
-			)
-		}
-		return
-	}
-	var modtime time.Time
-	e = session.Get(ctx, sessions.KeyModtime, &modtime)
-	if e != nil {
-		e = s.ToTokenError(e)
-		if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
-			ce.Write(
-				zap.Error(e),
-			)
-		}
-		return
-	}
-	s.SetHTTPCacheMaxAge(ctx, 60)
+
+	modtime := time.Unix(session.Token.AccessDeadline, 0)
 	e = s.ServeMessage(ctx, modtime, func(nobody bool) error {
 		if nobody {
 			resp = &emptyUserResponse
 		} else {
-			var userdata sessions.Userdata
-			if e := session.Get(ctx, sessions.KeyUserdata, &userdata); e != nil {
-				e = s.ToTokenError(e)
-				if ce := logger.Logger.Check(zap.WarnLevel, TAG); ce != nil {
-					ce.Write(
-						zap.Error(e),
-					)
-				}
-				return e
-			}
+			s.SetHTTPCacheExpress(ctx, modtime)
 			resp = &grpc_session.UserResponse{
-				Id:            userdata.ID,
-				Parent:        userdata.Parent,
-				Name:          userdata.Name,
-				Nickname:      userdata.Nickname,
-				Authorization: userdata.Authorization,
+				Id:            session.ID,
+				Parent:        session.Parent,
+				Name:          session.Name,
+				Nickname:      session.Nickname,
+				Authorization: session.Authorization,
 			}
 		}
 		return nil
 	})
+	return
+}
+func (s server) Download(ctx context.Context, req *grpc_session.DownloadRequest) (resp *grpc_session.DownloadResponse, e error) {
+	_, session, _ := s.Session(ctx)
+	if session == nil {
+		session = &sessionid.Session{}
+	}
+	unix := time.Now().Add(time.Hour * 24).Unix()
+	session.Token = &sessionstore.Token{
+		Access:          `temporary`,
+		Refresh:         `temporary`,
+		AccessDeadline:  unix,
+		RefreshDeadline: unix,
+		Deadline:        unix,
+	}
+	b, e := session.Marshal()
+	if e != nil {
+		return
+	}
+	playdata := base64.RawURLEncoding.EncodeToString(b)
+	access, e := sessionid.DefaultManager().Sin(playdata)
+	if e != nil {
+		return
+	}
+	resp = &grpc_session.DownloadResponse{
+		Access: access,
+	}
 	return
 }

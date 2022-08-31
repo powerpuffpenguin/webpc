@@ -1,17 +1,16 @@
 package web
 
 import (
-	"errors"
+	"encoding/base64"
 	"strings"
 
 	"github.com/powerpuffpenguin/webpc/db"
 	"github.com/powerpuffpenguin/webpc/m/helper"
-	"github.com/powerpuffpenguin/webpc/sessions"
+	"github.com/powerpuffpenguin/webpc/sessionid"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	"github.com/gin-gonic/gin"
-	"github.com/powerpuffpenguin/sessionid"
 )
 
 type sessionValue struct {
@@ -19,15 +18,6 @@ type sessionValue struct {
 	e       error
 }
 
-func (h Helper) tokenError(e error) error {
-	if sessionid.IsTokenExpired(e) {
-		return status.Error(codes.Unauthenticated, e.Error())
-	} else if errors.Is(e, sessionid.ErrTokenNotExists) {
-		return status.Error(codes.PermissionDenied, e.Error())
-	} else {
-		return e
-	}
-}
 func (h Helper) GetToken(c *gin.Context) string {
 	return h.getToken(c)
 }
@@ -53,11 +43,31 @@ func (h Helper) getToken(c *gin.Context) string {
 	}
 	return ``
 }
+
 func (h Helper) accessSession(c *gin.Context) (session *sessionid.Session, e error) {
 	token := h.getToken(c)
 	if strings.HasPrefix(token, `Bearer `) {
 		access := token[7:]
-		session, e = sessions.DefaultManager().Get(c.Request.Context(), access)
+		if c.Request.URL.Path == `/api/forward/v1/fs/download_access` {
+			var playdata string
+			playdata, e = sessionid.DefaultManager().Verify(access)
+			if e != nil {
+				return
+			}
+			var b []byte
+			b, e = base64.RawURLEncoding.DecodeString(playdata)
+			if e != nil {
+				return
+			}
+			var result sessionid.Session
+			e = result.Unmarshal(b)
+			if e != nil {
+				return
+			}
+			session = &result
+		} else {
+			session, e = sessionid.DefaultManager().Get(c.Request.Context(), access)
+		}
 	}
 	return
 }
@@ -71,12 +81,8 @@ func (h Helper) ShouldBindSession(c *gin.Context) (session *sessionid.Session, e
 		}
 	}
 	session, e = h.accessSession(c)
-	if e == nil {
-		if session == nil {
-			e = status.Error(codes.PermissionDenied, `token not exists`)
-		}
-	} else {
-		e = h.tokenError(e)
+	if e == nil && session == nil {
+		e = status.Error(codes.PermissionDenied, `token not exists`)
 	}
 	c.Set(`session`, sessionValue{
 		session: session,
@@ -84,38 +90,19 @@ func (h Helper) ShouldBindSession(c *gin.Context) (session *sessionid.Session, e
 	})
 	return
 }
-func (h Helper) BindSession(c *gin.Context) (session *sessionid.Session) {
-	session, e := h.ShouldBindSession(c)
+func (h Helper) BindSession(c *gin.Context) (session *sessionid.Session, e error) {
+	session, e = h.ShouldBindSession(c)
 	if e != nil {
 		h.Error(c, e)
 		return
 	}
 	return
 }
-func (h Helper) ShouldBindUserdata(c *gin.Context) (userdata sessions.Userdata, e error) {
-	session, e := h.ShouldBindSession(c)
-	if e != nil {
-		return
-	}
-	e = session.Get(c.Request.Context(), sessions.KeyUserdata, &userdata)
-	if e != nil {
-		e = h.tokenError(e)
-	}
-	return
+func (h Helper) ShouldBindUserdata(c *gin.Context) (userdata *sessionid.Session, e error) {
+	return h.ShouldBindSession(c)
 }
-func (h Helper) BindUserdata(c *gin.Context) (userdata sessions.Userdata, e error) {
-	session, e := h.ShouldBindSession(c)
-	if e != nil {
-		h.Error(c, e)
-		return
-	}
-	e = session.Get(c.Request.Context(), sessions.KeyUserdata, &userdata)
-	if e != nil {
-		e = h.tokenError(e)
-		h.Error(c, e)
-		return
-	}
-	return
+func (h Helper) BindUserdata(c *gin.Context) (userdata *sessionid.Session, e error) {
+	return h.BindSession(c)
 }
 
 func (h Helper) CheckRoot(c *gin.Context) {

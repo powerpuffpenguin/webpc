@@ -1,6 +1,11 @@
-# v1.1.2-x
+# v1.2.7
+* fix shared
+
+# v1.2.6
 
 * fix forward/socks5 RefreshToken error
+* new session module
+* movie list
 
 # v1.1.2
 

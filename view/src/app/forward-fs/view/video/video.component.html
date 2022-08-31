@@ -10,7 +10,8 @@
             <p>
                 <mat-checkbox [(ngModel)]="stretch" i18n>Stretch Width</mat-checkbox>
             </p>
-            <video *ngIf="url" [src]="url" [style.width]="stretch?'100%':''" controls="controls" autoplay loop>Not
+            <video *ngIf="url" [src]="url" [style.width]="stretch?'100%':''" controlsList="nodownload"
+                controls="controls" autoplay loop>Not
                 support video tag,Please use a modern browser.</video>
         </mat-card-content>
     </mat-card>

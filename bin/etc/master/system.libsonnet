@@ -13,6 +13,7 @@
             // web display name
             Name: "movie",
             // local filesystem path
+            // Root: "/home/dev/movie",
             Root: "/home/dev/movie",
             // Set the directory to be readable. Users with read/write permissions can read files
             Read: true,

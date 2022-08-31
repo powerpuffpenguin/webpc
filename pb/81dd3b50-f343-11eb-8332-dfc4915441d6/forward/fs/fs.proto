@@ -31,6 +31,12 @@ service FS {
             get: "/api/forward/v1/fs/download"
         };
     }
+    // DownloadAccess log file
+    rpc DownloadAccess (DownloadRequest) returns (stream google.api.HttpBody){
+        option (google.api.http) = {
+            get: "/api/forward/v1/fs/download_access"
+        };
+    }
     // Update file data
     // put /api/forward/v1/fs/put/:id/:root/*path
     rpc Put (stream PutRequest) returns (PutResponse){}

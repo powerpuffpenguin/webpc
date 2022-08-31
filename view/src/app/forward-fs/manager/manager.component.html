@@ -1,4 +1,10 @@
-<fs-path [path]="folder.dir" (pathChange)="onPathChange($event)"></fs-path>
+<div>
+    <fs-path class="fs-path" [path]="folder.dir" (pathChange)="onPathChange($event)"></fs-path>
+    <a [routerLink]="'/forward/fs/movie'" [queryParams]="movieParams" mat-icon-button i18n-matTooltip
+        matTooltip="Movie List">
+        <mat-icon>theaters</mat-icon>
+    </a>
+</div>
 
 <div class="view" #box (contextmenu)="onContextmenu($event)" (mousedown)="onStart($event)" (click)="onClick($event)">
     <div #fs>
