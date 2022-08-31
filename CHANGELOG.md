@@ -1,3 +1,7 @@
+# v1.2.8
+* cache session
+
+
 # v1.2.7
 * fix shared
 
