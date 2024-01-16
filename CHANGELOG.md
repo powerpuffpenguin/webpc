@@ -6,6 +6,7 @@
 * upgrade github.com/gin-gonic/gin to v1.9.1
 * upgrade angular to 14
 * angular target to es2020
+* rm require.min.js
 
 
 # v1.2.8

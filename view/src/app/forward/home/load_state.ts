@@ -10,9 +10,11 @@ export interface DataResponse {
 export interface VersionResponse {
     platform: string
     version: string
+    date?: string
+    commit?: string
 }
 export interface StartAtResponse {
-    result: number
+    result: number | string
 
     at: any
     started: string

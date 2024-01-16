@@ -16,12 +16,11 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { IndexComponent } from './index/index.component';
 import { ToasterComponent } from './toaster/toaster.component';
-import { RequireComponent } from './require/require.component';
 import { AnimationsComponent } from './animations/animations.component';
 
 
 @NgModule({
-  declarations: [IndexComponent, ToasterComponent, RequireComponent, AnimationsComponent],
+  declarations: [IndexComponent, ToasterComponent, AnimationsComponent],
   imports: [
     CommonModule, RouterModule, FormsModule,
 

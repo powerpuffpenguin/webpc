@@ -20,6 +20,7 @@ import { Element } from 'src/app/core/group/tree';
 import { StateManager } from './state';
 import { RequireNet } from 'src/app/core/utils/requirenet';
 import { I18nService } from 'src/app/core/i18n/i18n.service';
+import * as ClipboardJS from 'clipboard';
 
 @Component({
   selector: 'app-query',
@@ -82,32 +83,25 @@ export class QueryComponent implements OnInit, OnDestroy, AfterViewInit {
   }
   @ViewChild("clipboard")
   private readonly clipboard_: ElementRef | undefined
-  private clipboardjs_: any
+  private clipboardjs_?: ClipboardJS
   ngAfterViewInit() {
-    RequireNet('clipboard').then((ClipboardJS) => {
-      if (this.closed_.isClosed) {
-        return
+
+    this.clipboardjs_ = new ClipboardJS(this.clipboard_?.nativeElement).on('success', () => {
+      if (this.closed_.isNotClosed) {
+        this.toasterService.pop('info', '', this.i18nService.get('copied'))
       }
-      this.clipboardjs_ = new ClipboardJS(this.clipboard_?.nativeElement).on('success', () => {
-        if (this.closed_.isNotClosed) {
-          this.toasterService.pop('info', '', this.i18nService.get('copied'))
-        }
-      }).on('error', (evt: any) => {
-        if (this.closed_.isNotClosed) {
-          this.toasterService.pop('error', undefined, this.i18nService.get('copied error'))
-          console.error('Action:', evt.action)
-          console.error('Trigger:', evt.trigger)
-        }
-      })
+    }).on('error', (evt: any) => {
+      if (this.closed_.isNotClosed) {
+        this.toasterService.pop('error', undefined, this.i18nService.get('copied error'))
+        console.error('Action:', evt.action)
+        console.error('Trigger:', evt.trigger)
+      }
     })
   }
   ngOnDestroy() {
     this.stateManager.close()
     this.closed_.close()
-    if (this.clipboardjs_) {
-      this.clipboardjs_.destroy()
-      this.clipboardjs_ = null
-    }
+    this.clipboardjs_?.destroy()
   }
   private sets_ = new Set<GroupData>()
   private _updateAll() {

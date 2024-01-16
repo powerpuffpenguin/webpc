@@ -1,12 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, VERSION, OnDestroy } from '@angular/core';
 import { ToasterService } from 'src/app/core/toaster.service';
-import { interval } from 'rxjs';
+import { timer } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ServerAPI } from 'src/app/core/core/api';
 import { Closed } from 'src/app/core/utils/closed';
-import { RequireNet } from 'src/app/core/utils/requirenet';
-import { durationString } from 'src/app/core/utils/utils';
+import { datetimeString, usedString } from 'src/app/core/utils/datetime';
 interface VersionResponse {
   platform: string
   version: string
@@ -14,7 +13,7 @@ interface VersionResponse {
   commit?: string
 }
 interface StartAtResponse {
-  result: number
+  result: string | number
 }
 
 @Component({
@@ -42,30 +41,29 @@ export class VersionComponent implements OnInit, OnDestroy {
         e,
       )
     })
-
-    RequireNet('moment').then((moment) => {
-      ServerAPI.v1.system.child('start_at').get<StartAtResponse>(this.httpClient).pipe(
-        takeUntil(this.closed_.observable),
-      ).subscribe((response) => {
-        this.startAt = moment.unix(response.result)
-        const d = moment.duration(moment.unix(moment.now() / 1000).diff(this.startAt))
-        this.started = durationString(d)
-      }, (e) => {
-        this.toasterService.pop('error',
-          undefined,
-          e,
-        )
-      })
-      interval(1000).pipe(
-        takeUntil(this.closed_.observable),
-      ).subscribe(() => {
-        if (this.startAt) {
-          const d = moment.duration(moment.unix(moment.now() / 1000).diff(this.startAt))
-          this.started = durationString(d)
-        }
-      })
+    ServerAPI.v1.system.child('start_at').get<StartAtResponse>(this.httpClient).pipe(
+      takeUntil(this.closed_.observable),
+    ).subscribe((response) => {
+      const startAt = typeof response.result === "number" ? response.result : parseInt(response.result)
+      if (Number.isSafeInteger(startAt)) {
+        this.startAt = datetimeString(new Date(startAt * 1000))
+        timer(0, 1000).pipe(takeUntil(this.closed_.observable)).subscribe({
+          next: () => {
+            let used = Math.floor(Date.now() / 1000)
+            if (used > startAt) {
+              used -= startAt
+            } else {
+              used = 0
+            }
+            this.started = usedString(used)
+          },
+        })
+      }
     }, (e) => {
-      this.toasterService.pop('error', undefined, e)
+      this.toasterService.pop('error',
+        undefined,
+        e,
+      )
     })
   }
   ngOnDestroy() {

@@ -1,9 +1,9 @@
 import { HttpClient } from "@angular/common/http"
-import { interval } from "rxjs"
+import { interval, timer } from "rxjs"
 import { takeUntil } from "rxjs/operators"
 import { Closed } from "src/app/core/utils/closed"
+import { datetimeString, usedString } from "src/app/core/utils/datetime"
 import { Loader } from "src/app/core/utils/loader"
-import { RequireState } from "src/app/core/utils/requirenet"
 import { durationString } from "src/app/core/utils/utils"
 import { VersionState, VersionResponse, StartAtState, StartAtResponse, DataState, DataResponse, UpgradedResponse, UpgradedState } from './load_state'
 export interface Error {
@@ -14,7 +14,6 @@ const DefaultValue: any = {}
 export class State {
     ready = false
     loader: Loader = DefaultValue
-    moment: any
     data: DataResponse = DefaultValue
     version: VersionResponse = DefaultValue
     startAt: StartAtResponse = DefaultValue
@@ -32,14 +31,6 @@ export class State {
             cancel: this.closed.observable,
         }
         this.loader = new Loader([
-            new RequireState('moment', (moment) => {
-                this.moment = moment
-            }, (e) => {
-                this.errs.push({
-                    id: 'moment',
-                    err: e,
-                })
-            }),
             new DataState(opts, (data) => {
                 console.log(data)
                 this.data = data
@@ -79,20 +70,22 @@ export class State {
         this.hasErr = false
         this.errs = []
         this.loader.load().then(() => {
-            const moment = this.moment
-            const startAt = this.startAt
-            startAt.at = moment.unix(startAt.result)
-            const d = moment.duration(moment.unix(moment.now() / 1000).diff(startAt.at))
-            startAt.started = durationString(d)
-
-
-            interval(1000).pipe(
-                takeUntil(this.closed.observable),
-            ).subscribe(() => {
-                const startAt = this.startAt
-                const d = moment.duration(moment.unix(moment.now() / 1000).diff(startAt.at))
-                startAt.started = durationString(d)
-            })
+            const response = this.startAt
+            const startAt = typeof response.result === "number" ? response.result : parseInt(response.result)
+            if (Number.isSafeInteger(startAt)) {
+                response.at = datetimeString(new Date(startAt * 1000))
+                timer(0, 1000).pipe(takeUntil(this.closed.observable)).subscribe({
+                    next: () => {
+                        let used = Math.floor(Date.now() / 1000)
+                        if (used > startAt) {
+                            used -= startAt
+                        } else {
+                            used = 0
+                        }
+                        response.started = usedString(used)
+                    },
+                })
+            }
             this.ready = true
         }).catch((_) => {
             this.hasErr = true

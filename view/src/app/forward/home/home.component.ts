@@ -6,8 +6,8 @@ import { takeUntil } from 'rxjs/operators';
 import { ServerAPI } from 'src/app/core/core/api';
 import { SessionService } from 'src/app/core/session/session.service';
 import { Closed } from 'src/app/core/utils/closed';
-import { RequireNet } from 'src/app/core/utils/requirenet';
 import { State } from './state';
+import * as ClipboardJS from 'clipboard';
 
 @Component({
   selector: 'app-home',
@@ -44,32 +44,24 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
   @ViewChild("clipboard")
   private readonly clipboard_: ElementRef | undefined
-  private clipboardjs_: any
+  private clipboardjs_?: ClipboardJS
   ngAfterViewInit() {
-    RequireNet('clipboard').then((ClipboardJS) => {
-      if (this.closed_.isClosed) {
-        return
+    this.clipboardjs_ = new ClipboardJS(this.clipboard_?.nativeElement).on('success', () => {
+      if (this.closed_.isNotClosed) {
+        this.toasterService.pop('info', '', "copied")
       }
-      this.clipboardjs_ = new ClipboardJS(this.clipboard_?.nativeElement).on('success', () => {
-        if (this.closed_.isNotClosed) {
-          this.toasterService.pop('info', '', "copied")
-        }
-      }).on('error', (evt: any) => {
-        if (this.closed_.isNotClosed) {
-          this.toasterService.pop('error', undefined, "copied error")
-          console.error('Action:', evt.action)
-          console.error('Trigger:', evt.trigger)
-        }
-      })
+    }).on('error', (evt: any) => {
+      if (this.closed_.isNotClosed) {
+        this.toasterService.pop('error', undefined, "copied error")
+        console.error('Action:', evt.action)
+        console.error('Trigger:', evt.trigger)
+      }
     })
   }
   ngOnDestroy() {
     this.state.closed.close()
     this.closed_.close()
-    if (this.clipboardjs_) {
-      this.clipboardjs_.destroy()
-      this.clipboardjs_ = null
-    }
+    this.clipboardjs_?.destroy()
   }
   onClickRefresh() {
     this.state.refresh()

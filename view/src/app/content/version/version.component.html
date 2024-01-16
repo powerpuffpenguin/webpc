@@ -7,7 +7,7 @@
                 <p>{{response.version}}</p>
                 <p *ngIf="response.commit">{{response.commit}}</p>
                 <p *ngIf="response.date">build at {{response.date}}</p>
-                <p *ngIf="startAt">start at {{startAt.format('YYYY-MM-DD HH:mm:ss')}}, started {{started}}.</p>
+                <p *ngIf="startAt">start at {{startAt}}, started {{started}}.</p>
             </div>
         </mat-card-content>
     </mat-card>

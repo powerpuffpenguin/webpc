@@ -12,7 +12,9 @@
         <mat-card-content>
             <p>{{version.platform}}</p>
             <p>{{version.version}}</p>
-            <p>start at {{startAt.at.format('YYYY-MM-DD HH:mm:ss')}}, started {{startAt.started}}.</p>
+            <p *ngIf="version.commit">{{version.commit}}</p>
+            <p *ngIf="version.date">build at {{version.date}}</p>
+            <p>start at {{startAt.at}}, started {{startAt.started}}.</p>
             <p *ngIf="upgraded">new version "{{upgraded}}" is ready, wait until the server restarts to take effect.</p>
             <p *ngIf="url">
                 {{url}}

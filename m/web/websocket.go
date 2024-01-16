@@ -2,7 +2,9 @@ package web
 
 import (
 	"net/http"
+	"net/url"
 	"sync/atomic"
+	"unicode/utf8"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -13,9 +15,46 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+func equalASCIIFold(s, t string) bool {
+	var (
+		sn, tn int
+		sr, tr rune
+	)
+	for s != "" && t != "" {
+		sr, sn = utf8.DecodeRuneInString(s)
+		tr, tn = utf8.DecodeRuneInString(t)
+		s = s[sn:]
+		t = t[tn:]
+		if sr == tr {
+			continue
+		}
+		if 'A' <= sr && sr <= 'Z' {
+			sr = sr + 'a' - 'A'
+		}
+		if 'A' <= tr && tr <= 'Z' {
+			tr = tr + 'a' - 'A'
+		}
+		if sr != tr {
+			return false
+		}
+	}
+	return s == t
+}
+
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024 * 32,
 	WriteBufferSize: 1024 * 32,
+	CheckOrigin: func(r *http.Request) bool {
+		origin := r.Header["Origin"]
+		if len(origin) == 0 {
+			return true
+		}
+		u, err := url.Parse(origin[0])
+		if err != nil {
+			return false
+		}
+		return equalASCIIFold(u.Hostname(), r.Host)
+	},
 }
 
 func (h Helper) NewContext(c *gin.Context) context.Context {

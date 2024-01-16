@@ -29,6 +29,8 @@ message VersionRequest{
 message VersionResponse{
     string platform = 1;
     string version = 2;
+    string commit = 3;
+    string date = 4;
 }
 message StartAtRequest{
 }
