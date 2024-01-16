@@ -304,6 +304,6 @@ func (h Filesystem) download(c *gin.Context) {
 	c.Request.URL.Path = obj.Path
 	name := path.Base(obj.Path)
 	c.Header(`Cache-Control`, `max-age=0`)
-	c.Header(`Content-Disposition`, `attachment;filename=`+url.QueryEscape(name))
+	c.Header(`Content-Disposition`, `attachment;filename=`+url.PathEscape(name))
 	http.FileServer(root).ServeHTTP(c.Writer, c.Request)
 }

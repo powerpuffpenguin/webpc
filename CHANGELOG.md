@@ -4,6 +4,7 @@
 * fix jsonnet import  abs path on windows
 * upgrade github.com/gorilla/websocket to v1.5.1
 * upgrade github.com/gin-gonic/gin to v1.9.1
+* "attachment;filename="+url.PathEscape(name)
 * upgrade angular to 14
 * angular target to es2020
 * rm require.min.js
