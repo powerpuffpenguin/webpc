@@ -10,6 +10,8 @@ import { durationString } from 'src/app/core/utils/utils';
 interface VersionResponse {
   platform: string
   version: string
+  date?: string
+  commit?: string
 }
 interface StartAtResponse {
   result: number

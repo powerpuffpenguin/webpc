@@ -1,6 +1,11 @@
+# v1.2.9
+* target es2020
+* upgrade angular14
+* fix jsonnet import  abs path on windows
+
+
 # v1.2.8
 * cache session
-
 
 # v1.2.7
 * fix shared

@@ -3,7 +3,7 @@
 	<id>webpc-master-service</id>
 	<name>WebPC Master Service</name>
 	<description>WebPC Master Service</description>
-	<workingdirectory>%BASE%\etc</workingdirectory>
+	<workingdirectory>%BASE%</workingdirectory>
 	<executable>%BASE%\webpc</executable>
 	<startargument>master</startargument>
 	<log mode="none"/>

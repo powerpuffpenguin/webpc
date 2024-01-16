@@ -3,7 +3,7 @@
 	<id>webpc-slave-service</id>
 	<name>WebPC Slave Service</name>
 	<description>WebPC Slave Service</description>
-	<workingdirectory>%BASE%\etc</workingdirectory>
+	<workingdirectory>%BASE%</workingdirectory>
 	<executable>%BASE%\webpc</executable>
 	<startargument>slave</startargument>
 	<log mode="none"/>

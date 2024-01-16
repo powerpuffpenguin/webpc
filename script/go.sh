@@ -134,16 +134,22 @@ if [[ "$debug" == 1 ]];then
         -o "bin/$target"
     )
 else
+    commit=`git rev-parse HEAD`
+	if [ "$commit" == '' ];then
+		commit="[unknow commit]"
+	fi
+    date=`date +'%Y-%m-%d %H:%M:%S'`
     args=(
         go build 
         -ldflags "\"-s -w$flags\""
+        -ldflags "\"-s -w -X 'github.com/powerpuffpenguin/webpc/version.Version=$Version' -X 'github.com/powerpuffpenguin/webpc/version.Date=$date' -X 'github.com/powerpuffpenguin/webpc/version.Commit=$commit'\""
         -o "bin/$target"
     )
 fi
 
 cd "$Dir"
 # version
-"$BashDir/version.sh"
+# "$BashDir/version.sh"
 
 # build
 echo "build for \"$GOOS/$GOARCH\""

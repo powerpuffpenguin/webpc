@@ -2,10 +2,11 @@ package system
 
 import (
 	"context"
+	"time"
+
 	"github.com/powerpuffpenguin/webpc/m/helper"
 	grpc_system "github.com/powerpuffpenguin/webpc/protocol/system"
 	"github.com/powerpuffpenguin/webpc/version"
-	"time"
 )
 
 type server struct {
@@ -18,6 +19,8 @@ var (
 	versionResponse      = grpc_system.VersionResponse{
 		Platform: version.Platform,
 		Version:  version.Version,
+		Commit:   version.Commit,
+		Date:     version.Date,
 	}
 )
 
