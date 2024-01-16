@@ -1,7 +1,11 @@
 # v1.2.9
-* target es2020
-* upgrade angular14
+
+* upgrade golang to 1.21
 * fix jsonnet import  abs path on windows
+* upgrade github.com/gorilla/websocket to v1.5.1
+* upgrade github.com/gin-gonic/gin to v1.9.1
+* upgrade angular to 14
+* angular target to es2020
 
 
 # v1.2.8
