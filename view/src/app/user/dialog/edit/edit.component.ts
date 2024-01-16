@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, OnDestroy, Inject } from '@angular/core';
 import { MatCheckboxChange } from '@angular/material/checkbox';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { ToasterService } from 'angular2-toaster';
+import { ToasterService } from 'src/app/core/toaster.service';
 import { finalize, takeUntil } from 'rxjs/operators';
 import { Authorizations, ServerAPI, Authorization, AuthorizationName } from 'src/app/core/core/api';
 import { I18nService } from 'src/app/core/i18n/i18n.service';

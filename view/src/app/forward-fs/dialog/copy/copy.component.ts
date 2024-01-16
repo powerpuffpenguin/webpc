@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { ToasterService } from 'angular2-toaster';
+import { ToasterService } from 'src/app/core/toaster.service';
 import { I18nService } from 'src/app/core/i18n/i18n.service';
 import { SessionService } from 'src/app/core/session/session.service';
 import { ExistsChoiceComponent } from '../exists-choice/exists-choice.component';

@@ -2,7 +2,7 @@
 <div mat-dialog-content>
     <input #file type="file" name="files" multiple style="display: none;" (change)="onAdd($event)" />
     <div #drop [class]="dragover?'drop-zone-over':'drop-zone'">
-        <ng-container i18n>Queue length</ng-container> : {{ source?.length }}
+        <ng-container i18n>Queue length</ng-container> : {{ source.length }}
         <ng-container *ngIf="source && source.length!=0;then listView;else emptyView;"></ng-container>
         <ng-template #emptyView>
             <p i18n style="color: green;">Drag files here to upload</p>

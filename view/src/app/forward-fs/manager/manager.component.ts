@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit, Input, Output, EventEmitter, ElementRef, 
 import { MatDialog } from '@angular/material/dialog';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { Router } from '@angular/router';
-import { ToasterService } from 'angular2-toaster';
+import { ToasterService } from 'src/app/core/toaster.service';
 import { fromEvent, Subscription } from 'rxjs';
 import { first, takeUntil } from 'rxjs/operators';
 import { I18nService } from 'src/app/core/i18n/i18n.service';
@@ -573,9 +573,9 @@ export class ManagerComponent implements OnInit, OnDestroy {
   get movieParams(): any {
     const dir = this.folder
     return {
-      id:dir.id,
-      root:dir.root,
-      path:dir.dir,
+      id: dir.id,
+      root: dir.root,
+      path: dir.dir,
     }
   }
 

@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 import { SessionService } from 'src/app/core/session/session.service';
 import { ServerAPI } from 'src/app/core/core/api';
-import { ToasterService } from 'angular2-toaster';
+import { ToasterService } from 'src/app/core/toaster.service';
 import { I18nService } from 'src/app/core/i18n/i18n.service';
 import { HttpClient } from '@angular/common/http';
 import { Closed } from 'src/app/core/utils/closed';

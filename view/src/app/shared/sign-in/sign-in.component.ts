@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
-import { ToasterService } from 'angular2-toaster';
+import { ToasterService } from 'src/app/core/toaster.service';
 import { takeUntil } from 'rxjs/operators';
 import { SessionService } from 'src/app/core/session/session.service';
 import { Session } from 'src/app/core/session/session';

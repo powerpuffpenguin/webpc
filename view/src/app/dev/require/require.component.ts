@@ -1,5 +1,5 @@
 import { Component, OnInit, ElementRef, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
-import { ToasterService } from 'angular2-toaster';
+import { ToasterService } from 'src/app/core/toaster.service';
 import { Closed } from 'src/app/core/utils/closed';
 import { RequireNet } from 'src/app/core/utils/requirenet';
 

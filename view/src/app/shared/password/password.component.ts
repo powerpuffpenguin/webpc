@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { MatDialogRef } from '@angular/material/dialog';
-import { ToasterService } from 'angular2-toaster';
+import { ToasterService } from 'src/app/core/toaster.service';
 import { Closed } from 'src/app/core/utils/closed';
 import { ServerAPI } from 'src/app/core/core/api';
 import { finalize, takeUntil } from 'rxjs/operators';

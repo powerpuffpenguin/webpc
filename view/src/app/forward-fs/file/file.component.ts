@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FileInfo, FileType } from '../fs';
 import { Router } from '@angular/router';
-import { ToasterService } from 'angular2-toaster';
+import { ToasterService } from 'src/app/core/toaster.service';
 import { I18nService } from 'src/app/core/i18n/i18n.service';
 export interface NativeEvent extends Event {
   ctrlKey: boolean

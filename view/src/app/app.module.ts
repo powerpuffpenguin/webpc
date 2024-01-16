@@ -1,12 +1,12 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { BrowserAnimationsModule, provideAnimations } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
-import { ToasterModule, ToasterService } from 'angular2-toaster';
+import { ToastrModule } from 'ngx-toastr';
 
 import { SharedModule } from "./shared/shared.module";
 
@@ -52,12 +52,16 @@ import { environment } from '../environments/environment';
     MatInputModule, MatPaginatorModule, MatTableModule,
     MatTooltipModule, MatIconModule, MatDialogModule,
     MatProgressSpinnerModule,
-    AppRoutingModule, ToasterModule.forRoot(), ServiceWorkerModule.register('ngsw-worker.js', {
-  enabled: environment.production,
-  // Register the ServiceWorker as soon as the app is stable
-  // or after 30 seconds (whichever comes first).
-  registrationStrategy: 'registerWhenStable:30000'
-})
+    AppRoutingModule,
+    ToastrModule.forRoot({
+      positionClass: 'toast-bottom-right',
+    }),
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: environment.production,
+      // Register the ServiceWorker as soon as the app is stable
+      // or after 30 seconds (whichever comes first).
+      registrationStrategy: 'registerWhenStable:30000'
+    })
   ],
   providers: [
     {
@@ -65,7 +69,6 @@ import { environment } from '../environments/environment';
       useClass: HeaderInterceptor,
       multi: true,
     },
-    ToasterService,
   ],
   bootstrap: [AppComponent]
 })

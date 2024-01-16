@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ToasterService, ToastType } from 'angular2-toaster';
+import { ToasterService, ToastType } from 'src/app/core/toaster.service';
+
 @Component({
   selector: 'app-toaster',
   templateUrl: './toaster.component.html',
@@ -7,7 +8,6 @@ import { ToasterService, ToastType } from 'angular2-toaster';
 })
 export class ToasterComponent implements OnInit {
   title = false
-  async = false
   type: ToastType = 'success'
   constructor(private readonly toasterService: ToasterService) { }
 
@@ -19,10 +19,7 @@ export class ToasterComponent implements OnInit {
     if (this.title) {
       title = this.type
     }
-    if (this.async) {
-      this.toasterService.pop(this.type, title, `${this.title}`)
-    } else {
-      this.toasterService.popAsync(this.type, title, `${this.title}`)
-    }
+    this.toasterService.pop(this.type, title, `${this.title}`)
+
   }
 }

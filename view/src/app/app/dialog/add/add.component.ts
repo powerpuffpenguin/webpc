@@ -1,12 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, OnDestroy, Inject } from '@angular/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { ToasterService } from 'angular2-toaster';
 import { finalize, takeUntil } from 'rxjs/operators';
 import { ServerAPI } from 'src/app/core/core/api';
 import { KeysService } from 'src/app/core/group/keys.service';
 import { Element } from 'src/app/core/group/tree';
 import { I18nService } from 'src/app/core/i18n/i18n.service';
+import { ToasterService } from 'src/app/core/toaster.service';
 import { Closed } from 'src/app/core/utils/closed';
 import { TreeSelectComponent } from 'src/app/shared/tree-select/tree-select.component';
 import { Data } from '../../query/query';

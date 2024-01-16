@@ -3,7 +3,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ToasterService } from 'angular2-toaster';
+import { ToasterService } from 'src/app/core/toaster.service';
 import { finalize, takeUntil } from 'rxjs/operators';
 import { AuthorizationName, ServerAPI } from 'src/app/core/core/api';
 import { KeysService } from 'src/app/core/group/keys.service';

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, VERSION, OnDestroy } from '@angular/core';
-import { ToasterService } from 'angular2-toaster';
+import { ToasterService } from 'src/app/core/toaster.service';
 import { interval } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ServerAPI } from 'src/app/core/core/api';

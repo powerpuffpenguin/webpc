@@ -1,6 +1,5 @@
 import { Component, OnDestroy, ViewChild, ElementRef, } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
-import { ToasterConfig } from 'angular2-toaster';
 import { filter, takeUntil } from 'rxjs/operators';
 import { I18nService } from './core/i18n/i18n.service';
 import { NavigationService } from './core/navigation/navigation.service';
@@ -15,9 +14,6 @@ import { Closed } from './core/utils/closed';
 export class AppComponent implements OnDestroy {
   private closed_ = new Closed()
   theme = ''
-  config = new ToasterConfig({
-    positionClass: "toast-bottom-right"
-  })
   fullscreen = false
   constructor(readonly settingsService: SettingsService,
     readonly navigationService: NavigationService,

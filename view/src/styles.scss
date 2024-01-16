@@ -1,39 +1,47 @@
 /* You can add global styles to this file, and also import other style files */
 @import "xterm/css/xterm.css";
-@import "angular2-toaster/toaster.min.css";
+@import 'ngx-toastr/toastr';
 
-.terminal{
+.terminal {
     padding-left: 4px;
 }
 
-.fill-flex{
+.fill-flex {
     flex: 1 1 auto;
 }
-.hide{
+
+.hide {
     display: none;
 }
-.iconfont{
+
+.iconfont {
     font-size: 24px;
 }
-.fullwidth{
+
+.fullwidth {
     width: 100%;
 }
-.viewcard{
+
+.viewcard {
     padding: 18px 8px 8px;
 }
-.view{
+
+.view {
     padding: 18px 8px 8px;
 }
-@media screen and (max-width: 851px){ 
+
+@media screen and (max-width: 851px) {
     .dialog-content {
         min-width: calc(100vw - 250px);
     }
 }
-@media screen and (min-width: 850px){ 
+
+@media screen and (min-width: 850px) {
     .dialog-content {
         min-width: 600px;
     }
 }
-.left8{
+
+.left8 {
     margin-left: 8px;
 }

@@ -3,7 +3,7 @@ import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } fr
 import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ToasterService } from 'angular2-toaster';
+import { ToasterService } from 'src/app/core/toaster.service';
 import { finalize, takeUntil } from 'rxjs/operators';
 import { ServerAPI } from 'src/app/core/core/api';
 import { Closed } from 'src/app/core/utils/closed';
@@ -360,7 +360,7 @@ export class QueryComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     element.setAttribute(
       'data-clipboard-text',
-      socks5 ? ServerAPI.forward.v1.forward.websocketURL(code) : ServerAPI.v1.dialer.websocketURL(code) ,
+      socks5 ? ServerAPI.forward.v1.forward.websocketURL(code) : ServerAPI.v1.dialer.websocketURL(code),
     )
     element.click()
   }
