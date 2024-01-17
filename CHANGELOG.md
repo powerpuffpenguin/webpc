@@ -1,4 +1,4 @@
-# v1.2.9
+# v1.3.0
 
 * upgrade golang to 1.21
 * fix jsonnet import  abs path on windows
