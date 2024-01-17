@@ -40,6 +40,7 @@ export class ViewComponent implements OnInit, OnDestroy, AfterViewInit {
     return this.target_.value.id
   }
   private xterm_: Terminal | undefined
+  private canvas_?: CanvasAddon
   private fitAddon_: FitAddon | undefined
   private textarea_: Document | undefined
   private shell_: Shell | undefined
@@ -84,6 +85,7 @@ export class ViewComponent implements OnInit, OnDestroy, AfterViewInit {
       this.shell_.close()
       this.shell_ = undefined
     }
+    this.canvas_?.dispose()
     this.xterm_?.dispose()
     this.navigationService.target = ''
   }
@@ -111,7 +113,8 @@ export class ViewComponent implements OnInit, OnDestroy, AfterViewInit {
     xterm.loadAddon(fitAddon)
     xterm.loadAddon(new WebLinksAddon())
     xterm.open(this.xterm.nativeElement)
-    xterm.loadAddon(new CanvasAddon())
+    this.canvas_ = new CanvasAddon()
+    xterm.loadAddon(this.canvas_)
     this.textarea_ = this.xterm.nativeElement.querySelector('textarea')
     fitAddon.fit()
 

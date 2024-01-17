@@ -47,7 +47,9 @@ export class AttachComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild("xterm")
   xterm: ElementRef | undefined
   private xterm_: Terminal | undefined
+  private canvas_?: CanvasAddon
   ngAfterViewInit() {
+
     // new xterm
     const xterm = new Terminal({
       cursorBlink: true,
@@ -61,7 +63,8 @@ export class AttachComponent implements OnInit, OnDestroy, AfterViewInit {
     xterm.loadAddon(new WebLinksAddon())
 
     xterm.open(this.xterm?.nativeElement)
-    xterm.loadAddon(new CanvasAddon())
+    this.canvas_ = new CanvasAddon()
+    xterm.loadAddon(this.canvas_)
     fitAddon.fit()
 
     // window size change
@@ -78,6 +81,7 @@ export class AttachComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnDestroy() {
     this.closed_.close()
     this.onClickDetach()
+    this.canvas_?.dispose()
     this.xterm_?.dispose()
   }
   onClickAttach() {
