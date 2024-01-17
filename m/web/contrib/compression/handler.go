@@ -3,7 +3,6 @@ package compression
 import (
 	"compress/gzip"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -29,11 +28,11 @@ type helperHandler struct {
 func newHandler(br, gz int, options ...Option) *helperHandler {
 	var gzPool, brPool sync.Pool
 	brPool.New = func() interface{} {
-		br := brotli.NewWriterLevel(ioutil.Discard, br)
+		br := brotli.NewWriterLevel(io.Discard, br)
 		return br
 	}
 	gzPool.New = func() interface{} {
-		gz, err := gzip.NewWriterLevel(ioutil.Discard, gz)
+		gz, err := gzip.NewWriterLevel(io.Discard, gz)
 		if err != nil {
 			panic(err)
 		}
@@ -43,7 +42,7 @@ func newHandler(br, gz int, options ...Option) *helperHandler {
 		Options: DefaultOptions,
 		brPool:  &brPool,
 		gzPool:  &gzPool,
-		br:      brotli.NewWriterLevel(ioutil.Discard, br),
+		br:      brotli.NewWriterLevel(io.Discard, br),
 	}
 	for _, setter := range options {
 		setter(handler.Options)

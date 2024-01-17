@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -74,7 +73,7 @@ func (d *Download) download(f *os.File) (nomatch bool, e error) {
 		return
 	}
 	modified := resp.Header.Get(`last-modified`)
-	e = ioutil.WriteFile(d.modified, []byte(modified), 0666)
+	e = os.WriteFile(d.modified, []byte(modified), 0666)
 	if e != nil {
 		return
 	}
@@ -132,14 +131,14 @@ func (d *Download) append() (e error) {
 		}
 		return
 	}
-	b, e := ioutil.ReadFile(d.modified)
+	b, e := os.ReadFile(d.modified)
 	if e != nil || len(b) == 0 {
 		f.Close()
 		e = d.downloadTrunc()
 		return
 	}
 
-	ret, e := f.Seek(0, os.SEEK_CUR)
+	ret, e := f.Seek(0, io.SeekCurrent)
 	if e != nil {
 		return
 	}

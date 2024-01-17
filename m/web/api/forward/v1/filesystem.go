@@ -2,7 +2,6 @@ package v1
 
 import (
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"path"
@@ -260,7 +259,7 @@ func (h Filesystem) upload(c *gin.Context) {
 		h.Error(c, e)
 		return
 	}
-	b, e := ioutil.ReadAll(c.Request.Body)
+	b, e := io.ReadAll(c.Request.Body)
 	if e != nil {
 		h.Error(c, e)
 		return

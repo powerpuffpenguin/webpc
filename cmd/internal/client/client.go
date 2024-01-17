@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"io/ioutil"
 	"net/http"
 
 	"google.golang.org/grpc/codes"
@@ -33,7 +32,7 @@ type Client struct {
 func (client Client) response(resp *http.Response, response proto.Message) (e error) {
 	if resp.Body != nil {
 		var b []byte
-		b, e = ioutil.ReadAll(resp.Body)
+		b, e = io.ReadAll(resp.Body)
 		resp.Body.Close()
 		if e != nil {
 			return

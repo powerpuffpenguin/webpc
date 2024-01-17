@@ -87,7 +87,7 @@ fi
 cd "$Dir/bin"
 if [[ $slave == 0 ]];then
     args=(
-        ./"$Target" master -d -v "192.168.251.50:5900"
+        ./"$Target" master -d -v "127.0.0.1:5900"
     )
 else
     args=(

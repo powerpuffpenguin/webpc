@@ -53,7 +53,9 @@ var upgrader = websocket.Upgrader{
 		if err != nil {
 			return false
 		}
-		return equalASCIIFold(u.Hostname(), r.Host)
+		s, _ := splitHostPort(u.Host)
+		t, _ := splitHostPort(r.Host)
+		return equalASCIIFold(s, t)
 	},
 }
 

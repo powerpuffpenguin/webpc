@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"regexp"
@@ -233,7 +232,7 @@ func (u *Upgrade) requestHash(url string) (hash string, e error) {
 	defer resp.Body.Close()
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
 		var b []byte
-		b, e = ioutil.ReadAll(resp.Body)
+		b, e = io.ReadAll(resp.Body)
 		if e != nil {
 			return
 		}
