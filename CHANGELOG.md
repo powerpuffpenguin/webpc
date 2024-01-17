@@ -8,6 +8,8 @@
 * upgrade angular to 14
 * angular target to es2020
 * rm require.min.js
+* upgrade noVNC to 1.4
+* upgrade xterm to 5.3.0
 
 
 # v1.2.8

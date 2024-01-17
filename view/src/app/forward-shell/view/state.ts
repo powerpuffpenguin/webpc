@@ -51,7 +51,7 @@ export class Shell extends SessionRequest {
     _onConnected() {
         super._onConnected()
         this.xterm.focus()
-        this.xterm.setOption("cursorBlink", true)
+        this.xterm.options.cursorBlink = true
     }
     _onMessage(ws: WebSocket, resp: any) {
         if (resp.event == "Info") {

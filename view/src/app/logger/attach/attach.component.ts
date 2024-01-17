@@ -8,6 +8,7 @@ import { WebLinksAddon } from 'xterm-addon-web-links';
 import { Subject } from 'rxjs';
 import { Closed } from 'src/app/core/utils/closed';
 import { HttpClient } from '@angular/common/http';
+import { CanvasAddon } from 'xterm-addon-canvas';
 
 @Component({
   selector: 'logger-attach',
@@ -46,24 +47,22 @@ export class AttachComponent implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild("xterm")
   xterm: ElementRef | undefined
   private xterm_: Terminal | undefined
-  private fitAddon_: FitAddon | undefined
   ngAfterViewInit() {
     // new xterm
     const xterm = new Terminal({
       cursorBlink: true,
       screenReaderMode: true,
-      rendererType: 'canvas',
+      // rendererType: 'canvas',
     })
     this.xterm_ = xterm
     // addon
     const fitAddon = new FitAddon()
-    this.fitAddon_ = fitAddon
     xterm.loadAddon(fitAddon)
     xterm.loadAddon(new WebLinksAddon())
 
     xterm.open(this.xterm?.nativeElement)
+    xterm.loadAddon(new CanvasAddon())
     fitAddon.fit()
-    this.xterm_ = xterm
 
     // window size change
     this.subject_.pipe(
@@ -79,6 +78,7 @@ export class AttachComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnDestroy() {
     this.closed_.close()
     this.onClickDetach()
+    this.xterm_?.dispose()
   }
   onClickAttach() {
     if (this.listener) {
