@@ -1,3 +1,8 @@
+# v1.3.1
+
+* xterm: use xterm-addon-webgl instead of xterm-addon-canvas
+* server: resize rows-1/rows on shell attach
+
 # v1.3.0
 
 * upgrade golang to 1.21
