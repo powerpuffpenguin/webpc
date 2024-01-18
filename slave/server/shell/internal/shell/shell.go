@@ -80,13 +80,10 @@ func (s *Shell) Attack(conn Conn, cols, rows uint16) (e error) {
 	if s.conn == nil {
 		s.conn = conn
 		if s.cols == cols && s.rows == rows {
-			// e0 := s.term.SetSize(1, 1)
-			// if e0 == nil {
-			// 	go func() {
-			// 		time.Sleep(time.Second)
-			// 		e = s.term.SetSize(cols, rows)
-			// 	}()
-			// }
+			e0 := s.term.SetSize(cols, rows-1)
+			if e0 == nil {
+				e = s.term.SetSize(cols, rows)
+			}
 		} else {
 			e = s.term.SetSize(cols, rows)
 			s.cols = cols
