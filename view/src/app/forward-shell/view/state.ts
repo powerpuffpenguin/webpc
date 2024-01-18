@@ -50,8 +50,9 @@ export class Shell extends SessionRequest {
     }
     _onConnected() {
         super._onConnected()
-        this.xterm.focus()
-        this.xterm.options.cursorBlink = true
+        const xterm = this.xterm
+        xterm.focus()
+        xterm.options.cursorBlink = true
     }
     _onMessage(ws: WebSocket, resp: any) {
         if (resp.event == "Info") {

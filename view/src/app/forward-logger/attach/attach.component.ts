@@ -2,14 +2,11 @@ import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild, ElementRef } fr
 import { debounceTime, filter, map, takeUntil } from 'rxjs/operators';
 import { SessionService } from 'src/app/core/session/session.service';
 import { Listener } from './listener';
-import { Terminal } from 'xterm';
-import { FitAddon } from 'xterm-addon-fit';
-import { WebLinksAddon } from 'xterm-addon-web-links';
 import { Subject } from 'rxjs';
 import { Closed } from 'src/app/core/utils/closed';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
-import { CanvasAddon } from 'xterm-addon-canvas';
+import { MyTerminal } from 'src/app/core/utils/xterm';
 
 @Component({
   selector: 'logger-attach',
@@ -50,34 +47,26 @@ export class AttachComponent implements OnInit, OnDestroy, AfterViewInit {
   private subject_ = new Subject()
   @ViewChild("xterm")
   xterm: ElementRef | undefined
-  private xterm_: Terminal | undefined
-  private canvas_?: CanvasAddon
+  private xterm_?: MyTerminal
   ngAfterViewInit() {
     // new xterm
-    const xterm = new Terminal({
+    const term = new MyTerminal({
       cursorBlink: true,
       screenReaderMode: true,
       // rendererType: 'canvas',
     })
-    this.xterm_ = xterm
-    // addon
-    const fitAddon = new FitAddon()
-    xterm.loadAddon(fitAddon)
-    xterm.loadAddon(new WebLinksAddon())
-
+    this.xterm_ = term
+    const xterm = term.term!
     xterm.open(this.xterm?.nativeElement)
-    this.canvas_ = new CanvasAddon()
-    xterm.loadAddon(this.canvas_)
 
-    fitAddon.fit()
-    this.xterm_ = xterm
+    term.fit()
 
     // window size change
     this.subject_.pipe(
       debounceTime(100),
       takeUntil(this.closed_.observable),
     ).subscribe((_) => {
-      fitAddon.fit()
+      term.fit()
     })
   }
   onResize() {
@@ -86,8 +75,7 @@ export class AttachComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnDestroy() {
     this.closed_.close()
     this.onClickDetach()
-    this.canvas_?.dispose()
-    this.xterm_?.dispose()
+    this.xterm_?.close()
   }
   onClickAttach() {
     if (this.listener) {

@@ -9,12 +9,10 @@ import { NavigationService } from 'src/app/core/navigation/navigation.service';
 import { SessionService } from 'src/app/core/session/session.service';
 import { Closed } from 'src/app/core/utils/closed';
 import { Terminal } from 'xterm';
-import { CanvasAddon } from 'xterm-addon-canvas';
-import { FitAddon } from 'xterm-addon-fit';
-import { WebLinksAddon } from 'xterm-addon-web-links';
 import { SettingsComponent } from '../dialog/settings/settings.component';
 import { Info, Shell, Target } from './state';
-const DefaultFontFamily = "monospace"
+import { DefaultFontFamily, DefaultFontSize, MyTerminal } from 'src/app/core/utils/xterm';
+
 @Component({
   selector: 'app-view',
   templateUrl: './view.component.html',
@@ -39,12 +37,10 @@ export class ViewComponent implements OnInit, OnDestroy, AfterViewInit {
   get id(): string {
     return this.target_.value.id
   }
-  private xterm_: Terminal | undefined
-  private canvas_?: CanvasAddon
-  private fitAddon_: FitAddon | undefined
+  private xterm_?: MyTerminal
   private textarea_: Document | undefined
   private shell_: Shell | undefined
-  fontSize = 15
+  fontSize = DefaultFontSize
   fontFamily = DefaultFontFamily
   private target_ = new BehaviorSubject<Target>({ id: '', shellid: '' })
   private resize_ = new Subject()
@@ -85,8 +81,7 @@ export class ViewComponent implements OnInit, OnDestroy, AfterViewInit {
       this.shell_.close()
       this.shell_ = undefined
     }
-    this.canvas_?.dispose()
-    this.xterm_?.dispose()
+    this.xterm_?.close()
     this.navigationService.target = ''
   }
   @ViewChild("xterm")
@@ -98,32 +93,27 @@ export class ViewComponent implements OnInit, OnDestroy, AfterViewInit {
       return
     }
     // create xterm
-    const xterm = new Terminal({
+    const term = new MyTerminal({
       cursorBlink: true,
       screenReaderMode: true,
       fontFamily: this.fontFamily,
-      fontSize: 15,
+      fontSize: this.fontSize,
       // rendererType: 'canvas',
     })
-    this.xterm_ = xterm
-    this.fontSize = xterm.options.fontSize ?? 15
+    this.xterm_ = term
+    const xterm = term.term!
 
-    const fitAddon = new FitAddon()
-    this.fitAddon_ = fitAddon
-    xterm.loadAddon(fitAddon)
-    xterm.loadAddon(new WebLinksAddon())
+
     xterm.open(this.xterm.nativeElement)
-    this.canvas_ = new CanvasAddon()
-    xterm.loadAddon(this.canvas_)
     this.textarea_ = this.xterm.nativeElement.querySelector('textarea')
-    fitAddon.fit()
+    term.fit()
 
     // fix resize
     this.resize_.pipe(
       debounceTime(100),
       takeUntil(this.closed_.observable),
     ).subscribe((_) => {
-      fitAddon.fit()
+      term.fit()
     })
 
     xterm.onData((data) => {
@@ -144,8 +134,8 @@ export class ViewComponent implements OnInit, OnDestroy, AfterViewInit {
         this.fontFamily = info.fontFamily
         console.log(`set font`, this.fontFamily)
         xterm.options.fontFamily = this.fontFamily
-        xterm.resize(1, 1)
-        fitAddon.fit()
+        // xterm.resize(1, 1)
+        term.fit()
       }
 
       const target = this.target_.value
@@ -201,10 +191,13 @@ export class ViewComponent implements OnInit, OnDestroy, AfterViewInit {
     }
     this.fontSize = fontSize
 
-    const xterm = this.xterm_
-    const fitAddon = this.fitAddon_
+    const term = this.xterm_
+    if (!term) {
+      return
+    }
+    const xterm = term.term
     const shell = this.shell_
-    if (!xterm || !fitAddon || this.fontSize < 5 || !shell) {
+    if (!xterm || this.fontSize < 5 || !shell) {
       return
     }
     if (fontSize == xterm.options.fontSize) {
@@ -213,39 +206,45 @@ export class ViewComponent implements OnInit, OnDestroy, AfterViewInit {
     xterm.options.fontSize = fontSize
   }
   onClickFontSize() {
-    const xterm = this.xterm_
-    const fitAddon = this.fitAddon_
+    const term = this.xterm_
+    if (!term) {
+      return
+    }
+    const xterm = term.term
     const shell = this.shell_
     const fontSize = this.fontSize
-    if (!xterm || !fitAddon || fontSize < 5 || !shell) {
+    if (!xterm || fontSize < 5 || !shell) {
       return
     }
     if (fontSize == xterm.options.fontSize) {
       return
     }
     xterm.options.fontSize = fontSize
-    fitAddon.fit()
+    term.fit()
     shell.sendFontSize(fontSize)
   }
   onClickFontFamily() {
-    const xterm = this.xterm_
-    const fitAddon = this.fitAddon_
+    const term = this.xterm_
+    if (!term) {
+      return
+    }
+    const xterm = term.term
     const shell = this.shell_
     const fontFamily = this.fontFamily
-    if (!xterm || !fitAddon || !shell) {
+    if (!xterm || !shell) {
       return
     }
     if (xterm.options.fontFamily == fontFamily) {
       return
     }
     xterm.options.fontFamily = fontFamily
-    xterm.resize(1, 1)
-    xterm.clear()
-    fitAddon.fit()
+    // xterm.resize(1, 1)
+    // xterm.clear()
+    term.fit()
     shell.sendFontFamily(fontFamily)
   }
   onClickConnect() {
-    const xterm = this.xterm_
+    const xterm = this.xterm_?.term
     if (!xterm) {
       return
     }
@@ -296,20 +295,13 @@ export class ViewComponent implements OnInit, OnDestroy, AfterViewInit {
     this.onResize()
   }
   private _keyboardKeyDown(keyCode: number, key: string, evt: any) {
-    const textarea = this.textarea_
-    const xterm = this.xterm_
-    if (!textarea) {
-      return
-    }
-    textarea.dispatchEvent(new KeyboardEvent('keydown', {
+    this.textarea_?.dispatchEvent(new KeyboardEvent('keydown', {
       keyCode: keyCode,
       key: key,
       code: key,
     } as any))
-    if (xterm) {
-      setTimeout(() => {
-        xterm.focus()
-      }, 0)
-    }
+    setTimeout(() => {
+      this.xterm_?.focus()
+    }, 0)
   }
 }
