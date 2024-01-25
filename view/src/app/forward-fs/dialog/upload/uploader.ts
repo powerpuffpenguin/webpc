@@ -238,6 +238,9 @@ class Task {
         return completer.promise
     }
     get path(): string {
+        if (this.dir.dir.endsWith("/")) {
+            return this.dir.dir + this.file.file.name
+        }
         return this.dir.dir + '/' + this.file.file.name
     }
     private async _init(): Promise<Array<string>> {
@@ -306,6 +309,14 @@ class Task {
     private async _put(i: number, chunk: Chunk) {
         const dir = this.dir
         const buffer = await chunk.arrayBuffer()
+
+        console.log("upload", {
+            id: dir.id,
+            root: dir.root,
+            i: i,
+            path: this.path,
+        })
+        console.log(dir)
         await ServerAPI.forward.v1.fs.child('upload', dir.id, dir.root, i, this.path).post(this.httpClient, buffer).pipe(
             takeUntil(this.closed_.observable)
         ).toPromise()

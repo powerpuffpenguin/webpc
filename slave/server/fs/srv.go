@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/powerpuffpenguin/webpc/db"
@@ -602,6 +603,9 @@ func (s server) Upload(ctx context.Context, req *grpc_fs.UploadRequest) (resp *g
 	userdata, m, e := s.mountUserdataWrite(ctx, req.Root)
 	if e != nil {
 		return
+	}
+	for strings.HasPrefix(req.Path, `//`) {
+		req.Path = req.Path[1:]
 	}
 	resp, e = upload.Upload(m, req)
 	TAG := `forward.fs Upload`
