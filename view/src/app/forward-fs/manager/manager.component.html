@@ -4,6 +4,9 @@
         matTooltip="Movie List">
         <mat-icon>theaters</mat-icon>
     </a>
+    <button mat-icon-button (click)="onContextmenu($event)" i18n-matTooltip matTooltip="Function List Tooltip">
+        <mat-icon>add_box</mat-icon>
+    </button>
 </div>
 
 <div class="view" #box (contextmenu)="onContextmenu($event)" (mousedown)="onStart($event)" (click)="onClick($event)">
